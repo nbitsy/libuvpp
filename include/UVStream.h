@@ -45,9 +45,10 @@ public:
 
     virtual UVStream* OnNewConnection() = 0;
     virtual void OnRead(void *data, int nread)  = 0;
+    virtual void OnAccept(UVStream *client) = 0;
     virtual void OnAccepted(UVStream *server) = 0;
 
-    virtual void OnClose() {}
+    virtual void OnClosed() {}
     virtual void OnShutdown() {}
 
 public:

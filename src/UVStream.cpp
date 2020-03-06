@@ -75,6 +75,7 @@ bool UVStream::Accept(UVStream *client)
     if (_type & EUVS_READ)
         client->BeginRead();
 
+    OnAccept(client);
     client->OnAccepted(this);
     return true;
 }

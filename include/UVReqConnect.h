@@ -3,7 +3,7 @@
 #define UVREQCONNECT_H_
 
 #include "UVReq.h"
-#include "UVTypes.h"
+#include "EndPointAddress.h"
 #include "UVTcp.h"
 
 namespace XNode

@@ -31,7 +31,7 @@ public:
 
     int RawFd() const;
 
-    virtual void OnClose()  = 0;
+    virtual void OnClosed()  = 0;
 
 protected:
     uv_handle_t *_handle;

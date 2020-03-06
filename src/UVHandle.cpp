@@ -4,11 +4,11 @@
 namespace XNode
 {
 
-static void __OnClose(uv_handle_t *handle)
+static void __OnClosed(uv_handle_t *handle)
 {
     UVData* data = (UVData*)handle->data;
     if (data->_self)
-        (((UVHandle*)data->_self))->OnClose();
+        (((UVHandle*)data->_self))->OnClosed();
 }
 
 UVHandle::UVHandle() : _handle(NULL)
@@ -78,7 +78,7 @@ int UVHandle::RawFd() const
 void UVHandle::Close()
 {
     if (_handle != NULL)
-        uv_close(_handle, __OnClose);
+        uv_close(_handle, __OnClosed);
 }
 
 int UVHandle::SendBufferSize() const
