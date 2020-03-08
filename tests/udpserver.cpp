@@ -13,8 +13,7 @@ int main(int argc, char* argv[])
     UVLoop* loop = new UVLoop("Loop");
 
     UVUdp* udp4close = UVUdp::Create(loop);
-    udp4close->Close();
-    // UVUdp::Destroy(udp4close);
+    UVUdp::Destroy(udp4close);
 
     UVUdp* udp = UVUdp::Create(loop);
 

@@ -2,8 +2,8 @@
 #ifndef UVTCP_H_
 #define UVTCP_H_
 
-#include "UVStream.h"
 #include "EndPointAddress.h"
+#include "UVStream.h"
 #include <iostream>
 
 namespace XNode
@@ -14,12 +14,12 @@ class UVLoop;
 class UVTcp : public UVStream
 {
 public:
-    static UVTcp* Create(UVLoop* loop, int flags = AF_UNSPEC)
+    static UVTcp *Create(UVLoop *loop, int flags = AF_UNSPEC)
     {
         return new UVTcp(loop, flags); // TODO:
     }
 
-    static void Destroy(UVTcp* tcp)
+    static void Destroy(UVTcp *tcp)
     {
         if (NULL == tcp)
             return;
@@ -33,11 +33,11 @@ public:
     void SetDelay(bool delay);
     void KeepAlive(bool v, unsigned int delay);
 
-    bool BeginConnect(const std::string& ip, int port);
+    bool BeginConnect(const std::string &ip, int port);
 
-    inline const UVLoop* GetLoop() const { return _loop; }
+    inline const UVLoop *GetLoop() const { return _loop; }
 
-    UVStream* OnNewConnection();
+    UVStream *OnNewConnection();
     void OnAccepted(UVStream *server);
     void OnAccept(UVStream *client);
     virtual void OnConnected();
@@ -46,10 +46,11 @@ public:
     void OnClosed();
     void OnShutdown();
 
+private:
     /**
      * 构造函数和析构函数放这里说明不允许在栈里去构造一个UVTcp对象
     */
-    UVTcp(UVLoop* loop, int flags = AF_UNSPEC);
+    UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
     ~UVTcp();
 };
 

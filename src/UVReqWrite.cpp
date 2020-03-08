@@ -250,7 +250,7 @@ bool UVReqWrite::Begin()
             return true;
     }
 
-    return false;
+    return false; // TODO: 回收自己
 }
 
 void UVReqWrite::OnReq(int status)
