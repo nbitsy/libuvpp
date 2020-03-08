@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     UVTimer::Destroy(timer4close);
 
     UVTimer* timer = UVTimer::Create(loop);
-    timer->Start(1000);
+    timer->Start(1000, 3);
     loop->Run();
 
     UVTimer::Destroy(timer);

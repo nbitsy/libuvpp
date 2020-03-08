@@ -15,7 +15,7 @@ class UVLoop;
 class UVIODevice : public UVHandle
 {
 public:
-    UVIODevice(UVLoop *loop, int flags) : _loop(loop), _flags(flags) {}
+    UVIODevice(UVLoop *loop, int flags) : UVHandle(loop), _flags(flags) {}
     ~UVIODevice() {}
 
     bool Bind(uv_handle_t *handle, const std::string &ip, int port, unsigned int flags = 0);
@@ -44,7 +44,6 @@ protected:
     void InitAddress();
 
 protected:
-    UVLoop *_loop;
     int _flags;
     // local
     union {

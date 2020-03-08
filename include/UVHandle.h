@@ -2,26 +2,28 @@
 #ifndef UVHANDLE_H_
 #define UVHANDLE_H_
 
+#include "uv.h"
 #include "UVDataHelper.h"
 #include "UVLoop.h"
-#include "uv.h"
 
 namespace XNode
 {
 
+class UVLoop;
+
 class UVHandle : public UVDataHelper
 {
 public:
-    UVHandle();
+    UVHandle(UVLoop* loop);
     virtual ~UVHandle();
 
     void SetData(void *data, bool force = false);
     const UVData *GetData() const;
     void ClearData();
 
-    UVLoop* GetLoop() const;
+    inline UVLoop *GetLoop() const { return _loop; }
     template <typename T>
-    inline T *GetHandle() const { return (T *)_handle; }
+    inline T *GetHandle() const { return reinterpret_cast<T *>(_handle); }
 
     bool IsActive() const;
     bool IsClosing() const;
@@ -35,9 +37,10 @@ public:
     /**
      * 完成关闭后调用OnClosed
     */
-    virtual void OnClosed()  = 0;
+    virtual void OnClosed() = 0;
 
 protected:
+    UVLoop* _loop;
     uv_handle_t *_handle;
 };
 

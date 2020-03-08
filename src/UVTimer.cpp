@@ -4,13 +4,13 @@
 namespace XNode
 {
 
-UVTimer::UVTimer(UVLoop *loop) : UVHandle()
+UVTimer::UVTimer(UVLoop *loop) : UVHandle(loop)
 {
     _handle = (uv_handle_t *)malloc(sizeof(uv_timer_t)); // TODO:
-    if (_handle != NULL && loop != NULL && loop->GetHandle<uv_loop_t>() != NULL)
+    if (_handle != NULL && _loop != NULL && _loop->GetLoop<uv_loop_t>() != NULL)
     {
         uv_handle_set_data(_handle, NULL);
-        uv_timer_init(loop->GetHandle<uv_loop_t>(), GetHandle<uv_timer_t>());
+        uv_timer_init(_loop->GetLoop<uv_loop_t>(), GetHandle<uv_timer_t>());
         SetData(&_timestamp);
     }
     std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
@@ -58,6 +58,22 @@ void UVTimer::Stop()
 
     uv_timer_stop(GetHandle<uv_timer_t>());
     Close();
+}
+
+void UVTimer::SetRepeat(unsigned long long repeat)
+{
+    if (NULL == _handle)
+        return;
+
+    uv_timer_set_repeat(GetHandle<uv_timer_t>(), repeat);
+}
+
+unsigned long long UVTimer::GetRepeat() const
+{
+    if (NULL == _handle)
+        return 0;
+
+    return uv_timer_get_repeat(GetHandle<uv_timer_t>());
 }
 
 void UVTimer::OnClosed()

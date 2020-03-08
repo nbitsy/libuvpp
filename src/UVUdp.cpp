@@ -10,7 +10,7 @@ UVUdp::UVUdp(UVLoop *loop, int flags) : UVIODevice(loop, flags)
     if (_handle != NULL)
     {
         std::cout << "Malloc @" << (void*)_handle << std::endl;
-        uv_udp_init_ex(_loop->GetHandle<uv_loop_t>(), (uv_udp_t *)_handle, flags);
+        uv_udp_init_ex(_loop->GetLoop<uv_loop_t>(), (uv_udp_t *)_handle, flags);
     }
 
     SetData(NULL);

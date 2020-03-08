@@ -21,7 +21,7 @@ static void __OnClosed(uv_handle_t *handle)
     // free(handle); // TODO:
 }
 
-UVHandle::UVHandle() : _handle(NULL)
+UVHandle::UVHandle(UVLoop* loop) : _loop(loop), _handle(NULL)
 {
 }
 
@@ -51,6 +51,7 @@ void UVHandle::ClearData()
     UVDataHelper::ClearData(_handle);
 }
 
+#if 0
 UVLoop* UVHandle::GetLoop() const
 {
     if (NULL == _handle)
@@ -66,6 +67,7 @@ UVLoop* UVHandle::GetLoop() const
     
     return (UVLoop*)pdata->_self;
 }
+#endif
 
 bool UVHandle::IsActive() const
 {

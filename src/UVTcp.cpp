@@ -11,7 +11,7 @@ UVTcp::UVTcp(UVLoop *loop, int flags) : UVStream(loop, flags)
     if (_handle != NULL)
     {
         std::cout << "Malloc @" << (void*)_handle << std::endl;
-        uv_tcp_init_ex(_loop->GetHandle<uv_loop_t>(), (uv_tcp_t *)_handle, flags);
+        uv_tcp_init_ex(_loop->GetLoop<uv_loop_t>(), (uv_tcp_t *)_handle, flags);
     }
 
     SetData(NULL);

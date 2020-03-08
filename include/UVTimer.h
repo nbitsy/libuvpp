@@ -32,6 +32,9 @@ public:
     bool Start(uint64_t repeat = 5, uint64_t timeout = 0);
     void Stop();
 
+    void SetRepeat(unsigned long long repeat);
+    unsigned long long GetRepeat() const;
+
     void OnClosed();
     virtual void Tick(Timestamp* now);
 

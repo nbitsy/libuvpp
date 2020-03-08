@@ -30,14 +30,14 @@ public:
     static UVLoop *DefaultLoop();
 
     template <typename T>
-    T *GetHandle() { return (T *)_loop; }
+    T *GetLoop() { return reinterpret_cast<T *>(_loop); }
 
     std::thread::id ThreadId() const { return _threadId; }
 
 protected:
+    uv_loop_t *_loop;
     std::string _name;
     std::thread::id _threadId;
-    uv_loop_t *_loop;
 };
 
 } // namespace XNode
