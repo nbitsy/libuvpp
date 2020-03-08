@@ -17,12 +17,12 @@ YAdSYM = $(dSYM:.c=.dSYM)
 
 all: .libuv .libuvpp $(YAFFS)
 
-$(YAFFS): ../lib/libuv.a ../lib/libuv++.a
+$(YAFFS): ../lib/libuv.a ../lib/libuvpp.a
 
 .libuv : ../lib/libuv.a
 	make -C ..
 
-.libuvpp : ../lib/libuv++.a
+.libuvpp : ../lib/libuvpp.a
 
 clean:
 	make clean -C ..

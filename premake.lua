@@ -1,10 +1,10 @@
-solution "LIBUV++"
+solution "LIBUVPP"
     location ".build"
     language "C++"
     objdir ".obj"
     configurations { "DebugLib", "ReleaseLib" }
 
-project "uv++"
+project "uvpp"
     kind "StaticLib" -- ConsoleApp,SharedLib,StaticLib
     files { "**.cpp", "**.c", "**.h", "**.hpp" }
     excludes { "tests/*" }
