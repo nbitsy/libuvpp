@@ -17,6 +17,7 @@ public:
 
     void SetData(void *data, bool force = false);
     const UVData *GetData() const;
+    void ClearData();
 
     UVLoop* GetLoop() const;
     template <typename T>
@@ -31,6 +32,9 @@ public:
 
     int RawFd() const;
 
+    /**
+     * 完成关闭后调用OnClosed
+    */
     virtual void OnClosed()  = 0;
 
 protected:

@@ -5,17 +5,22 @@
 namespace XNode
 {
 
-UVTcp::UVTcp(UVLoop *loop) : _loop(loop), _af(AF_MAX), _flags(0)
+UVTcp::UVTcp(UVLoop *loop, int flags) : UVStream(loop, flags)
 {
-    _handle = (uv_handle_t *)malloc(sizeof(uv_tcp_t));
+    _handle = (uv_handle_t *)malloc(sizeof(uv_tcp_t)); // TODO:
     if (_handle != NULL)
-        uv_tcp_init(_loop->GetHandle<uv_loop_t>(), (uv_tcp_t *)_handle);
+    {
+        std::cout << "Malloc @" << (void*)_handle << std::endl;
+        uv_tcp_init_ex(_loop->GetHandle<uv_loop_t>(), (uv_tcp_t *)_handle, flags);
+    }
 
     SetData(NULL);
+    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
 }
 
 UVTcp::~UVTcp()
 {
+    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void UVTcp::SetDelay(bool delay)
@@ -28,31 +33,9 @@ void UVTcp::KeepAlive(bool v, unsigned int delay)
     uv_tcp_keepalive(GetHandle<uv_tcp_t>(), v, delay);
 }
 
-bool UVTcp::Bind(const std::string &ip, int port, int af, unsigned int flags)
+bool UVTcp::Bind(const std::string &ip, int port, unsigned int flags)
 {
-    struct sockaddr *addr = NULL;
-    if (af == AF_INET6)
-    {
-        uv_ip6_addr(ip.c_str(), port, &_addr6);
-        addr = (struct sockaddr *)&_addr6;
-    }
-    else
-    {
-        uv_ip4_addr(ip.c_str(), port, &_addr);
-        addr = (struct sockaddr *)&_addr;
-    }
-
-    if (NULL == addr)
-        return false;
-
-    if (!uv_tcp_bind(GetHandle<uv_tcp_t>(), addr, flags))
-    {
-        _af = af;
-        _flags = flags;
-        return true;
-    }
-
-    return false;
+    return UVIODevice::Bind(GetHandle<uv_handle_t>(), ip, port, flags);
 }
 
 void UVTcp::OnAccept(UVStream *client)
@@ -61,32 +44,6 @@ void UVTcp::OnAccept(UVStream *client)
         return;
 
     ((UVTcp *)client)->InitAddress();
-}
-
-void UVTcp::InitAddress()
-{
-    struct sockaddr_in *addr = NULL;
-    int len = sizeof(_addr);
-    if (_af == AF_INET6)
-    {
-        addr = (struct sockaddr_in *)&_addr6;
-        len = sizeof(_addr6);
-    }
-    else
-        addr = (struct sockaddr_in *)&_addr;
-
-    uv_tcp_getsockname(GetHandle<uv_tcp_t>(), (struct sockaddr *)addr, &len);
-
-    len = sizeof(_addr);
-    if (_af == AF_INET6)
-    {
-        addr = (struct sockaddr_in *)&_addr6Peer;
-        len = sizeof(_addr6);
-    }
-    else
-        addr = (struct sockaddr_in *)&_addrPeer;
-
-    uv_tcp_getpeername(GetHandle<uv_tcp_t>(), (struct sockaddr *)addr, &len);
 }
 
 bool UVTcp::BeginConnect(const std::string &ip, int port)
@@ -98,69 +55,43 @@ bool UVTcp::BeginConnect(const std::string &ip, int port)
     return false;
 }
 
-void UVTcp::GetAddress(int type, EndPointAddress &address) const
-{
-    char ip[128] = {
-        0,
-    };
-    const struct sockaddr_in *addr = NULL;
-    if (type == 0)
-    {
-        addr = &_addr;
-        if (addr->sin_family == AF_INET6)
-            addr = (const struct sockaddr_in *)&_addr6;
-    }
-    else
-    {
-        addr = &_addrPeer;
-        if (addr->sin_family == AF_INET6)
-            addr = (const struct sockaddr_in *)&_addr6Peer;
-    }
-
-    if (addr->sin_family == AF_INET)
-        uv_ip4_name(addr, ip, sizeof(ip));
-    else if (_addr.sin_family == AF_INET6)
-        uv_ip6_name((const struct sockaddr_in6 *)addr, ip, sizeof(ip));
-
-    address._ip = ip;
-    address._port = ntohs(addr->sin_port);
-}
-
-const EndPointAddress UVTcp::LocalAddress() const
-{
-    EndPointAddress address;
-    GetAddress(0, address);
-    return address;
-}
-
-const EndPointAddress UVTcp::RemoteAddress() const
-{
-    EndPointAddress address;
-    GetAddress(1, address);
-    return address;
-}
-
 UVStream *UVTcp::OnNewConnection()
 {
-    std::cout << __FUNCTION__ << std::endl;
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     auto tcp = new UVTcp((UVLoop *)GetLoop());
     return tcp;
 }
 
+void UVTcp::OnConnected()
+{
+    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " Connected To => " << RemoteAddress().ToString() << std::endl;
+    const char *msg = "hello";
+    Write((void *)msg, 5);
+}
+
 void UVTcp::OnRead(void *data, int nread)
 {
-    std::cout << __FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
+    std::cout << __PRETTY_FUNCTION__ << " RECV FROM " << RemoteAddress().ToString() << std::endl;
     std::cout << "data: " << (char *)data << " len: " << nread << std::endl;
 }
 
 void UVTcp::OnAccepted(UVStream *server)
 {
-    std::cout << __FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
+    std::cout << __PRETTY_FUNCTION__ << " " << RemoteAddress().ToString() << " => " << LocalAddress().ToString() << std::endl;
 }
 
+/**
+ * 对于一个UVHandle对象来说，因为只有被关闭后才可以释放
+*/
 void UVTcp::OnClosed()
 {
-    std::cout << __FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
+    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
+    delete this;
+}
+
+void UVTcp::OnShutdown()
+{
+    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
 }
 
 } // namespace XNode

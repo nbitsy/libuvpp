@@ -1,4 +1,6 @@
 
+.PHONY: .libuv .libuvpp
+
 LIB=-L../lib
 INCL=-I../include
 
@@ -13,10 +15,16 @@ YAFFS := $(FFS:.c=)
 dSYM := $(FF:.cpp=.dSYM)
 YAdSYM = $(dSYM:.c=.dSYM)
 
-all: $(YAFFS)
+all: .libuv .libuvpp $(YAFFS)
 
-$(YAFFS) : ../lib/libuv.a ../lib/libuv++.a
+$(YAFFS): ../lib/libuv.a ../lib/libuv++.a
+
+.libuv : ../lib/libuv.a
+	make -C ..
+
+.libuvpp : ../lib/libuv++.a
 
 clean:
+	make clean -C ..
 	rm -rf $(YAFFS:.c=) $(YAdSYM) .DS_Store
 

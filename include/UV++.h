@@ -3,7 +3,6 @@
 #define UV_PP_H_
 
 #include "uv.h"
-#include "UVTypes.h"
 #include "UVLoop.h"
 #include "UVHandle.h"
 #include "UVReq.h"

@@ -19,7 +19,7 @@ UVLoop::UVLoop(const std::string &name, bool useDefault) : _name(name), _loop(NU
         SetGC(false);
     }
     else
-        _loop = uv_loop_new();
+        _loop = (uv_loop_t*)malloc(sizeof(*_loop)); // TODO:
 
     if (_loop != NULL)
     {
@@ -35,17 +35,15 @@ UVLoop::~UVLoop()
 {
     if (_loop != NULL)
     {
-        if (GetData() != NULL)
-            delete GetData(); // TODO:
+        ClearData();
 
         if (GetGC())
         {
-            uv_loop_delete(_loop);
+            uv_loop_close(_loop);
+            free(_loop); // TODO:
         }
         else
-        {
             uv_loop_close(_loop);
-        }
 
         _loop = NULL;
     }
@@ -56,14 +54,14 @@ void UVLoop::SetData(void *data, bool force)
     UVDataHelper::SetData(_loop, data, force);
 }
 
-const UVData *UVLoop::GetData() const
+UVData *UVLoop::GetData() const
 {
     return UVDataHelper::GetData(_loop);
 }
 
 void UVLoop::ClearData()
 {
-    SetData(NULL, true);
+    UVDataHelper::ClearData(_loop);
 }
 
 void UVLoop::Run()

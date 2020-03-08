@@ -14,49 +14,43 @@ class UVLoop;
 class UVTcp : public UVStream
 {
 public:
-    UVTcp(UVLoop* loop);
-    ~UVTcp();
+    static UVTcp* Create(UVLoop* loop, int flags = AF_UNSPEC)
+    {
+        return new UVTcp(loop, flags); // TODO:
+    }
+
+    static void Destroy(UVTcp* tcp)
+    {
+        if (NULL == tcp)
+            return;
+        tcp->Close();
+    }
+
+public:
+    bool Bind(const std::string &ip, int port, unsigned int flags = 0);
 
     inline void SetNoDelay() { SetDelay(false); }
     void SetDelay(bool delay);
     void KeepAlive(bool v, unsigned int delay);
 
-    bool Bind(const std::string &ip, int port, int af = AF_INET, unsigned int flags = 0);
     bool BeginConnect(const std::string& ip, int port);
 
-    const EndPointAddress LocalAddress() const;
-    const EndPointAddress RemoteAddress() const;
-
     inline const UVLoop* GetLoop() const { return _loop; }
-    inline int GetAf() const { return _af; }
 
     UVStream* OnNewConnection();
     void OnAccepted(UVStream *server);
     void OnAccept(UVStream *client);
-    virtual void OnConnected() {}
+    virtual void OnConnected();
 
     void OnRead(void *data, int nread);
     void OnClosed();
-    void OnShutdown() {}
+    void OnShutdown();
 
-private:
-    void InitAddress();
-    void GetAddress(int type, EndPointAddress& address) const;
-
-private:
-    UVLoop* _loop;
-    int _af;
-    unsigned int _flags;
-    // local
-    union {
-        struct sockaddr_in _addr;
-        struct sockaddr_in6 _addr6;
-    };
-    // peer
-    union {
-        struct sockaddr_in _addrPeer;
-        struct sockaddr_in6 _addr6Peer;
-    };
+    /**
+     * 构造函数和析构函数放这里说明不允许在栈里去构造一个UVTcp对象
+    */
+    UVTcp(UVLoop* loop, int flags = AF_UNSPEC);
+    ~UVTcp();
 };
 
 } // namespace XNode

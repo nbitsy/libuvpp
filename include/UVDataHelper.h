@@ -3,6 +3,7 @@
 #define UVDATAHELPER_H_
 
 #include "uv.h"
+#include <iostream> // TODO: for test
 
 namespace XNode
 {
@@ -18,11 +19,16 @@ enum UVDataType
 // TODO：对象池
 struct UVData
 {
-    UVData() : _self(NULL), _data(NULL) {}
-    UVData(void *self, void *data) : _self(self), _data(data) {}
+    static UVData *Create();
+    static void Destroy(UVData *);
 
     void *_self; // 本对象的原始对象
     void *_data; // 外部数据
+
+private:
+    UVData() : _self(NULL), _data(NULL) {}
+    UVData(void *self, void *data) : _self(self), _data(data) {}
+    ~UVData() { std::cout << __PRETTY_FUNCTION__ << " _self: " << _self << " _data: " << _data << std::endl; } // TODO: for test
 };
 
 class UVDataHelper
@@ -53,6 +59,22 @@ public:
     }
 
     template <typename T>
+    void ClearData(T *target);
+
+    inline void ClearData(uv_loop_t *target)
+    {
+        ClearData(target, UVDT_LOOP);
+    }
+    inline void ClearData(uv_handle_t *target)
+    {
+        ClearData(target, UVDT_HANDLE);
+    }
+    inline void ClearData(uv_req_t *target)
+    {
+        ClearData(target, UVDT_REQ);
+    }
+
+    template <typename T>
     UVData *GetData(T *target) const;
 
     inline UVData *GetData(uv_loop_t *target) const
@@ -71,8 +93,23 @@ public:
     inline void SetGC(bool gc = true) { _bgc = gc; }
     inline bool GetGC() const { return _bgc; }
 
+    static void BufAlloc(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf);
+    static void BufFree(const uv_buf_t *buf);
+
+    static uv_loop_t *LoopAlloc();
+    static void LoopFree(uv_loop_t *loop);
+
+    template <typename T>
+    static T *HandleAlloc();
+    static void HandleFree(uv_handle_t *handle);
+
+    template <typename T>
+    static T *ReqAlloc();
+    static void ReqFree(uv_req_t *req);
+
 private:
     void SetData(void *target, void *data, bool force, int type);
+    void ClearData(void *target, int type);
     UVData *GetData(void *target, int type) const;
 
 private:

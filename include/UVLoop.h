@@ -16,7 +16,7 @@ public:
     virtual ~UVLoop();
 
     void SetData(void *data, bool force = false);
-    const UVData *GetData() const;
+    UVData *GetData() const;
     void ClearData();
 
     void Run();

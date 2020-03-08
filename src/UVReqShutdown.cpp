@@ -7,9 +7,9 @@ namespace XNode
 
 void __OnShutdown(uv_shutdown_t *req, int status)
 {
-    UVData *data = (UVData *)uv_req_get_data((uv_req_t *)req);
-    if (data != NULL && data->_self != NULL)
-        ((UVReqShutdown *)data->_self)->OnReq(status);
+    UVData *uvdata = (UVData *)uv_req_get_data((uv_req_t *)req);
+    if (uvdata != NULL && uvdata->_self != NULL)
+        ((UVReqShutdown *)uvdata->_self)->OnReq(status);
 }
 
 UVReqShutdown::UVReqShutdown(UVStream *stream)

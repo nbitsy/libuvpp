@@ -14,7 +14,7 @@ public:
     virtual ~UVReq();
 
     void SetData(void *data, bool force = false);
-    const UVData *GetData() const;
+    UVData *GetData() const;
 
     template <typename T>
     inline T *GetReq() { return (T *)_req; }
