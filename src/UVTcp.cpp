@@ -46,11 +46,11 @@ void UVTcp::OnAccept(UVStream *client)
     ((UVTcp *)client)->InitAddress();
 }
 
-bool UVTcp::BeginConnect(const std::string &ip, int port)
+bool UVTcp::StartConnect(const std::string &ip, int port)
 {
     UVReqConnect *req = new UVReqConnect(this, ip, port); // TODO:
     if (req != NULL)
-        return req->Begin();
+        return req->Start();
 
     return false;
 }

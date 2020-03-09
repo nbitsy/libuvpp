@@ -29,7 +29,7 @@ UVReqConnect::~UVReqConnect()
 {
 }
 
-bool UVReqConnect::Begin()
+bool UVReqConnect::Start()
 {
     if (NULL == _req || NULL == _handle)
         return false;

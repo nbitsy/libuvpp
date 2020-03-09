@@ -19,7 +19,7 @@ public:
     template <typename T>
     inline T *GetReq() { return (T *)_req; }
 
-    virtual bool Begin() = 0;
+    virtual bool Start() = 0;
     virtual void OnReq(int status) = 0;
 
 protected:

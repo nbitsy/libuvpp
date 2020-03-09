@@ -4,13 +4,12 @@ extern "C" {
 #include <stdlib.h>
 }
 
-#include "UVLoop.h"
+#include "UVBuf.h"
 
 using namespace XNode;
 
 int main(int argc, char* argv[])
 {
-    UVLoop loop("Hello");
-    loop.Start();
+
 	return 0;
 }

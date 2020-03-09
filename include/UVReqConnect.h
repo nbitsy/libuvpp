@@ -16,7 +16,7 @@ public:
     UVReqConnect(UVTcp* handle, const std::string& ip, int port);
     ~UVReqConnect();
 
-    bool Begin();
+    bool Start();
     void OnReq(int status);
 
 private:

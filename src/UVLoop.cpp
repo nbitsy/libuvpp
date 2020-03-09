@@ -43,7 +43,9 @@ UVLoop::~UVLoop()
             free(_loop); // TODO:
         }
         else
+        {
             uv_loop_close(_loop);
+        }
 
         _loop = NULL;
     }
@@ -64,19 +66,19 @@ void UVLoop::ClearData()
     UVDataHelper::ClearData(_loop);
 }
 
-void UVLoop::Run()
+void UVLoop::Start()
 {
     if (_loop != NULL)
         uv_run(_loop, UV_RUN_DEFAULT);
 }
 
-void UVLoop::RunOnce()
+void UVLoop::StartOnce()
 {
     if (_loop != NULL)
         uv_run(_loop, UV_RUN_ONCE);
 }
 
-void UVLoop::RunNowait()
+void UVLoop::StartNowait()
 {
     if (_loop != NULL)
         uv_run(_loop, UV_RUN_NOWAIT);

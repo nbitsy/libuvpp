@@ -4,13 +4,16 @@ extern "C" {
 #include <stdlib.h>
 }
 
-#include "UVLoop.h"
+#include "MemPool.h"
 
 using namespace XNode;
 
 int main(int argc, char* argv[])
 {
-    UVLoop loop("Hello");
-    loop.Start();
+    MemPool<> pool;
+
+    void* p = pool.AllocBlock(1);
+    pool.FreeBlock(p);
+
 	return 0;
 }

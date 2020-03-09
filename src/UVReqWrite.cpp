@@ -187,7 +187,7 @@ UVReqWrite::~UVReqWrite()
     }
 }
 
-bool UVReqWrite::Begin()
+bool UVReqWrite::Start()
 {
     if (NULL == _req || NULL == _uviodevice)
         return false; // TODO: 回收自己

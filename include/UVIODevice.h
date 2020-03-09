@@ -19,8 +19,8 @@ public:
     ~UVIODevice() {}
 
     bool Bind(uv_handle_t *handle, const std::string &ip, int port, unsigned int flags = 0);
+    bool StartRead();
     bool StopRead();
-    bool BeginRead();
 
     bool Write(void *data, int nsize, UVIODevice *other = NULL, const struct sockaddr *addr = NULL);
     bool Write(void *bufs[], int nbuf, UVIODevice *other = NULL, const struct sockaddr *addr = NULL);

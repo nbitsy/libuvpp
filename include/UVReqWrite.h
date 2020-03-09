@@ -53,7 +53,7 @@ public:
 
     ~UVReqWrite();
 
-    bool Begin();
+    bool Start();
     void OnReq(int status);
 
 private:

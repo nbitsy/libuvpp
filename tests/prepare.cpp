@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
     UVPrepare* obj = new UVPrepare(loop);
     obj->Start();
-    loop->Run();
+    loop->Start();
 
     obj->Stop();
     delete loop;

@@ -50,7 +50,7 @@ bool UVStream::Accept(UVStream *client)
         return false;
 
     if (_type & EUVS_READ)
-        client->BeginRead();
+        client->StartRead();
 
     OnAccept(client);
     client->OnAccepted(this);
@@ -88,7 +88,7 @@ bool UVStream::Shutdown()
 
     UVReqShutdown *req = new UVReqShutdown(this);
     if (req)
-        return req->Begin();
+        return req->Start();
 
     return false;
 }

@@ -26,5 +26,5 @@ project "uvpp"
 
     linkoptions { "-g3" }
     buildoptions { "-std=c++11" }
-    links { "uv" }
+    links { "uv", "tcmalloc_minimal" }
 

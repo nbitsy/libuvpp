@@ -15,7 +15,7 @@ public:
     UVReqShutdown(UVStream* stream);
     ~UVReqShutdown();
 
-    bool Begin();
+    bool Start();
     void OnReq(int status);
 
 private:

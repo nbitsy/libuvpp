@@ -20,7 +20,7 @@ UVReqShutdown::~UVReqShutdown()
 {
 }
 
-bool UVReqShutdown::Begin()
+bool UVReqShutdown::Start()
 {
     if (NULL == _req || NULL == _stream)
         return false;

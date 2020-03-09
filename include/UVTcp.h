@@ -33,7 +33,7 @@ public:
     void SetDelay(bool delay);
     void KeepAlive(bool v, unsigned int delay);
 
-    bool BeginConnect(const std::string &ip, int port);
+    bool StartConnect(const std::string &ip, int port);
 
     inline const UVLoop *GetLoop() const { return _loop; }
 

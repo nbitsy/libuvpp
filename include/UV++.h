@@ -11,7 +11,9 @@
 #include "UVStream.h"
 #include "UVTcp.h"
 #include "UVUdp.h"
-
+#include "UVTimer.h"
+#include "UVIdle.h"
+#include "UVPrepare.h"
 
 namespace XNode
 {

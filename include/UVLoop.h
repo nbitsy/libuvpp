@@ -19,9 +19,9 @@ public:
     UVData *GetData() const;
     void ClearData();
 
-    void Run();
-    void RunOnce();
-    void RunNowait();
+    void Start();
+    void StartOnce();
+    void StartNowait();
     void StopLoop();
 
     int RawFd() const;

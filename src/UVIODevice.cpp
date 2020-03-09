@@ -177,7 +177,7 @@ const EndPointAddress UVIODevice::RemoteAddress(const struct sockaddr *remote) c
     return address;
 }
 
-bool UVIODevice::BeginRead()
+bool UVIODevice::StartRead()
 {
     if (NULL == _handle)
         return false;
@@ -218,7 +218,7 @@ bool UVIODevice::Write(void *data, int nsize, UVIODevice *other, const struct so
 
     UVReqWrite *req = new UVReqWrite(this, other, data, nsize);
     if (req != NULL)
-        return req->Begin();
+        return req->Start();
 
     return false;
 }
@@ -230,7 +230,7 @@ bool UVIODevice::Write(void *bufs[], int nbuf, UVIODevice *other, const struct s
 
     UVReqWrite *req = new UVReqWrite(this, other, bufs, nbuf);
     if (req != NULL)
-        return req->Begin();
+        return req->Start();
 
     return false;
 }

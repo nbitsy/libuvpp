@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
     tcp->Bind("127.0.0.1", 13300);
     tcp->Listen(10000);
-    loop->Run();
+    loop->Start();
 
     UVTcp::Destroy(tcp);
     delete loop;

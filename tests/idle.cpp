@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
     UVIdle* obj = new UVIdle(loop);
     obj->Start();
-    loop->Run();
+    loop->Start();
 
     obj->Stop();
     delete loop;
