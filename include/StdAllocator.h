@@ -1,6 +1,6 @@
 
-#ifndef STDALLOCTOR_H_
-#define STDALLOCTOR_H_
+#ifndef STDALLOCATOR_H_
+#define STDALLOCATOR_H_
 
 #include <stdlib.h> // XXX: for malloc,free
 #include <cstdlib> // XXX: for std::size_t
@@ -9,7 +9,7 @@
 namespace XNode
 {
 
-class StdAlloctor
+class StdAllocator
 {
 public:
     typedef std::size_t size_type;
@@ -22,7 +22,7 @@ public:
 
 } // namespace XNode
 
-#endif // STDALLOCTOR_H_
+#endif // STDALLOCATOR_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

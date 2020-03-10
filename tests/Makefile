@@ -4,8 +4,8 @@
 LIB=-L../lib
 INCL=-I../include
 
-CPPFLAGS=-g -Wall -std=c++17 $(INCL)
-CFLAGS=-g -Wall -std=c++17 $(INCL)
+CPPFLAGS=-g -Wall -std=c++17 $(INCL) -D_DEBUG -DUSE_TC_MALLOC
+CFLAGS=-g -Wall -std=c++17 $(INCL) -D_DEBUG -DUSE_TC_MALLOC
 LDFLAGS=$(LIB)
 
 FF := $(shell find * -name "*.cpp")

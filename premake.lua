@@ -16,11 +16,13 @@ project "uvpp"
     configuration { "DebugLib" }
         symbols "On"
         defines "_DEBUG"
+        defines { "USE_TC_MALLOC" }
         targetdir "lib"
         buildoptions { "-g3" }
 
     configuration { "ReleaseLib" }
         symbols "On"
+        defines { "USE_TC_MALLOC" }
         targetdir "lib"
         buildoptions { "-O3" }
 
