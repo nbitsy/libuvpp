@@ -37,7 +37,11 @@ void UVTimer::Release()
     if (NULL == loop)
         return;
 
+    ClearData();
     loop->Destroy((uv_timer_t*)_handle);
+    if (GetGC())
+        delete this; // TODO:
+
     _handle = NULL;
 }
 

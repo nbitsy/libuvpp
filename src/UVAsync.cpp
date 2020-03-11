@@ -48,7 +48,11 @@ void UVAsync::Release()
         return;
     }
 
+    ClearData();
     loop->Destroy((uv_async_t*)_handle);
+    if (GetGC())
+        delete this; // TODO:
+
     _handle = NULL;
 }
 

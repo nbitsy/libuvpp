@@ -11,10 +11,6 @@ UVReq::UVReq(bool gc) : _req(NULL)
 
 UVReq::~UVReq()
 {
-    UVData* uvdata = GetData();
-    UVLoop* loop = GetLoop();
-    if (uvdata != NULL && loop != NULL)
-        loop->Destroy(uvdata);
 }
 
 void UVReq::SetData(void *data, bool force)
@@ -25,6 +21,11 @@ void UVReq::SetData(void *data, bool force)
 UVData *UVReq::GetData() const
 {
     return UVDataHelper::GetData(_req);
+}
+
+void UVReq::ClearData()
+{
+    UVDataHelper::ClearData(_req);
 }
 
 } // namespace XNode

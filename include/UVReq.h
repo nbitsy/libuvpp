@@ -16,6 +16,8 @@ public:
     void SetData(void *data, bool force = false);
     UVData *GetData() const;
 
+    void ClearData();
+
     template <typename T>
     inline T *GetReq() { return (T *)_req; }
 

@@ -41,7 +41,11 @@ void UVPrepare::Release()
     if (NULL == _handle)
         return;
 
+    ClearData();
     Allocator::free(_handle);
+    if (GetGC())
+        delete this; // TODO:
+
     _handle = NULL;
 }
 

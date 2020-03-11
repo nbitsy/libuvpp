@@ -13,14 +13,9 @@ static void __OnClosed(uv_handle_t *handle)
 
     UVHandle* uvhandle = (UVHandle*)data->_self;
     if (data != NULL && uvhandle)
-    {
         uvhandle->OnClosed();
-        uvhandle->ClearData();
-    }
 
     DEBUG("Free @%p\n", handle);
-    // ??? 没有地方会释放这个对象了，只能在这里???
-    // free(handle); // TODO:
 
     // 如果没用调用到Release可能会导致资源泄漏
     if (uvhandle != NULL)

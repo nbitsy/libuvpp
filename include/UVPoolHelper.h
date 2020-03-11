@@ -16,11 +16,14 @@ public:
         // data
         : _data(100)
           // cpp req
-          , _reqwrite(100)
+          ,
+          _reqwrite(100)
           // uv req
-          , _uvconnect(100), _uvwrite(10), _uvudpsend(10)
+          ,
+          _uvconnect(100), _uvwrite(10), _uvudpsend(10)
           // uv handle
-          , _uvtcp(50), _uvudp(10), _uvtimer(100), _uvasync(10)
+          ,
+          _uvtcp(50), _uvudp(10), _uvtimer(100), _uvasync(10)
     {
     }
 
@@ -35,6 +38,12 @@ public:
     T *Construct(T * = NULL) { return GetPool<T>((T *)NULL).Construct(); }
     template <typename T>
     void Destroy(T *p) { GetPool<T>((T *)NULL).Destroy(p); }
+
+    template <typename T, typename... U>
+    T *Construct2(U... args)
+    {
+        return GetPool<T>((T *)NULL).Construct(args...);
+    }
 
     template <typename T>
     ObjectPool<T> &GetPool(T *);

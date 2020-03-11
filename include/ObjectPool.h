@@ -24,9 +24,27 @@ public:
     explicit ObjectPool(int size);
     ~ObjectPool();
 
-    //template <class ...U>
-    //T *Construct(U ... args);
-    T *Construct();
+    template <typename... U>
+    T *Construct(U... args)
+    {
+        void *p = malloc();
+        if (NULL == p)
+            return NULL;
+
+        DEBUG("Construct @%p\n", p);
+        try
+        {
+            return new (p) T(args...);
+        }
+        catch (...)
+        {
+            free(p);
+            return NULL;
+        }
+
+        return NULL;
+    }
+
     void Destroy(T *obj);
 
     void PrintInfo();
@@ -117,6 +135,7 @@ void ObjectPool<T, Allocator>::free(void *p)
     ++_listcount;
 }
 
+#if 0
 template <typename T, typename Allocator>
 T *ObjectPool<T, Allocator>::Construct()
 {
@@ -137,6 +156,7 @@ T *ObjectPool<T, Allocator>::Construct()
 
     return NULL;
 }
+#endif
 
 template <typename T, typename Allocator>
 void ObjectPool<T, Allocator>::Destroy(T *obj)

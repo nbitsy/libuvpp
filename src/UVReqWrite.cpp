@@ -32,9 +32,6 @@ static void __OnWrite(uv_write_t *req, int status)
 
     uvreqwrite->OnReq(status);
     uvreqwrite->Release();
-
-    // UVData没有回收
-    // req没有回收
 }
 
 static void __OnWriteUDP(uv_udp_send_t *req, int status)
@@ -63,10 +60,6 @@ static void __OnWriteUDP(uv_udp_send_t *req, int status)
 
     uvreqwrite->OnReq(status);
     uvreqwrite->Release();
-}
-
-UVReqWrite::UVReqWrite()
-{
 }
 
 void UVReqWrite::Init(UVIODevice *uviodevice, void *data, int nsize, bool copy)
@@ -139,24 +132,30 @@ void UVReqWrite::Init(UVIODevice *uviodevice, void *bufs[], int nbuf, bool copy)
     InitReq(uviodevice);
 }
 
-void UVReqWrite::Init(UVIODevice *uviodevice, UVIODevice *other, void *data, int nsize, bool copy, bool gc)
+UVReqWrite::UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *data, int nsize, bool copy, bool gc)
+    : UVReq(gc), _bCopye(copy), _uviodevice(uviodevice), _other(other), _bBuffers(false)
 {
-    _bgc = gc;
-    _bCopye = copy;
-    _uviodevice = uviodevice;
-    _other = other;
-    _bBuffers = false;
     Init(uviodevice, data, nsize, copy);
 }
 
-void UVReqWrite::Init(UVIODevice *uviodevice, UVIODevice *other, void *bufs[], int nbuf, bool copy, bool gc)
+UVReqWrite::UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *bufs[], int nbuf, bool copy, bool gc)
+    : UVReq(gc), _bCopye(false), _uviodevice(uviodevice), _other(other), _bBuffers(true)
 {
-    _bgc = gc;
-    _bCopye = false;
-    _uviodevice = uviodevice;
-    _other = other;
-    _bBuffers = true;
     Init(uviodevice, bufs, nbuf, copy);
+}
+
+UVReqWrite::UVReqWrite(UVIODevice *uviodevice, const struct sockaddr *addr, void *data, int nsize, bool copy, bool gc)
+    : UVReq(gc), _bCopye(false), _uviodevice(uviodevice), _bBuffers(false), _other(NULL), _addr(NULL)
+{
+    Init(uviodevice, data, nsize, copy);
+    InitAddress(addr);
+}
+
+UVReqWrite::UVReqWrite(UVIODevice *uviodevice, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy, bool gc)
+    : UVReq(gc), _bCopye(false), _uviodevice(uviodevice), _bBuffers(true), _other(NULL), _addr(NULL)
+{
+    Init(uviodevice, bufs, nbuf, copy);
+    InitAddress(addr);
 }
 
 void UVReqWrite::InitAddress(const struct sockaddr *addr)
@@ -171,30 +170,6 @@ void UVReqWrite::InitAddress(const struct sockaddr *addr)
         if (_addr != NULL)
             *_addr = *addr;
     }
-}
-
-void UVReqWrite::Init(UVIODevice *uviodevice, const struct sockaddr *addr, void *data, int nsize, bool copy, bool gc)
-{
-    _bgc = gc;
-    _bCopye = false;
-    _uviodevice = uviodevice;
-    _bBuffers = false;
-    _other = NULL;
-    _addr = NULL;
-    Init(uviodevice, data, nsize, copy);
-    InitAddress(addr);
-}
-
-void UVReqWrite::Init(UVIODevice *uviodevice, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy, bool gc)
-{
-    _bgc = gc;
-    _bCopye = false;
-    _uviodevice = uviodevice;
-    _bBuffers = true;
-    _other = NULL;
-    _addr = NULL;
-    Init(uviodevice, bufs, nbuf, copy);
-    InitAddress(addr);
 }
 
 UVReqWrite::~UVReqWrite()
@@ -310,6 +285,7 @@ void UVReqWrite::OnReq(int status)
 
 void UVReqWrite::Release()
 {
+    // XXX: 这里释放的顺序不能乱
     if (NULL ==_req)
         return;
 
@@ -320,6 +296,7 @@ void UVReqWrite::Release()
         return;
     }
 
+    ClearData();
     loop->Destroy((uv_write_t*)_req);
     if (GetGC())
         loop->Destroy(this);

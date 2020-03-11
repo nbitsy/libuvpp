@@ -28,7 +28,7 @@ void test1()
 void test2()
 {
     ObjectPool<uv_loop_t> pool(2);
-    uv_loop_t *loop = pool.Construct();
+    uv_loop_t *loop = pool.Construct(); 
     uv_loop_t *loop1 = pool.Construct();
     uv_loop_t *loop2 = pool.Construct();
     uv_loop_t *loop3 = pool.Construct();
@@ -67,12 +67,34 @@ void test3()
     delete pool;
 }
 
+class PoolObj
+{
+public:
+    PoolObj()
+    {
+        DEBUG("\n");
+    }
+    PoolObj(const char* p)
+    {
+        DEBUG("%s\n", p);
+    }
+
+    void* p;
+};
+
+void test4()
+{
+    ObjectPool<PoolObj> _pool(10);
+    PoolObj* p1 = _pool.Construct();
+    PoolObj* p2 = _pool.Construct("YYF");
+}
+
 int main(int argc, char *argv[])
 {
     srandom(time(NULL));
     //test1();
     //test2();
-    test3();
-
+    //test3();
+    test4();
     return 0;
 }

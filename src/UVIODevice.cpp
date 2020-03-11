@@ -1,8 +1,8 @@
 
 #include "UVIODevice.h"
 #include "UVDataHelper.h"
-#include "UVReqWrite.h"
 #include "UVLoop.h"
+#include "UVReqWrite.h"
 
 namespace XNode
 {
@@ -231,12 +231,9 @@ bool UVIODevice::Write(void *data, int nsize, UVIODevice *other, const struct so
         return false;
     }
 
-    UVReqWrite *req = loop->Construct<UVReqWrite>();
+    UVReqWrite *req = loop->Construct2<UVReqWrite>(this, other, data, nsize, false, true);
     if (req != NULL)
-    {
-        req->Init(this, other, data, nsize);
         return req->Start();
-    }
 
     return false;
 }
@@ -253,12 +250,9 @@ bool UVIODevice::Write(void *bufs[], int nbuf, UVIODevice *other, const struct s
         return false;
     }
 
-    UVReqWrite *req = loop->Construct<UVReqWrite>();
+    UVReqWrite *req = loop->Construct2<UVReqWrite>(this, other, bufs, nbuf, false, true);
     if (req != NULL)
-    {
-        req->Init(this, other, bufs, nbuf);
         return req->Start();
-    }
 
     return false;
 }

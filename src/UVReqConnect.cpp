@@ -80,9 +80,10 @@ void UVReqConnect::Release()
     if (NULL == _req)
         return;
 
+    ClearData();
     Allocator::free(_req);
     if (GetGC())
-        delete this; // TODO
+        delete this; // TODO:
 
     _req = NULL;
 }

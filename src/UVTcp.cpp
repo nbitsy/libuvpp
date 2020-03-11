@@ -107,8 +107,11 @@ void UVTcp::Release()
     if (NULL == loop)
         return;
     
+    ClearData();
     loop->Destroy((uv_tcp_t*)_handle);
-    delete this;
+    if (GetGC())
+        delete this; // TODO:
+
     _handle = NULL;
 }
 
