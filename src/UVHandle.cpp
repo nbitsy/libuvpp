@@ -1,5 +1,6 @@
 
 #include "UVHandle.h"
+#include <iostream>
 
 namespace XNode
 {
@@ -10,19 +11,25 @@ static void __OnClosed(uv_handle_t *handle)
     if (NULL == data)
         std::cout << "@" << handle << " 's owner has released already." << std::endl;
 
-    if (data != NULL && data->_self)
+    UVHandle* uvhandle = (UVHandle*)data->_self;
+    if (data != NULL && uvhandle)
     {
-        (((UVHandle*)data->_self))->OnClosed(); // XXX: 必须确保UVHandle对象是在OnClosed之后释放
-        (((UVHandle*)data->_self))->ClearData();
+        uvhandle->OnClosed();
+        uvhandle->ClearData();
     }
-    
-    std::cout << "Free @" << (void*)handle << std::endl;
-    // ??? 没有地方会释放这个对象了，只能在这里
+
+    DEBUG("Free @%p\n", handle);
+    // ??? 没有地方会释放这个对象了，只能在这里???
     // free(handle); // TODO:
+
+    // 如果没用调用到Release可能会导致资源泄漏
+    if (uvhandle != NULL)
+        uvhandle->Release();
 }
 
 UVHandle::UVHandle(UVLoop* loop) : _loop(loop), _handle(NULL)
 {
+    DEBUG("Object @%p\n", this);
 }
 
 UVHandle::~UVHandle()
@@ -34,6 +41,7 @@ UVHandle::~UVHandle()
     */
     Close();
     // XXX: handle本身的回收需要到确定的handle的析构函数里去处理
+    DEBUG("Object @%p\n", this);
 }
 
 void UVHandle::SetData(void *data, bool force)
@@ -52,7 +60,7 @@ void UVHandle::ClearData()
 }
 
 #if 0
-UVLoop* UVHandle::GetLoop() const
+UVLoop* UVHandle::GetLoop()
 {
     if (NULL == _handle)
         return NULL;
@@ -118,6 +126,12 @@ int UVHandle::RecvBufferSize() const
     int value = 0;
     uv_recv_buffer_size(_handle, &value);
     return value;
+}
+
+void UVHandle::Release()
+{
+    DEBUG("Release");
+    delete this; // TODO:
 }
 
 } // namespace XNode

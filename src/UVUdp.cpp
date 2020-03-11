@@ -1,25 +1,28 @@
 
 #include "UVUdp.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
 
 UVUdp::UVUdp(UVLoop *loop, int flags) : UVIODevice(loop, flags)
 {
-    _handle = (uv_handle_t *)malloc(sizeof(uv_udp_t)); // TODO:
+    if (NULL == _loop)
+        return;
+
+    _handle = (uv_handle_t *)_loop->Construct<uv_udp_t>();
     if (_handle != NULL)
     {
-        std::cout << "Malloc @" << (void*)_handle << std::endl;
-        uv_udp_init_ex(_loop->GetLoop<uv_loop_t>(), (uv_udp_t *)_handle, flags);
+        uv_udp_init_ex(_loop->GetRawLoop<uv_loop_t>(), (uv_udp_t *)_handle, flags);
+        uv_handle_set_data(_handle, NULL);
+        SetData(NULL);
     }
-
-    SetData(NULL);
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 UVUdp::~UVUdp()
 {
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 bool UVUdp::Bind(const std::string &ip, int port, unsigned int flags)
@@ -100,8 +103,8 @@ size_t UVUdp::SendQueueCount() const
 // test
 void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags)
 {
-    std::cout << __PRETTY_FUNCTION__ << " RECV FROM " << RemoteAddress(addr).ToString() << std::endl;
-    std::cout << "data: " << (char *)data << " len: " << nread << " flags: " << flags << std::endl;
+    DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str());
+    DEBUG("data: %s len: %d\n", (char*)data, nread);
 }
 
 /**
@@ -109,8 +112,22 @@ void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned 
 */
 void UVUdp::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
-    delete this; // TODO: 
+    DEBUG("RECV FROM %s => %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
+}
+
+void UVUdp::Release()
+{
+    DEBUG("\n");
+    if (NULL == _handle)
+        return;
+
+    auto loop = GetLoop();
+    if (NULL == loop)
+        return;
+    
+    loop->Destroy((uv_udp_t*)_handle);
+    delete this;
+    _handle = NULL;
 }
 
 } // namespace XNode

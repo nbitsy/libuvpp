@@ -17,7 +17,9 @@ public:
 
 public:
     static void *malloc(size_t size) { return ::malloc(size); }
-    static void free(void *p) { ::free(p); }
+    static void *calloc(size_t nmemb, size_t size) { return ::calloc(nmemb, size); }
+    static void *realloc(void* p, size_t size) { return ::realloc(p, size); }
+    static void free(void *p) { return ::free(p); }
 };
 
 } // namespace XNode
@@ -25,4 +27,3 @@ public:
 #endif // STDALLOCATOR_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

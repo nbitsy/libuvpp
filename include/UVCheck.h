@@ -1,6 +1,6 @@
 
-#ifndef UVCHECK_H_
-#define UVCHECK_H_
+#ifndef _UVCHECK_H_
+#define _UVCHECK_H_
 
 #include "UVHandle.h"
 
@@ -19,13 +19,14 @@ public:
     bool Start();
     bool Stop();
 
-    virtual void OnClosed();
+    void OnClosed();
     virtual void OnCheck();
+    void Release();
 };
 
 } // namespace XNode
 
-#endif // UVCHECK_H_
+#endif // _UVCHECK_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

@@ -1,5 +1,7 @@
 
 #include "UVAsync.h"
+#include "Debuger.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
@@ -15,26 +17,44 @@ static void __OnAsync(uv_async_t *async)
         return;
     
     self->OnAsync();
+    self->Release();
 }
 
 UVAsync::UVAsync(UVLoop *loop) : UVHandle(loop)
 {
-    _handle = (uv_handle_t *)malloc(sizeof(uv_async_t));
-    if (_loop != NULL && _handle != NULL)
-        uv_async_init(loop->GetLoop<uv_loop_t>(), (uv_async_t *)_handle, __OnAsync);
+    if (NULL == _loop)
+        return;
 
-    SetData(NULL);
-    std::cout << "Object@" << (void *)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    _handle = (uv_handle_t *)loop->Construct<uv_async_t>();
+    if (_loop != NULL && _handle != NULL)
+    {
+        uv_async_init(loop->GetRawLoop<uv_loop_t>(), (uv_async_t *)_handle, __OnAsync);
+        uv_handle_set_data(_handle, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 UVAsync::~UVAsync()
 {
-    std::cout << "Object@" << (void *)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
+}
+
+void UVAsync::Release()
+{
+    auto loop = GetLoop();
+    if (NULL == loop)
+    {
+        return;
+    }
+
+    loop->Destroy((uv_async_t*)_handle);
+    _handle = NULL;
 }
 
 bool UVAsync::Send()
 {
-    if (NULL == _loop || _loop->GetLoop<uv_loop_t>() == NULL || NULL == _handle)
+    if (NULL == _loop || _loop->GetRawLoop<uv_loop_t>() == NULL || NULL == _handle)
         return false;
 
     if (!uv_is_closing(_handle))
@@ -45,12 +65,12 @@ bool UVAsync::Send()
 
 void UVAsync::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("")
 }
 
 void UVAsync::OnAsync()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("")
 }
 
 } // namespace XNode

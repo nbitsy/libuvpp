@@ -5,11 +5,8 @@
 #include <new>      // XXX: for std::ptrdiff_t
 #include <stdlib.h> // XXX: for NULL
 
+#include "Allocator.h"
 #include "Debuger.h"
-#include "StdAllocator.h"
-#ifdef USE_TC_MALLOC
-#include "TCAllocator.h"
-#endif
 
 #include <iostream>
 
@@ -41,7 +38,7 @@ struct MemPoolBlock
 
 struct MemPoolBin
 {
-    void* _freelist;
+    void *_freelist;
     int _count;
 };
 
@@ -63,7 +60,7 @@ struct MemPoolBin
 
 #define BLOCK(p) ((char *)p - &((MemPoolBlock *)0)->_data[0])
 
-template <typename Allocator = StdAllocator>
+template <typename Allocator = Allocator>
 class MemPool
 {
 public:
@@ -135,7 +132,7 @@ MemPool<Allocator>::MemPool() : _freelist(NULL), _freelistcnt(0), _blocks(0), _b
         ++count;
 
     _freelistcnt = count;
-    _freelist = (MemPoolBin*)Allocator::malloc(count * sizeof(MemPoolBin));
+    _freelist = (MemPoolBin *)Allocator::malloc(count * sizeof(MemPoolBin));
     if (_freelist != NULL)
         memset(_freelist, 0x00, count * sizeof(MemPoolBin));
 }
@@ -148,7 +145,7 @@ MemPool<Allocator>::~MemPool()
 
     for (int i = 0; i < _freelistcnt; ++i)
     {
-        auto& freelist = _freelist[i]._freelist;
+        auto &freelist = _freelist[i]._freelist;
         while (freelist != NULL)
         {
             void *p = freelist;
@@ -174,8 +171,8 @@ void *MemPool<Allocator>::AllocBlock(int size)
 #endif
 
     int idx = GetFreeListIdx(GetRealSize(size));
-    auto& memblockbin = _freelist[idx];
-    auto& freelist = memblockbin._freelist;
+    auto &memblockbin = _freelist[idx];
+    auto &freelist = memblockbin._freelist;
     if (NULL == freelist)
     {
         if (AddBlock(size, idx) == NULL)
@@ -210,8 +207,8 @@ void *MemPool<Allocator>::AddBlock(int size, int idx)
         idx = GetFreeListIdx(realsize);
 
     DEBUG("AddBlock @%p with size: %d => realsize: %d total: %d\n", p, size, realsize, total);
-    auto& memblockbin = _freelist[idx];
-    auto& freelist = memblockbin._freelist;
+    auto &memblockbin = _freelist[idx];
+    auto &freelist = memblockbin._freelist;
 
     MemPoolBlock *block = (MemPoolBlock *)p;
     block->_size = realsize;
@@ -258,8 +255,8 @@ void MemPool<Allocator>::FreeBlock(void *p)
 
     DEBUG("FreeBlock@ %p realaddr: %p with size: %d\n", p, block, block->_size);
     int idx = GetFreeListIdx(block->_size);
-    auto& memblockbin = _freelist[idx];
-    auto& freelist = memblockbin._freelist;
+    auto &memblockbin = _freelist[idx];
+    auto &freelist = memblockbin._freelist;
     if (NULL == freelist)
     {
         freelist = block;
@@ -281,11 +278,11 @@ void MemPool<Allocator>::PrintInfo()
     std::cout << "blocks: " << Blocks() << " alloced: " << _blocksalloced << std::endl;
     for (int i = 0; i < _freelistcnt; ++i)
     {
-        auto& memblockbin = _freelist[i];
+        auto &memblockbin = _freelist[i];
         if (i == (_freelistcnt - 1))
-            std::cout << "  MemPoolBin(>" << 64*(1<<(i-1)) << ") blocks: " << memblockbin._count << std::endl;
+            std::cout << "  MemPoolBin(>" << 64 * (1 << (i - 1)) << ") blocks: " << memblockbin._count << std::endl;
         else
-            std::cout << "  MemPoolBin(<=" << 64*(1<<i) << ") blocks: " << memblockbin._count << std::endl;
+            std::cout << "  MemPoolBin(<=" << 64 * (1 << i) << ") blocks: " << memblockbin._count << std::endl;
     }
     std::cout << "======================MemPoolInfo=====================" << std::endl;
 }

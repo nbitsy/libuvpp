@@ -19,8 +19,9 @@ public:
     bool Start();
     bool Stop();
 
-    virtual void OnClosed();
+    void OnClosed();
     virtual void OnPrepare();
+    void Release();
 };
 
 } // namespace XNode

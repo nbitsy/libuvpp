@@ -19,6 +19,8 @@ public:
     template <typename T>
     inline T *GetReq() { return (T *)_req; }
 
+    virtual UVLoop* GetLoop() { return NULL; }
+
     virtual bool Start() = 0;
     virtual void OnReq(int status) = 0;
 

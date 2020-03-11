@@ -12,26 +12,20 @@ namespace XNode
  * 这个链表里的所有元素至少需要存放一个void*指令
 */
 
-#ifdef USE_TC_MALLOC
-#define DEFAULT_ALLOCATOR TCAllocator
-#else
-#define DEFAULT_ALLOCATOR StdAllocator
-#endif
-
 #define NEXT(cur) *((std::ptrdiff_t *)(cur))
 
-template <typename T, typename Allocator = DEFAULT_ALLOCATOR>
+template <typename T, typename Allocator = Allocator>
 class ObjectPool : public MemPool<Allocator>
 {
 public:
-    //#if (sizeof(T) < sizeof(std::ptrdiff_t))
-    //#endif
     /**
      * size 空闲对象不够时，每次申请对象的个数
     */
     explicit ObjectPool(int size);
     ~ObjectPool();
 
+    //template <class ...U>
+    //T *Construct(U ... args);
     T *Construct();
     void Destroy(T *obj);
 
@@ -53,12 +47,16 @@ private:
 template <typename T, typename Allocator>
 ObjectPool<T, Allocator>::ObjectPool(int size) : _freelist(NULL), _listcount(0), _allocsize(size)
 {
+    DEBUG("\n");
     AllocObjects(size);
+    if (sizeof(T) < sizeof(std::ptrdiff_t))
+        std::cerr << "sizeof(T) < " << MEMPOOL_SIZE_MIN << std::endl;
 }
 
 template <typename T, typename Allocator>
 ObjectPool<T, Allocator>::~ObjectPool()
 {
+    DEBUG("\n");
     // do nothing
 }
 

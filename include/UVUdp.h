@@ -45,6 +45,7 @@ public:
 
     void OnRead(void *data, int nread, const struct sockaddr* addr, unsigned int flags);
     void OnClosed();
+    void Release();
 
 private:
     UVUdp(UVLoop *loop, int flags);

@@ -1,18 +1,20 @@
 
 #include "UVReq.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
 
 UVReq::UVReq(bool gc) : _req(NULL)
 {
-    SetData(NULL); // set this
 }
 
 UVReq::~UVReq()
 {
-    if (GetData())
-        UVData::Destroy(GetData());
+    UVData* uvdata = GetData();
+    UVLoop* loop = GetLoop();
+    if (uvdata != NULL && loop != NULL)
+        loop->Destroy(uvdata);
 }
 
 void UVReq::SetData(void *data, bool force)

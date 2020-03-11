@@ -5,6 +5,7 @@ extern "C" {
 }
 
 #include "MemPool.h"
+#include "Allocator.h"
 #include <list>
 #include <math.h>
 
@@ -66,6 +67,6 @@ int main(int argc, char* argv[])
     test1();
     test2();
 
-    MemPool<TCAllocator> pool;
+    MemPool<Allocator> pool;
 	return 0;
 }

@@ -1,5 +1,6 @@
 
 #include "UVCheck.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
@@ -9,24 +10,39 @@ static void __OnCheck(uv_check_t *handle)
     UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)handle);
     if (NULL == uvdata)
         return;
-
-    if (uvdata->_self != NULL)
-        ((UVCheck *)uvdata->_self)->OnCheck();
+    
+    UVCheck* self = (UVCheck*)uvdata->_self;
+    if (NULL == self)
+        return;
+    
+    self->OnCheck();
+    self->Release();
 }
 
 UVCheck::UVCheck(UVLoop *loop) : UVHandle(loop)
 {
-    _handle = (uv_handle_t *)malloc(sizeof(uv_check_t));
+    _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_check_t)); // XXX: 频率很低所有直接使用Allocator::malloc
     if (_loop != NULL && _handle != NULL)
-        uv_check_init(loop->GetLoop<uv_loop_t>(), (uv_check_t *)_handle);
-
-    SetData(NULL);
-    std::cout << "Object@" << (void *)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    {
+        uv_check_init(loop->GetRawLoop<uv_loop_t>(), (uv_check_t *)_handle);
+        uv_handle_set_data(_handle, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p => ", (void *)this);
 }
 
 UVCheck::~UVCheck()
 {
-    std::cout << "Object@" << (void *)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p => ", (void *)this);
+}
+
+void UVCheck::Release()
+{
+    if (NULL == _handle)
+        return;
+
+    Allocator::free(_handle);
+    _handle = NULL;
 }
 
 bool UVCheck::Start()
@@ -47,12 +63,12 @@ bool UVCheck::Stop()
 
 void UVCheck::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("\n");
 }
 
 void UVCheck::OnCheck()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("\n");
 }
 
 } // namespace XNode

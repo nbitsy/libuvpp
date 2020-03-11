@@ -1,37 +1,36 @@
 
 #include "UVDataHelper.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
-
-UVData* UVData::Create()
-{
-    return new UVData(); // TODO:
-}
-
-void UVData::Destroy(UVData* uvdata)
-{
-    if (NULL == uvdata)
-        return;
-    delete uvdata; // TODO:
-}
 
 void UVDataHelper::SetData(void *target, void *data, bool force, int type)
 {
     if (NULL == target)
         return;
 
+    auto loop = GetLoop();
+    if (NULL == loop)
+    {
+        std::cerr << "GetLoop get a null value!!!" << std::endl;
+        return;
+    }
+
     UVData *uvdata = GetData(target, type);
     if (NULL == uvdata || force)
     {
         if (uvdata != NULL && !force)
-            UVData::Destroy(uvdata);
+            loop->Destroy(uvdata);
 
-        uvdata = UVData::Create();
+        uvdata = loop->Construct<UVData>();
     }
 
     if (NULL == uvdata)
+    {
+        std::cerr << "ERROR: alloc UVData!!!" << std::endl;
         return;
+    }
 
     uvdata->_self = this;
     uvdata->_data = data;
@@ -57,11 +56,18 @@ void UVDataHelper::ClearData(void *target, int type)
     if (NULL == target)
         return;
 
+    auto loop = GetLoop();
+    if (NULL == loop)
+    {
+        DEBUG("GetLoop get a null value!!!");
+        return;
+    }
+
     UVData *uvdata = GetData(target, type);
     if (NULL == uvdata)
         return;
     
-    UVData::Destroy(uvdata);
+    loop->Destroy(uvdata);
 
     switch (type)
     {
@@ -110,22 +116,40 @@ void UVDataHelper::BufAlloc(uv_handle_t *handle, size_t suggested_size, uv_buf_t
         buf->len = 0;
         return;
     }
+    
+    UVDataHelper* uvhandle = (UVDataHelper*)data->_self;
+    if (NULL == uvhandle)
+    {
+        DEBUG("self is null!!!");
+        return;
+    }
 
-    buf->base = (char *)malloc(suggested_size); // TODO: malloc where
+    auto loop = uvhandle->GetLoop();
+    if (NULL == loop)
+    {
+        DEBUG("loop is null!!!");
+        return;
+    }
+
+    buf->base = (char*)loop->Malloc(suggested_size);
     buf->len = suggested_size; 
 
-    // TODO: test
-    std::cout << "OnRead alloc @" << (void*)buf->base << " size: " << buf->len << std::endl;
+    DEBUG("OnRead alloc @%p size: %lu\n", buf->base, buf->len);
 }
 
-void UVDataHelper::BufFree(const uv_buf_t *buf)
+void UVDataHelper::BufFree(const uv_buf_t *buf, UVLoop* loop)
 {
-    if (NULL == buf || NULL == buf->base)
+    if (NULL == buf || NULL == buf->base || NULL == loop)
+    {
+        if (loop == NULL)
+        {
+            DEBUG("******************loop is null!!!******************"); // 内存泄漏了
+        }
         return;
+    }
 
-    // TODO: test
-    std::cout << "OnRead free @" << (void*)buf->base << std::endl;
-    free((void*)buf->base); // TODO:
+    DEBUG("OnRead free @%p\n", buf->base);
+    loop->Free(buf->base);
 }
 
 } // namespace XNode

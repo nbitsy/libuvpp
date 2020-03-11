@@ -1,26 +1,29 @@
 
 #include "UVTcp.h"
 #include "UVReqConnect.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
 
 UVTcp::UVTcp(UVLoop *loop, int flags) : UVStream(loop, flags)
 {
-    _handle = (uv_handle_t *)malloc(sizeof(uv_tcp_t)); // TODO:
+    if (NULL == _loop)
+        return;
+
+    _handle = (uv_handle_t *)_loop->Construct<uv_tcp_t>();
     if (_handle != NULL)
     {
-        std::cout << "Malloc @" << (void*)_handle << std::endl;
-        uv_tcp_init_ex(_loop->GetLoop<uv_loop_t>(), (uv_tcp_t *)_handle, flags);
+        uv_tcp_init_ex(_loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, flags);
+        uv_handle_set_data(_handle, NULL);
+        SetData(NULL);
     }
-
-    SetData(NULL);
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 UVTcp::~UVTcp()
 {
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 void UVTcp::SetDelay(bool delay)
@@ -58,26 +61,27 @@ bool UVTcp::StartConnect(const std::string &ip, int port)
 UVStream *UVTcp::OnNewConnection()
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    auto tcp = new UVTcp((UVLoop *)GetLoop());
+    auto tcp = new UVTcp(GetLoop());
     return tcp;
 }
 
 void UVTcp::OnConnected()
 {
-    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " Connected To => " << RemoteAddress().ToString() << std::endl;
+    DEBUG("%s Connected To %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
     const char *msg = "hello";
     Write((void *)msg, 5);
 }
 
 void UVTcp::OnRead(void *data, int nread)
 {
-    std::cout << __PRETTY_FUNCTION__ << " RECV FROM " << RemoteAddress().ToString() << std::endl;
-    std::cout << "data: " << (char *)data << " len: " << nread << std::endl;
+    DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str())
+    DEBUG("data: %s, len: %d\n", (char*)data, nread);
+    Write((char*)"BACK", 4);
 }
 
 void UVTcp::OnAccepted(UVStream *server)
 {
-    std::cout << __PRETTY_FUNCTION__ << " " << RemoteAddress().ToString() << " => " << LocalAddress().ToString() << std::endl;
+    DEBUG("%s => %s\n", RemoteAddress().ToString().c_str(), LocalAddress().ToString().c_str());
 }
 
 /**
@@ -85,13 +89,27 @@ void UVTcp::OnAccepted(UVStream *server)
 */
 void UVTcp::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
-    delete this;
+    DEBUG("%s %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
 }
 
 void UVTcp::OnShutdown()
 {
-    std::cout << __PRETTY_FUNCTION__ << " " << LocalAddress().ToString() << " => " << RemoteAddress().ToString() << std::endl;
+    DEBUG("%s %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
+}
+
+void UVTcp::Release()
+{
+    DEBUG("\n");
+    if (NULL == _handle)
+        return;
+
+    auto loop = GetLoop();
+    if (NULL == loop)
+        return;
+    
+    loop->Destroy((uv_tcp_t*)_handle);
+    delete this;
+    _handle = NULL;
 }
 
 } // namespace XNode

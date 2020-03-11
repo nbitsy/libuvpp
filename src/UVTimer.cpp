@@ -1,19 +1,23 @@
 
 #include "UVTimer.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
 
 UVTimer::UVTimer(UVLoop *loop) : UVHandle(loop)
 {
-    _handle = (uv_handle_t *)malloc(sizeof(uv_timer_t)); // TODO:
-    if (_handle != NULL && _loop != NULL && _loop->GetLoop<uv_loop_t>() != NULL)
+    if (NULL == _loop)
+        return;
+
+    _handle = (uv_handle_t *)_loop->Construct<uv_timer_t>();
+    if (_handle != NULL && _loop != NULL && _loop->GetRawLoop<uv_loop_t>() != NULL)
     {
+        uv_timer_init(_loop->GetRawLoop<uv_loop_t>(), GetHandle<uv_timer_t>());
         uv_handle_set_data(_handle, NULL);
-        uv_timer_init(_loop->GetLoop<uv_loop_t>(), GetHandle<uv_timer_t>());
         SetData(&_timestamp);
     }
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 UVTimer::~UVTimer()
@@ -21,7 +25,20 @@ UVTimer::~UVTimer()
     if (_handle != NULL)
         Stop();
 
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
+}
+
+void UVTimer::Release()
+{
+    if (NULL == _handle)
+        return;
+    
+    auto loop = GetLoop();
+    if (NULL == loop)
+        return;
+
+    loop->Destroy((uv_timer_t*)_handle);
+    _handle = NULL;
 }
 
 void __OnTimer(uv_timer_t *timer)
@@ -78,16 +95,27 @@ unsigned long long UVTimer::GetRepeat() const
 
 void UVTimer::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    delete this; // TODO:
+    DEBUG("\n");
 }
 
 void UVTimer::Tick(Timestamp* now)
 {
+    static int i = 0;
+
+    if (i++ > 3)
+    {
+        Stop();
+        return;
+    }
+
     if (now != NULL)
-        std::cout << __PRETTY_FUNCTION__ << " Now: " << now->Ticks() << std::endl;
+    {
+        DEBUG("Now: %lld\n", now->Ticks());
+    }
     else
-        std::cout << __PRETTY_FUNCTION__ << std::endl;
+    {
+        DEBUG("\n");
+    }
 }
 
 } // namespace XNode

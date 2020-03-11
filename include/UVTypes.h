@@ -1,6 +1,6 @@
 
-#ifndef UVTYPES_H_
-#define UVTYPES_H_
+#ifndef _UVTYPES_H_
+#define _UVTYPES_H_
 
 namespace XNode
 {

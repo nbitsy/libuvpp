@@ -10,20 +10,32 @@ namespace XNode
 static void __OnNewConnection(uv_stream_t *server, int status)
 {
     UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)server);
-    if (uvdata != NULL && uvdata->_self != NULL)
+    if (NULL == uvdata)
+        return;
+
+    UVStream *uvstream = (UVStream *)uvdata->_self;
+    if (NULL == uvstream)
+        return;
+
+    UVStream *newuvstream = uvstream->OnNewConnection();
+    if (NULL == newuvstream)
     {
-        UVStream *uvstream = (UVStream *)uvdata->_self;
-        uvstream->Accept(uvstream->OnNewConnection());
+        std::cerr << "Create connection error!!!" << std::endl;
+        return;
     }
+
+    uvstream->Accept(newuvstream);
 }
 
 UVStream::UVStream(UVLoop *loop, int flags, EUVStreamType type)
     : UVIODevice(loop, flags), _type(type)
 {
+    DEBUG("Object @%p\n", this);
 }
 
 UVStream::~UVStream()
 {
+    DEBUG("Object @%p\n", this);
 }
 
 bool UVStream::Listen(int backlog)

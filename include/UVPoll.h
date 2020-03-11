@@ -2,8 +2,8 @@
 #ifndef UVPOLL_H_
 #define UVPOLL_H_
 
-#include "UVHandle.h"
 #include "UVTypes.h"
+#include "UVHandle.h"
 
 namespace XNode
 {
@@ -19,8 +19,9 @@ public:
     bool Start(int events = UVET_ALL);
     bool Stop();
 
-    virtual void OnClosed();
+    void OnClosed();
     virtual void OnPoll(int status, int event);
+    void Release();
 };
 
 } // namespace XNode

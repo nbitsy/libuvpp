@@ -15,8 +15,10 @@ public:
     UVReqShutdown(UVStream* stream);
     ~UVReqShutdown();
 
+    UVLoop *GetLoop();
     bool Start();
     void OnReq(int status);
+    void Release();
 
 private:
     UVStream* _stream;

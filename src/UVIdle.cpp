@@ -1,5 +1,6 @@
 
 #include "UVIdle.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
@@ -10,23 +11,38 @@ static void __OnIdle(uv_idle_t* handle)
     if (NULL == uvdata)
         return;
     
-    if (uvdata->_self != NULL)
-        ((UVIdle*)uvdata->_self)->OnIdle();
+    UVIdle* self = (UVIdle*)uvdata->_self;
+    if (NULL == self)
+        return;
+    
+    self->OnIdle();
+    self->Release();
 }
 
 UVIdle::UVIdle(UVLoop* loop) : UVHandle(loop)
 {
-    _handle = (uv_handle_t*)malloc(sizeof(uv_idle_t));
+    _handle = (uv_handle_t*)Allocator::malloc(sizeof(uv_idle_t));
     if (_loop != NULL && _handle != NULL)
-        uv_idle_init(loop->GetLoop<uv_loop_t>(), (uv_idle_t*)_handle);
-    
-    SetData(NULL);
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    {
+        uv_idle_init(loop->GetRawLoop<uv_loop_t>(), (uv_idle_t*)_handle);
+        uv_handle_set_data(_handle, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 UVIdle::~UVIdle()
 {
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
+}
+
+void UVIdle::Release()
+{
+    if (NULL == _handle)
+        return ;
+
+    Allocator::free(_handle);
+    _handle = NULL;
 }
 
 bool UVIdle::Start()
@@ -47,12 +63,12 @@ bool UVIdle::Stop()
 
 void UVIdle::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("\n");
 }
 
 void UVIdle::OnIdle()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("\n");
 }
 
 } // namespace XNode

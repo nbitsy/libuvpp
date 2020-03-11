@@ -8,12 +8,26 @@ namespace XNode
 void __OnShutdown(uv_shutdown_t *req, int status)
 {
     UVData *uvdata = (UVData *)uv_req_get_data((uv_req_t *)req);
-    if (uvdata != NULL && uvdata->_self != NULL)
-        ((UVReqShutdown *)uvdata->_self)->OnReq(status);
+    if (NULL == uvdata)
+        return;
+    
+    UVReqShutdown* uvreqshutdown = (UVReqShutdown*)uvdata->_self;
+    if (NULL == uvreqshutdown)
+        return;
+
+    uvreqshutdown->OnReq(status);
+    uvreqshutdown->Release();
 }
 
 UVReqShutdown::UVReqShutdown(UVStream *stream)
 {
+    _req = (uv_req_t*)Allocator::malloc(sizeof(uv_shutdown_t));
+    if (_req != NULL)
+    {
+        uv_req_set_data(_req, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 UVReqShutdown::~UVReqShutdown()
@@ -30,8 +44,27 @@ bool UVReqShutdown::Start()
 
 void UVReqShutdown::OnReq(int status)
 {
+    DEBUG("\n");
+}
+
+void UVReqShutdown::Release()
+{
+    if (NULL == _req)
+        return;
+
+    Allocator::free(_req);
     if (GetGC())
-        delete this; // TODO: delete or pool release
+        delete this; // TODO
+    
+    _req = NULL;
+}
+
+UVLoop *UVReqShutdown::GetLoop()
+{
+    if (NULL == _stream)
+        return NULL;
+
+    return _stream->GetLoop();
 }
 
 } // namespace XNode

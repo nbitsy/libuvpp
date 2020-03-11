@@ -4,8 +4,7 @@ extern "C" {
 #include <stdlib.h>
 }
 
-#include "UVTcp.h"
-#include "UVLoop.h"
+#include "UVPP.h"
 
 using namespace XNode;
 

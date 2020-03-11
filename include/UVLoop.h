@@ -3,13 +3,14 @@
 #define UVLOOP_H_
 
 #include "UVDataHelper.h"
+#include "UVPoolHelper.h"
 #include <string>
 #include <thread>
 
 namespace XNode
 {
 
-class UVLoop : public UVDataHelper
+class UVLoop : public UVDataHelper, public UVPoolHelper
 {
 public:
     explicit UVLoop(const std::string &name, bool useDefault = false);
@@ -27,10 +28,12 @@ public:
     int RawFd() const;
     bool IsAlive() const;
 
+    UVLoop *GetLoop() { return this; }
+    void Release() {/*do nothing*/}
     static UVLoop *DefaultLoop();
 
     template <typename T>
-    T *GetLoop() { return reinterpret_cast<T *>(_loop); }
+    T *GetRawLoop() { return reinterpret_cast<T *>(_loop); }
 
     std::thread::id ThreadId() const { return _threadId; }
 

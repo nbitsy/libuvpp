@@ -13,12 +13,23 @@ void __OnConnected(uv_connect_t *req, int status)
     if (NULL == uvdata)
         return;
     
-    if (uvdata->_self != NULL)
-        ((UVReqConnect*)uvdata->_self)->OnReq(status);
+    UVReqConnect* uvreqconnect = (UVReqConnect*)uvdata->_self;
+    if (NULL == uvdata->_self)
+        return;
+
+    uvreqconnect->OnReq(status);
+    uvreqconnect->Release();
 }
 
 UVReqConnect::UVReqConnect(UVTcp *handle, EndPointAddress address) : _handle(handle), _address(address)
 {
+    _req = (uv_req_t*)Allocator::malloc(sizeof(uv_connect_t));
+    if (_req != NULL)
+    {
+        uv_req_set_data(_req, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 UVReqConnect::UVReqConnect(UVTcp *handle, const std::string &ip, int port) : _handle(handle), _address(ip, port)
@@ -62,9 +73,26 @@ void UVReqConnect::OnReq(int status)
 {
     if (_handle != NULL)
         _handle->OnConnected();
+}
 
+void UVReqConnect::Release()
+{
+    if (NULL == _req)
+        return;
+
+    Allocator::free(_req);
     if (GetGC())
         delete this; // TODO
+
+    _req = NULL;
+}
+
+UVLoop *UVReqConnect::GetLoop()
+{
+    if (NULL == _handle)
+        return NULL;
+
+    return _handle->GetLoop();
 }
 
 } // namespace XNode

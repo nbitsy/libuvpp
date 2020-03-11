@@ -1,25 +1,30 @@
 
 #include "UVLoop.h"
+#include "Allocator.h"
 
 namespace XNode
 {
 
-static UVLoop gDefaultLoop("Default");
+static UVLoop gDefaultLoop("Default", true);
 
 UVLoop *UVLoop::DefaultLoop()
 {
     return &gDefaultLoop;
 }
 
-UVLoop::UVLoop(const std::string &name, bool useDefault) : _name(name), _loop(NULL)
+UVLoop::UVLoop(const std::string &name, bool useDefault) : UVDataHelper(), UVPoolHelper(), _name(name), _loop(NULL)
 {
+    uv_replace_allocator(Allocator::malloc, Allocator::realloc, Allocator::calloc, Allocator::free);
+
     if (useDefault)
     {
         _loop = uv_default_loop();
         SetGC(false);
     }
     else
-        _loop = (uv_loop_t*)malloc(sizeof(*_loop)); // TODO:
+    {
+        _loop = (uv_loop_t *)Allocator::malloc(sizeof(*_loop));
+    }
 
     if (_loop != NULL)
     {
@@ -29,6 +34,7 @@ UVLoop::UVLoop(const std::string &name, bool useDefault) : _name(name), _loop(NU
     }
 
     _threadId = std::this_thread::get_id();
+    DEBUG("Object @%p\n", this);
 }
 
 UVLoop::~UVLoop()
@@ -40,7 +46,7 @@ UVLoop::~UVLoop()
         if (GetGC())
         {
             uv_loop_close(_loop);
-            free(_loop); // TODO:
+            Allocator::free(_loop);
         }
         else
         {
@@ -49,6 +55,7 @@ UVLoop::~UVLoop()
 
         _loop = NULL;
     }
+    DEBUG("Object @%p\n", this);
 }
 
 void UVLoop::SetData(void *data, bool force)

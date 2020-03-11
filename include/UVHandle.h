@@ -1,10 +1,9 @@
 
-#ifndef UVHANDLE_H_
-#define UVHANDLE_H_
+#ifndef _UVHANDLE_H_
+#define _UVHANDLE_H_
 
 #include "uv.h"
 #include "UVDataHelper.h"
-#include "UVLoop.h"
 
 namespace XNode
 {
@@ -21,7 +20,7 @@ public:
     const UVData *GetData() const;
     void ClearData();
 
-    inline UVLoop *GetLoop() const { return _loop; }
+    UVLoop *GetLoop() { return _loop; }
     template <typename T>
     inline T *GetHandle() const { return reinterpret_cast<T *>(_handle); }
 
@@ -38,6 +37,7 @@ public:
      * 完成关闭后调用OnClosed
     */
     virtual void OnClosed() = 0;
+    void Release();
 
 protected:
     UVLoop* _loop;
@@ -46,6 +46,6 @@ protected:
 
 } // namespace XNode
 
-#endif // UVHANDLE_H_
+#endif // _UVHANDLE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

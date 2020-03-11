@@ -1,9 +1,10 @@
 
-#ifndef UVDATAHELPER_H_
-#define UVDATAHELPER_H_
+#ifndef _UVDATAHELPER_H_
+#define _UVDATAHELPER_H_
 
+#include "Debuger.h"
+#include "ObjectPool.h"
 #include "uv.h"
-#include <iostream> // TODO: for test
 
 namespace XNode
 {
@@ -16,19 +17,21 @@ enum UVDataType
     UVDT_OTH,
 };
 
+class UVLoop;
+
 // TODO：对象池
 struct UVData
 {
-    static UVData *Create();
-    static void Destroy(UVData *);
+    UVData() : _self(NULL), _data(NULL) {}
+    UVData(void *self, void *data) : _self(self), _data(data) {}
+
+    ~UVData()
+    {
+        DEBUG("_self: %p, _data: %p\n", _self, _data);
+    }
 
     void *_self; // 本对象的原始对象
     void *_data; // 外部数据
-
-private:
-    UVData() : _self(NULL), _data(NULL) {}
-    UVData(void *self, void *data) : _self(self), _data(data) {}
-    ~UVData() { std::cout << __PRETTY_FUNCTION__ << " _self: " << _self << " _data: " << _data << std::endl; } // TODO: for test
 };
 
 class UVDataHelper
@@ -90,14 +93,17 @@ public:
         return GetData(target, UVDT_REQ);
     }
 
+    virtual UVLoop *GetLoop() = 0;
+    /**
+     * Release里干的是一些释放资源的工作，包括对象自己，因为进入UVLoop的对象已经不受自己控制了
+    */
+    virtual void Release() = 0;
+
     inline void SetGC(bool gc = true) { _bgc = gc; }
     inline bool GetGC() const { return _bgc; }
 
     static void BufAlloc(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf);
-    static void BufFree(const uv_buf_t *buf);
-
-    static uv_loop_t *LoopAlloc();
-    static void LoopFree(uv_loop_t *loop);
+    static void BufFree(const uv_buf_t *buf, UVLoop *loop);
 
     template <typename T>
     static T *HandleAlloc();
@@ -112,12 +118,12 @@ private:
     void ClearData(void *target, int type);
     UVData *GetData(void *target, int type) const;
 
-private:
+protected:
     bool _bgc;
 };
 
 } // namespace XNode
 
-#endif // UVDATAHELPER_H_
+#endif // _UVDATAHELPER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

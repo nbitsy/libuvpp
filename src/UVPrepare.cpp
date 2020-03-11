@@ -1,5 +1,6 @@
 
 #include "UVPrepare.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
@@ -10,23 +11,38 @@ static void __OnPrepare(uv_prepare_t* handle)
     if (NULL == uvdata)
         return;
     
-    if (uvdata->_self != NULL)
-        ((UVPrepare*)uvdata->_self)->OnPrepare();
+    UVPrepare *self = (UVPrepare *)uvdata->_self;
+    if (NULL == self)
+        return;
+
+    self->OnPrepare();
+    self->Release();
 }
 
 UVPrepare::UVPrepare(UVLoop* loop) : UVHandle(loop)
 {
-    _handle = (uv_handle_t*)malloc(sizeof(uv_prepare_t));
+    _handle = (uv_handle_t*)Allocator::malloc(sizeof(uv_prepare_t));
     if (_loop != NULL && _handle != NULL)
-        uv_prepare_init(loop->GetLoop<uv_loop_t>(), (uv_prepare_t*)_handle);
-    
-    SetData(NULL);
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    {
+        uv_prepare_init(loop->GetRawLoop<uv_loop_t>(), (uv_prepare_t*)_handle);
+        uv_handle_set_data(_handle, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 UVPrepare::~UVPrepare()
 {
-    std::cout << "Object@"<< (void*)this << " =>" << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
+}
+
+void UVPrepare::Release()
+{
+    if (NULL == _handle)
+        return;
+
+    Allocator::free(_handle);
+    _handle = NULL;
 }
 
 bool UVPrepare::Start()
@@ -47,12 +63,12 @@ bool UVPrepare::Stop()
 
 void UVPrepare::OnClosed()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 void UVPrepare::OnPrepare()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("Object @%p\n", this);
 }
 
 } // namespace XNode

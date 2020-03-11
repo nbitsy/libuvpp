@@ -20,7 +20,7 @@ public:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *data, int nsize, bool copy = false, bool gc = true);
+    void Init(UVIODevice *uviodevice, UVIODevice *other, void *data, int nsize, bool copy = false, bool gc = true);
 
     /**
      * UVIODevice 输出目标流对象
@@ -30,7 +30,7 @@ public:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *bufs[], int nbuf, bool copy = false, bool gc = true);
+    void Init(UVIODevice *uviodevice, UVIODevice *other, void *bufs[], int nbuf, bool copy = false, bool gc = true);
 
     /**
      * UVIODevice 输出目标流对象
@@ -40,7 +40,7 @@ public:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(UVIODevice *uviodevice, const struct sockaddr* addr, void *data, int nsize, bool copy = false, bool gc = true);
+    void Init(UVIODevice *uviodevice, const struct sockaddr* addr, void *data, int nsize, bool copy = false, bool gc = true);
     /**
      * UVIODevice 输出目标流对象
      * addr UDP时的目标地址
@@ -49,12 +49,15 @@ public:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(UVIODevice *uviodevice, const struct sockaddr* addr, void *bufs[], int nbuf, bool copy = false, bool gc = true);
+    void Init(UVIODevice *uviodevice, const struct sockaddr* addr, void *bufs[], int nbuf, bool copy = false, bool gc = true);
 
+    UVReqWrite();
     ~UVReqWrite();
 
+    UVLoop *GetLoop();
     bool Start();
     void OnReq(int status);
+    void Release();
 
 private:
     void Init(UVIODevice* uviodevice, void* data, int nsize, bool copy);

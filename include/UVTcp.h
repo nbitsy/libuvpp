@@ -35,8 +35,6 @@ public:
 
     bool StartConnect(const std::string &ip, int port);
 
-    inline const UVLoop *GetLoop() const { return _loop; }
-
     UVStream *OnNewConnection();
     void OnAccepted(UVStream *server);
     void OnAccept(UVStream *client);
@@ -45,6 +43,7 @@ public:
     void OnRead(void *data, int nread);
     void OnClosed();
     void OnShutdown();
+    void Release();
 
 private:
     /**

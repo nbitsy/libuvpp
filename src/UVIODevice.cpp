@@ -2,6 +2,7 @@
 #include "UVIODevice.h"
 #include "UVDataHelper.h"
 #include "UVReqWrite.h"
+#include "UVLoop.h"
 
 namespace XNode
 {
@@ -10,20 +11,27 @@ static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
     UVData *data = (UVData *)stream->data;
     if (NULL == data)
+    {
+        UVDataHelper::BufFree(buf, NULL);
         return;
+    }
 
     UVIODevice *uviodevice = (UVIODevice *)data->_self;
     if (NULL == uviodevice)
+    {
+        UVDataHelper::BufFree(buf, NULL);
         return;
+    }
 
     if (nread <= 0)
     {
         uviodevice->Close();
+        UVDataHelper::BufFree(buf, uviodevice->GetLoop());
         return;
     }
 
     uviodevice->OnRead(buf->base, nread);
-    UVDataHelper::BufFree(buf);
+    UVDataHelper::BufFree(buf, uviodevice->GetLoop());
 }
 
 static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, const struct sockaddr *addr, unsigned flags)
@@ -31,14 +39,14 @@ static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, co
     UVData *data = (UVData *)stream->data;
     if (NULL == data)
     {
-        UVDataHelper::BufFree(buf);
+        UVDataHelper::BufFree(buf, NULL);
         return;
     }
 
     UVIODevice *uviodevice = (UVIODevice *)data->_self;
     if (NULL == uviodevice)
     {
-        UVDataHelper::BufFree(buf);
+        UVDataHelper::BufFree(buf, NULL);
         return;
     }
 
@@ -47,12 +55,12 @@ static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, co
         if (nread < 0)
             uviodevice->Close();
 
-        UVDataHelper::BufFree(buf);
+        UVDataHelper::BufFree(buf, uviodevice->GetLoop());
         return;
     }
 
     uviodevice->OnRead(buf->base, nread, addr, flags);
-    UVDataHelper::BufFree(buf);
+    UVDataHelper::BufFree(buf, uviodevice->GetLoop());
 }
 
 bool UVIODevice::Bind(uv_handle_t *handle, const std::string &ip, int port, unsigned int flags)
@@ -216,9 +224,19 @@ bool UVIODevice::Write(void *data, int nsize, UVIODevice *other, const struct so
     if (NULL == _handle)
         return false;
 
-    UVReqWrite *req = new UVReqWrite(this, other, data, nsize);
+    auto loop = GetLoop();
+    if (NULL == loop)
+    {
+        DEBUG("*********************loop is null!!!***********************");
+        return false;
+    }
+
+    UVReqWrite *req = loop->Construct<UVReqWrite>();
     if (req != NULL)
+    {
+        req->Init(this, other, data, nsize);
         return req->Start();
+    }
 
     return false;
 }
@@ -228,9 +246,19 @@ bool UVIODevice::Write(void *bufs[], int nbuf, UVIODevice *other, const struct s
     if (NULL == _handle)
         return false;
 
-    UVReqWrite *req = new UVReqWrite(this, other, bufs, nbuf);
+    auto loop = GetLoop();
+    if (NULL == loop)
+    {
+        DEBUG("*********************loop is null!!!***********************");
+        return false;
+    }
+
+    UVReqWrite *req = loop->Construct<UVReqWrite>();
     if (req != NULL)
+    {
+        req->Init(this, other, bufs, nbuf);
         return req->Start();
+    }
 
     return false;
 }
@@ -257,7 +285,7 @@ bool UVIODevice::TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr)
     if (nbuf <= 0 || NULL == bufs)
         return false;
 
-    uv_buf_t *uvbufs = (uv_buf_t *)malloc(nbuf * sizeof(uv_buf_t));
+    uv_buf_t *uvbufs = (uv_buf_t *)Allocator::malloc(nbuf * sizeof(uv_buf_t));
     if (NULL == uvbufs)
         return false;
 

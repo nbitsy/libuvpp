@@ -37,6 +37,7 @@ public:
 
     void OnClosed();
     virtual void Tick(Timestamp* now);
+    void Release();
 
 private:
     UVTimer(UVLoop *loop);

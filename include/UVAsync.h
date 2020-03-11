@@ -1,6 +1,6 @@
 
-#ifndef UVASYNC_H_
-#define UVASYNC_H_
+#ifndef _UVASYNC_H_
+#define _UVASYNC_H_
 
 #include "UVHandle.h"
 
@@ -23,6 +23,7 @@ public:
 
     virtual void OnAsync();
     void OnClosed();
+    void Release();
 
 private:
     void AppendData(void *data);
@@ -30,6 +31,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVASYNC_H_
+#endif // _UVASYNC_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

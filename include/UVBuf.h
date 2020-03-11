@@ -1,6 +1,6 @@
 
-#ifndef UVBUF_H_
-#define UVBUF_H_
+#ifndef _UVBUF_H_
+#define _UVBUF_H_
 
 namespace XNode
 {
@@ -21,7 +21,7 @@ private:
 
 } // namespace XNode
 
-#endif // UVBUF_H_
+#endif // _UVBUF_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 
