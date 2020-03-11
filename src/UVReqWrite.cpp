@@ -89,13 +89,21 @@ void UVReqWrite::InitReq(UVIODevice *uviodevice)
         return;
     }
 
-    if (uviodevice->GetHandle<uv_handle_t>()->type == UV_TCP)
+    uv_handle_t* handle = uviodevice->GetHandle<uv_handle_t>();
+    if (NULL == handle)
+        return;
+
+    if (handle->type == UV_TCP || handle->type == UV_TTY)
     {
         _req = (uv_req_t *)loop->Construct<uv_write_t>();
     }
-    else if (uviodevice->GetHandle<uv_handle_t>()->type == UV_UDP)
+    else if (handle->type == UV_UDP)
     {
         _req = (uv_req_t *)loop->Construct<uv_udp_send_t>();
+    }
+    else
+    {
+        ERROR("^^^^^^^^^^^^^Unkonw handle!!!^^^^^^^^^^^^^\n");
     }
 
     if (_req != NULL)
@@ -246,7 +254,7 @@ bool UVReqWrite::Start()
         return false; // TODO: 回收自己
 
     int type = uvhandle->type;
-    if (type == UV_TCP)
+    if (type == UV_TCP || type == UV_TTY)
     {
         if (NULL == _other)
         {

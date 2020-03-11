@@ -190,7 +190,7 @@ bool UVIODevice::StartRead()
     if (NULL == _handle)
         return false;
 
-    if (_handle->type == UV_TCP)
+    if (_handle->type == UV_TCP || _handle->type == UV_TTY)
     {
         int ret = uv_read_start(GetHandle<uv_stream_t>(), UVDataHelper::BufAlloc, __OnRead);
         if (ret != 0)
@@ -211,7 +211,7 @@ bool UVIODevice::StopRead()
     if (NULL == _handle)
         return false;
 
-    if (_handle->type == UV_TCP)
+    if (_handle->type == UV_TCP || _handle->type == UV_TTY)
         return uv_read_stop(GetHandle<uv_stream_t>()) == 0;
     else if (_handle->type == UV_UDP)
         return uv_udp_recv_stop(GetHandle<uv_udp_t>()) == 0;

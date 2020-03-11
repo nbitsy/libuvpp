@@ -21,6 +21,7 @@
 #include "UVTcp.h"
 #include "UVTimer.h"
 #include "UVUdp.h"
+#include "UVTty.h"
 
 namespace XNode
 {

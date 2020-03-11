@@ -75,6 +75,7 @@ void UVTcp::OnConnected()
 void UVTcp::OnRead(void *data, int nread)
 {
     DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str())
+    ((char*)data)[nread-1] = '\0';
     DEBUG("data: %s, len: %d\n", (char*)data, nread);
     Write((char*)"BACK", 4);
 }
