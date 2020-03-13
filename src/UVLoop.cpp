@@ -12,7 +12,8 @@ UVLoop *UVLoop::DefaultLoop()
     return &gDefaultLoop;
 }
 
-UVLoop::UVLoop(const std::string &name, bool useDefault) : UVDataHelper(), UVPoolHelper(), _name(name), _loop(NULL)
+UVLoop::UVLoop(const std::string &name, bool useDefault)
+    : UVDataHelper(), UVPoolHelper(), _name(name), _loop(NULL), _running(false)
 {
     uv_replace_allocator(Allocator::malloc, Allocator::realloc, Allocator::calloc, Allocator::free);
 
@@ -73,28 +74,46 @@ void UVLoop::ClearData()
     UVDataHelper::ClearData(_loop);
 }
 
-void UVLoop::Start()
+bool UVLoop::Run(uv_run_mode type)
 {
+    if (IsRunning())
+        return true;
+
     if (_loop != NULL)
-        uv_run(_loop, UV_RUN_DEFAULT);
+    {
+        _running = true;
+        uv_run(_loop, type);
+        _running = false;
+    }
+
+    return _running;
 }
 
-void UVLoop::StartOnce()
+bool UVLoop::Start()
 {
-    if (_loop != NULL)
-        uv_run(_loop, UV_RUN_ONCE);
+    return Run(UV_RUN_DEFAULT);
 }
 
-void UVLoop::StartNowait()
+bool UVLoop::StartOnce()
 {
-    if (_loop != NULL)
-        uv_run(_loop, UV_RUN_NOWAIT);
+    return Run(UV_RUN_ONCE);
+}
+
+bool UVLoop::StartNowait()
+{
+    return Run(UV_RUN_NOWAIT);
 }
 
 void UVLoop::StopLoop()
 {
+    if (!IsRunning())
+        return;
+
     if (_loop != NULL)
+    {
         uv_stop(_loop);
+        _running = false;
+    }
 }
 
 int UVLoop::RawFd() const
@@ -107,7 +126,7 @@ int UVLoop::RawFd() const
 bool UVLoop::IsAlive() const
 {
     if (_loop != NULL)
-        uv_loop_alive(_loop);
+        return uv_loop_alive(_loop);
     return false;
 }
 

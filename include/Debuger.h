@@ -19,23 +19,30 @@ namespace XNode
 #define DEBUG_END "\033[0m"
 
 #ifdef _DEBUG
-#define DEBUG(...)                                                                      \
+#define DEBUG(...)                                                                     \
+    {                                                                                  \
+        fprintf(stderr, "%s%s %s ", DEBUG_GREENnBACK, __PRETTY_FUNCTION__, DEBUG_END); \
+        fprintf(stderr, ##__VA_ARGS__);                                                \
+    }
+#define INFO(...)                                                        \
+    {                                                                    \
+        fprintf(stderr, "%s%s ", DEBUG_WHITEnBACK, __PRETTY_FUNCTION__); \
+        fprintf(stdout, ##__VA_ARGS__);                                  \
+    }
+#define WARN(...)                                                                       \
     {                                                                                   \
-        fprintf(stderr, "%s%s=>%s ", DEBUG_GREENnBACK, __PRETTY_FUNCTION__, DEBUG_END); \
+        fprintf(stderr, "%s%s %s ", DEBUG_YALLOWnBACK, __PRETTY_FUNCTION__, DEBUG_END); \
         fprintf(stderr, ##__VA_ARGS__);                                                 \
     }
-#define WARN(...)                                                                        \
-    {                                                                                    \
-        fprintf(stderr, "%s%s=>%s ", DEBUG_YALLOWnBACK, __PRETTY_FUNCTION__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                  \
+#define ERROR(...)                                                                   \
+    {                                                                                \
+        fprintf(stderr, "%s%s %s ", DEBUG_REDnBACK, __PRETTY_FUNCTION__, DEBUG_END); \
+        fprintf(stderr, ##__VA_ARGS__);                                              \
     }
-#define ERROR(...)                                                                    \
-    {                                                                                 \
-        fprintf(stderr, "%s%s=>%s ", DEBUG_REDnBACK, __PRETTY_FUNCTION__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                               \
-    }
+
 #else
 #define DEBUG(...)
+#define INFO(...)
 #define WARN(...)
 #define ERROR(...)
 #endif

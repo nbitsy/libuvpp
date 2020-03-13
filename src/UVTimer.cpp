@@ -102,15 +102,17 @@ void UVTimer::OnClosed()
     DEBUG("\n");
 }
 
-void UVTimer::Tick(Timestamp* now)
+void UVTimer::Tick(const Timestamp* now)
 {
     static int i = 0;
 
+#if 0
     if (i++ > 3)
     {
         Stop();
         return;
     }
+#endif
 
     if (now != NULL)
     {

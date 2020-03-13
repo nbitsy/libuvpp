@@ -18,11 +18,13 @@ void UVDataHelper::SetData(void *target, void *data, bool force, int type)
     }
 
     UVData *uvdata = GetData(target, type);
-    if (NULL == uvdata || force)
+    if (uvdata != NULL && force)
     {
-        if (uvdata != NULL && !force)
-            loop->Destroy(uvdata);
-
+        loop->Destroy(uvdata);
+        uvdata = loop->Construct<UVData>();
+    }
+    else if (NULL == uvdata)
+    {
         uvdata = loop->Construct<UVData>();
     }
 

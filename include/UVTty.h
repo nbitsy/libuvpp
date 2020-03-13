@@ -19,8 +19,6 @@ public:
     void OnClosed();
     void Release();
     void OnShutdown();
-
-private:
 };
 
 } // namespace XNode

@@ -9,7 +9,6 @@ namespace XNode
 {
 
 class UVLoop;
-class UVTime;
 
 class UVTimer : public UVHandle
 {
@@ -36,10 +35,10 @@ public:
     unsigned long long GetRepeat() const;
 
     void OnClosed();
-    virtual void Tick(Timestamp* now);
+    virtual void Tick(const Timestamp* now);
     void Release();
 
-private:
+protected:
     UVTimer(UVLoop *loop);
     ~UVTimer();
 

@@ -12,7 +12,7 @@ static void __OnClosed(uv_handle_t *handle)
         std::cout << "@" << handle << " 's owner has released already." << std::endl;
 
     UVHandle* uvhandle = (UVHandle*)data->_self;
-    if (data != NULL && uvhandle)
+    if (data != NULL && uvhandle != NULL)
         uvhandle->OnClosed();
 
     DEBUG("Free @%p\n", handle);

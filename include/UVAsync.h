@@ -19,14 +19,15 @@ public:
     explicit UVAsync(UVLoop *loop);
     virtual ~UVAsync();
 
-    bool Send();
+    bool Send(void* data);
 
-    virtual void OnAsync();
     void OnClosed();
     void Release();
 
-private:
-    void AppendData(void *data);
+    // 同步消息调起后处理函数
+    virtual void OnAsync();
+    // 放入同步对象的数据怎么处理
+    virtual void Append(void* data) = 0;
 };
 
 } // namespace XNode

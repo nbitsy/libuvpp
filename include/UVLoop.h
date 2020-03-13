@@ -20,13 +20,15 @@ public:
     UVData *GetData() const;
     void ClearData();
 
-    void Start();
-    void StartOnce();
-    void StartNowait();
+    bool Start();
+    bool StartOnce();
+    bool StartNowait();
     void StopLoop();
+    inline void Stop() { StopLoop(); }
 
     int RawFd() const;
     bool IsAlive() const;
+    inline const std::string& Name() const { return _name; }
 
     UVLoop *GetLoop() { return this; }
     void Release() {/*do nothing*/}
@@ -35,12 +37,17 @@ public:
     template <typename T>
     T *GetRawLoop() { return reinterpret_cast<T *>(_loop); }
 
-    std::thread::id ThreadId() const { return _threadId; }
+    inline std::thread::id ThreadId() const { return _threadId; }
+    inline bool IsRunning() const { return _running; }
+
+private:
+    bool Run(uv_run_mode type);
 
 protected:
     uv_loop_t *_loop;
     std::string _name;
     std::thread::id _threadId;
+    bool _running;
 };
 
 } // namespace XNode

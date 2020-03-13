@@ -56,10 +56,12 @@ void UVAsync::Release()
     _handle = NULL;
 }
 
-bool UVAsync::Send()
+bool UVAsync::Send(void* data)
 {
     if (NULL == _loop || _loop->GetRawLoop<uv_loop_t>() == NULL || NULL == _handle)
         return false;
+    
+    Append(data);
 
     if (!uv_is_closing(_handle))
         return !uv_async_send(GetHandle<uv_async_t>());
