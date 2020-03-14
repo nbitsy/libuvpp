@@ -14,8 +14,6 @@
 namespace XNode
 {
 
-typedef unsigned int MaskType_t;
-
 // TODO: freelist到一定个数或者大小后需要进行释放
 // 最小块为64字节，8字节对齐
 // 8,16,32,64,128,256,512,1k,2k,4k,8k,16k,32k,64k
@@ -23,8 +21,11 @@ typedef unsigned int MaskType_t;
 const int MEMPOOL_SIZE_MIN = 8;         // aligned 8
 const int MEMPOOL_SIZE_MAX = 64 * 1024; // aligned 8
 
+#ifdef MEMPOOL_CHECK_OVERFLOW
+typedef unsigned int MaskType_t;
 const MaskType_t MEMPOOL_FREE = 0xFEFEFEFE;
 const MaskType_t MEMPOOL_USED = 0xDFDFDFDF;
+#endif
 
 #pragma pack(1)
 // 内存块描述性结构
@@ -43,7 +44,9 @@ struct MemPoolBlock
         };
         void *_next;
     };
+#ifdef MEMPOOL_CHECK_OVERFLOW
     MaskType_t _mask;
+#endif
     char _data[]; // ... Body
 };
 #pragma pack()
@@ -54,6 +57,7 @@ struct MemPoolBin
     int _count;
 };
 
+#ifdef MEMPOOL_CHECK_OVERFLOW
 #define HEAD_SIZE() (sizeof(MemPoolBlock) + sizeof(MaskType_t))
 #define GET_BEGIN_MASK(block) block->_mask
 #define SET_BEGIN_MASK(block, mask) block->_mask = (mask)
@@ -71,6 +75,13 @@ struct MemPoolBin
 
 #define IS_FREE(block, size) ((GET_BEGIN_MASK(block) == MEMPOOL_FREE) && (GET_END_MASK(block, size) == MEMPOOL_FREE))
 #define IS_USED(block, size) ((GET_BEGIN_MASK(block) == MEMPOOL_USED) && (GET_END_MASK(block, size) == MEMPOOL_USED))
+#else
+#define HEAD_SIZE() (sizeof(MemPoolBlock))
+#define SET_USED(...)
+#define SET_FREE(...)
+#define IS_FREE(...)
+#define IS_USED(...) true
+#endif
 
 #define LIST_EMPTY(list) (NULL == (list) || ((std::ptrdiff_t)(list)) == 0x1)
 #define IS_NULL(block) (NULL == (block) || ((std::ptrdiff_t)(block)) == 0x1)
@@ -91,7 +102,7 @@ public:
 
     // TODO: 加速这个过程
     // 这个参数是实际分配内存的大小，不包括管理字段的实际大小
-    int GetFreeListIdx(int size, int& binsize, const char* reason)
+    int GetFreeListIdx(int size, int &binsize, const char *reason)
     {
         int bsize = MEMPOOL_SIZE_MIN;
         int idxsize = size;
@@ -193,7 +204,9 @@ void MemPool<Allocator>::FreeBigBlock(void *p)
     MemPoolBlock *block = (MemPoolBlock *)BLOCK(p);
     DEBUG("FreeBigBlock@ %p realaddr: %p with size: %d\n", p, block, block->_size);
 
+#ifdef MEMPOOL_CHECK_OVERFLOW
     int binsize = block->_size;
+#endif
     int freed = block->_freed;
     if ((!freed && !IS_USED(block, binsize)) || freed)
     {

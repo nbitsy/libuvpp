@@ -80,6 +80,7 @@ void test3()
 
 int main(int argc, char* argv[])
 {
+    srandom(time(NULL));
     std::cout << "HeadSize: " << HEAD_SIZE() << std::endl;
     test1();
     test2();
