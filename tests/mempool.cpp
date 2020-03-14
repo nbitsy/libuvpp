@@ -54,7 +54,7 @@ void test2()
 
     for (int i = 0; i < mems.size(); ++i)
     {
-        void* p = mems.front();
+        void* p = mems.front(); 
         pool.FreeBlock(p);
         mems.pop_front();
     }
@@ -62,11 +62,27 @@ void test2()
     pool.PrintInfo();
 }
 
+void test3()
+{
+    MemPool<Allocator> pool;
+    void* pp = pool.AllocBlock(1);
+    snprintf((char*)pp, 9, "fuck you");
+    void* ppp = pool.AllocBlock(1);
+    pool.FreeBlock(ppp);
+    pool.FreeBlock(pp);
+    //pool.FreeBlock(ppp);
+    pool.AllocBlock(1);
+    void* p = pool.AllocBlock(1);
+    pool.FreeBlock(pool.AllocBlock(1));
+    pool.FreeBlock(p); 
+    //pool.FreeBlock(pp);
+}
+
 int main(int argc, char* argv[])
 {
+    std::cout << "HeadSize: " << HEAD_SIZE() << std::endl;
     test1();
     test2();
-
-    MemPool<Allocator> pool;
+    test3();
 	return 0;
 }
