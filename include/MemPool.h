@@ -236,7 +236,7 @@ void *MemPool<Allocator>::AllocBlock(int size)
         return AllocBigBlock(size);
 
     int binsize = 0;
-    int idx = GetFreeListIdx(size, binsize, "ALLOC");
+    int idx = GetFreeListIdx(size + HEAD_SIZE(), binsize, "ALLOC");
 
     auto &memblockbin = _binlist[idx];
     auto &freelist = memblockbin._binlist;
@@ -270,12 +270,11 @@ void *MemPool<Allocator>::AddBlock(int binsize, int idx)
     if (NULL == _binlist)
         return NULL;
 
-    int total = binsize + HEAD_SIZE();
-    void *p = Allocator::malloc(total); // [NEXT,[[CHECK][...binsize...][CHECK]]]
+    void *p = Allocator::malloc(binsize); // [NEXT,[[CHECK][...binsize...][CHECK]]]
     if (NULL == p)
         return NULL;
 
-    DEBUG("AddBlock @%p binsize: %d total: %d\n", p, binsize, total);
+    DEBUG("AddBlock @%p binsize: %d\n", p, binsize);
     auto &memblockbin = _binlist[idx];
     auto &freelist = memblockbin._binlist;
 
