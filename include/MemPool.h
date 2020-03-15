@@ -14,6 +14,11 @@
 namespace XNode
 {
 
+// XXX: 如果需要检查内存是否有溢出情况，可以把空上选项打开后编译
+#ifndef MEMPOOL_CHECK_OVERFLOW
+#define MEMPOOL_CHECK_OVERFLOW
+#endif
+
 // TODO: freelist到一定个数或者大小后需要进行释放
 // 最小块为64字节，8字节对齐
 // 8,16,32,64,128,256,512,1k,2k,4k,8k,16k,32k,64k
@@ -62,8 +67,8 @@ struct MemPoolBin
 #define GET_BEGIN_MASK(block) block->_mask
 #define SET_BEGIN_MASK(block, mask) block->_mask = (mask)
 
-#define SET_END_MASK(block, mask, size) (*(MaskType_t *)((char *)&block->_data[0] + (size)) = (mask))
-#define GET_END_MASK(block, size) (*(MaskType_t *)((char *)&block->_data[0] + (size)))
+#define SET_END_MASK(block, mask, binsize) (*(MaskType_t *)((((char *)(block)) + (binsize)) - sizeof(MaskType_t))) = (mask)
+#define GET_END_MASK(block, binsize) (*(MaskType_t *)((((char *)(block)) + (binsize)) - sizeof(MaskType_t)))
 
 #define SET_FREE(block, size)            \
     SET_BEGIN_MASK(block, MEMPOOL_FREE); \
@@ -88,6 +93,8 @@ struct MemPoolBin
 
 #define BLOCK(p) ((char *)p - &((MemPoolBlock *)0)->_data[0])
 
+const int MEMPOOL_USABLE_SIZE_MAX = MEMPOOL_SIZE_MAX - HEAD_SIZE();
+
 template <typename Allocator = Allocator>
 class MemPool
 {
@@ -101,6 +108,7 @@ public:
     inline int Blocks() const { return _blocks; }
 
     // TODO: 加速这个过程
+    // size 整个块的大小，所以包括头部大小
     // 这个参数是实际分配内存的大小，不包括管理字段的实际大小
     int GetFreeListIdx(int size, int &binsize, const char *reason)
     {
@@ -108,7 +116,7 @@ public:
         int idxsize = size;
         int idx = 0;
 
-        if (idxsize > MEMPOOL_SIZE_MAX)
+        if (size - HEAD_SIZE() > MEMPOOL_USABLE_SIZE_MAX)
         {
             ERROR("size: %d idx: %d\n", size, _binlistcnt - 1);
             return _binlistcnt - 1;
@@ -190,10 +198,13 @@ void *MemPool<Allocator>::AllocBigBlock(int size)
     if (size <= 0)
         size = MEMPOOL_SIZE_MIN;
 
-    MemPoolBlock *block = (MemPoolBlock *)Allocator::malloc(HEAD_SIZE() + size);
-    block->_size = size;
+    int binszie = size + HEAD_SIZE();
+    binszie = (binszie + (sizeof(void *) - 1)) & ~(sizeof(void *) - 1);
+
+    MemPoolBlock *block = (MemPoolBlock *)Allocator::malloc(binszie);
+    block->_size = binszie;
     block->_freed = 0;
-    SET_USED(block, size);
+    SET_USED(block, binszie);
     DEBUG("AllocBigBlock @%p realaddr: @%p with size: %d realsize: %d\n", &block->_data[0], block, size, block->_size);
     return &block->_data[0];
 }
@@ -232,7 +243,7 @@ void *MemPool<Allocator>::AllocBlock(int size)
         WARN("Alloc size is too small: %d\n", size);
 #endif
 
-    if (size > MEMPOOL_SIZE_MAX)
+    if (size > MEMPOOL_USABLE_SIZE_MAX)
         return AllocBigBlock(size);
 
     int binsize = 0;
@@ -270,7 +281,7 @@ void *MemPool<Allocator>::AddBlock(int binsize, int idx)
     if (NULL == _binlist)
         return NULL;
 
-    void *p = Allocator::malloc(binsize); // [NEXT,[[CHECK][...binsize...][CHECK]]]
+    void *p = Allocator::malloc(binsize); // [NEXT,[[CHECK][...binsize-HEAD_SIZE()...][CHECK]]]
     if (NULL == p)
         return NULL;
 
@@ -308,7 +319,7 @@ void MemPool<Allocator>::FreeBlock(void *p)
 
     MemPoolBlock *block = (MemPoolBlock *)BLOCK(p);
     int size = block->_size;
-    if (size > MEMPOOL_SIZE_MAX)
+    if (size > MEMPOOL_USABLE_SIZE_MAX)
     {
         FreeBigBlock(p);
         return;

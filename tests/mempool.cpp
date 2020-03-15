@@ -38,6 +38,7 @@ void test2()
     for (int i = 0; i < 10000; ++i)
     {
         int size = random()%(MEMPOOL_SIZE_MAX*2);
+        //int size = random()%(MEMPOOL_SIZE_MAX);
         void* p = pool.AllocBlock(size);
         mems.push_back(p);
 
@@ -66,7 +67,7 @@ void test3()
 {
     MemPool<Allocator> pool;
     void* pp = pool.AllocBlock(1);
-    snprintf((char*)pp, 9, "fuck you");
+    snprintf((char*)pp, 20, "fuck you ffffff");
     void* ppp = pool.AllocBlock(1);
     pool.FreeBlock(ppp);
     pool.FreeBlock(pp);

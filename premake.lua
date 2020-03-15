@@ -16,7 +16,7 @@ project "uvpp"
     configuration { "DebugLib" }
         symbols "On"
         defines "_DEBUG"
-        defines { "USE_TC_MALLOC" }
+        defines { "USE_TC_MALLOC", "MEMPOOL_CHECK_OVERFLOW" }
         targetdir "lib"
         buildoptions { "-g3" }
 
