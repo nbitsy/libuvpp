@@ -135,29 +135,6 @@ void ObjectPool<T, Allocator>::free(void *p)
     ++_listcount;
 }
 
-#if 0
-template <typename T, typename Allocator>
-T *ObjectPool<T, Allocator>::Construct()
-{
-    void *p = malloc();
-    if (NULL == p)
-        return NULL;
-
-    DEBUG("Construct @%p\n", p);
-    try
-    {
-        return new (p) T();
-    }
-    catch (...)
-    {
-        free(p);
-        return NULL;
-    }
-
-    return NULL;
-}
-#endif
-
 template <typename T, typename Allocator>
 void ObjectPool<T, Allocator>::Destroy(T *obj)
 {
