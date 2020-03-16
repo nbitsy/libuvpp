@@ -187,7 +187,7 @@ MemPool<Allocator>::~MemPool()
         }
     }
 
-    PrintInfo();
+    //PrintInfo();
     if (_binlist != NULL)
         Allocator::free(_binlist);
 }
