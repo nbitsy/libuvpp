@@ -17,9 +17,9 @@ YAdSYM = $(dSYM:.c=.dSYM)
 
 all: .libuv .libuvpp $(YAFFS)
 
-$(YAFFS): ../lib/libuv.a ../lib/libuvpp.a ../lib/libtcmalloc_minimal.a
+$(YAFFS): ../3Party/libuv/lib/libuv.a ../lib/libuvpp.a ../3Party/tcmalloc/lib/libtcmalloc_minimal.a
 
-.libuv : ../lib/libuv.a
+.libuv : ../3Party/libuv/lib/libuv.a
 	make -C ..
 
 .libuvpp : ../lib/libuvpp.a
