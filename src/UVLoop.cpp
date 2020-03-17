@@ -83,6 +83,7 @@ bool UVLoop::Run(uv_run_mode type)
     {
         _running = true;
         uv_run(_loop, type);
+        OnStopped();
         _running = false;
     }
 
@@ -128,6 +129,11 @@ bool UVLoop::IsAlive() const
     if (_loop != NULL)
         return uv_loop_alive(_loop);
     return false;
+}
+
+void UVLoop::OnStopped()
+{
+    DEBUG("\n");
 }
 
 } // namespace XNode

@@ -36,7 +36,14 @@ public:
     }
 
     template <typename T>
-    void Destroy(T *obj) { free(obj); }
+    void Destroy(T *obj)
+    {
+        if (obj != NULL)
+        {
+            obj->~T();
+            free(obj);
+        }
+    }
 
 private:
     inline void *malloc(size_t size) { return AllocBlock(size); }

@@ -25,6 +25,7 @@ public:
     bool StartNowait();
     void StopLoop();
     inline void Stop() { StopLoop(); }
+    virtual void OnStopped();
 
     int RawFd() const;
     bool IsAlive() const;

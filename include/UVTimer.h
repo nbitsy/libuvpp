@@ -25,6 +25,9 @@ public:
         timer->Stop();
     }
 
+    UVTimer(UVLoop *loop);
+    virtual ~UVTimer();
+
 public:
     // timeout: 第一次开始时的延迟时间
     // repeat: 下一次的回调的间隔时间,ms
@@ -37,10 +40,6 @@ public:
     void OnClosed();
     virtual void Tick(const Timestamp* now);
     void Release();
-
-protected:
-    UVTimer(UVLoop *loop);
-    ~UVTimer();
 
 private:
     Timestamp _timestamp;
