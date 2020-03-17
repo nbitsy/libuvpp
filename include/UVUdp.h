@@ -1,6 +1,6 @@
 
-#ifndef UVUDP_H_
-#define UVUDP_H_
+#ifndef _UVUDP_H_
+#define _UVUDP_H_
 
 #include "EndPointAddress.h"
 #include "UVIODevice.h"
@@ -54,6 +54,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVUDP_H_
+#endif // _UVUDP_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

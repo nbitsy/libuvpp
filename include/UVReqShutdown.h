@@ -1,6 +1,6 @@
 
-#ifndef UVREQSHUTDOWN_H_
-#define UVREQSHUTDOWN_H_
+#ifndef _UVREQSHUTDOWN_H_
+#define _UVREQSHUTDOWN_H_
 
 #include "UVReq.h"
 
@@ -26,7 +26,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVREQSHUTDOWN_H_
+#endif // _UVREQSHUTDOWN_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

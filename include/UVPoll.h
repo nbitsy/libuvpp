@@ -1,6 +1,6 @@
 
-#ifndef UVPOLL_H_
-#define UVPOLL_H_
+#ifndef _UVPOLL_H_
+#define _UVPOLL_H_
 
 #include "UVTypes.h"
 #include "UVHandle.h"
@@ -26,6 +26,6 @@ public:
 
 } // namespace XNode
 
-#endif // UVPOLL_H_
+#endif // _UVPOLL_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

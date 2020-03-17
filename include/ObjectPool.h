@@ -1,6 +1,6 @@
 
-#ifndef OBJECTPOOL_H_
-#define OBJECTPOOL_H_
+#ifndef _OBJECTPOOL_H_
+#define _OBJECTPOOL_H_
 
 #include "MemPool.h"
 
@@ -158,6 +158,6 @@ void ObjectPool<T, Allocator>::PrintInfo()
 
 } // namespace XNode
 
-#endif // OBJECTPOOL_H_
+#endif // _OBJECTPOOL_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

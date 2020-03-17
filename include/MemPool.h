@@ -1,6 +1,6 @@
 
-#ifndef MEMPOOL_H_
-#define MEMPOOL_H_
+#ifndef _MEMPOOL_H_
+#define _MEMPOOL_H_
 
 #include <new>      // XXX: for std::ptrdiff_t
 #include <stdlib.h> // XXX: for NULL
@@ -378,6 +378,6 @@ void MemPool<Allocator>::PrintInfo()
 
 } // namespace XNode
 
-#endif // MEMPOOL_H_
+#endif // _MEMPOOL_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

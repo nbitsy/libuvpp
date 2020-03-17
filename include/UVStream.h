@@ -1,6 +1,6 @@
 
-#ifndef UVSTREAM_H_
-#define UVSTREAM_H_
+#ifndef _UVSTREAM_H_
+#define _UVSTREAM_H_
 
 #include "uv.h"
 #include "UVIODevice.h"
@@ -70,6 +70,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVSTREAM_H_
+#endif // _UVSTREAM_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

@@ -1,6 +1,6 @@
 
-#ifndef UVIODEVICE_H_
-#define UVIODEVICE_H_
+#ifndef _UVIODEVICE_H_
+#define _UVIODEVICE_H_
 
 #include "EndPointAddress.h"
 #include "UVHandle.h"
@@ -59,6 +59,6 @@ protected:
 
 } // namespace XNode
 
-#endif // UVIODEVICE_H_
+#endif // _UVIODEVICE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

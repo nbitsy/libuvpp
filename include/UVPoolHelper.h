@@ -1,6 +1,6 @@
 
-#ifndef UVPOOLHELPER_H_
-#define UVPOOLHELPER_H_
+#ifndef _UVPOOLHELPER_H_
+#define _UVPOOLHELPER_H_
 
 #include "ObjectPool.h"
 #include "UVDataHelper.h"
@@ -91,6 +91,6 @@ protected:
 
 } // namespace XNode
 
-#endif // UVPOOLHELPER_H_
+#endif // _UVPOOLHELPER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

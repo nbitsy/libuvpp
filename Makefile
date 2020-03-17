@@ -9,6 +9,7 @@
 OS := $(shell uname)
 
 TARGETDIR=~/PRG/XNode/3Party
+LIBUVPPTAR=${TARGETDIR}/libuvpp
 
 .PHONY: all premake install clean distclean 
 
@@ -18,11 +19,13 @@ all: .build .obj
 .build .obj premake: premake.lua
 	premake --os=macosx --file=premake.lua gmake
 
-install:
-	mkdir -p ${TARGETDIR}/libuvpp/include
-	mkdir -p ${TARGETDIR}/lib
-	cp -rf include/* ${TARGETDIR}/libuvpp/include
-	cp -rf lib/* ${TARGETDIR}/lib/
+install: all
+	mkdir -p ${TARGETDIR}
+	cp -rf 3Party/* ${TARGETDIR}
+	mkdir -p ${LIBUVPPTAR}/include
+	mkdir -p ${LIBUVPPTAR}/lib
+	cp -rf include/* ${LIBUVPPTAR}/include
+	cp -rf lib/* ${LIBUVPPTAR}/lib
 
 clean: 
 	rm -rf .obj .build

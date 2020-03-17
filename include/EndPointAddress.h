@@ -1,6 +1,6 @@
 
-#ifndef UVTYPES_H_
-#define UVTYPES_H_
+#ifndef _ENDPOINTADDRESS_H_
+#define _ENDPOINTADDRESS_H_
 
 #include <string>
 
@@ -21,6 +21,6 @@ struct EndPointAddress
 
 } // namespace XNode
 
-#endif // UVTYPES_H_
+#endif // _ENDPOINTADDRESS_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

@@ -1,6 +1,6 @@
 
-#ifndef UVREQCONNECT_H_
-#define UVREQCONNECT_H_
+#ifndef _UVREQCONNECT_H_
+#define _UVREQCONNECT_H_
 
 #include "UVReq.h"
 #include "EndPointAddress.h"
@@ -29,7 +29,7 @@ private:
 
 } // namespace XNode
 
-#endif // UVREQCONNECT_H_
+#endif // _UVREQCONNECT_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

@@ -1,6 +1,6 @@
 
-#ifndef TIMESTAMP_H_
-#define TIMESTAMP_H_
+#ifndef _TIMESTAMP_H_
+#define _TIMESTAMP_H_
 
 #include <algorithm>
 #include <ctime>
@@ -198,6 +198,6 @@ inline std::time_t Timestamp::EpochTime() const
 
 } // namespace XNode
 
-#endif // TIMESTAMP_H_
+#endif // _TIMESTAMP_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

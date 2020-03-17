@@ -1,6 +1,6 @@
 
-#ifndef UV_PP_H_
-#define UV_PP_H_
+#ifndef _UVPP_H_
+#define _UVPP_H_
 
 #include "uv.h"
 #include "EndPointAddress.h"
@@ -33,7 +33,6 @@ inline const char* Version()
 
 } // namespace XNode
 
-#endif // UV_PP_H_
+#endif // _UVPP_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

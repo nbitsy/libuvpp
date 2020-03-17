@@ -1,6 +1,6 @@
 
-#ifndef UVREQWRITE_H_
-#define UVREQWRITE_H_
+#ifndef _UVREQWRITE_H_
+#define _UVREQWRITE_H_
 
 #include "UVReq.h"
 
@@ -89,6 +89,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVREQWRITE_H_
+#endif // _UVREQWRITE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

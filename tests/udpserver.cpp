@@ -17,7 +17,8 @@ int main(int argc, char* argv[])
 
     UVUdp* udp = UVUdp::Create(loop);
 
-    udp->Bind("127.0.0.1", 13300);
+    udp->Bind("127.0.0.1", 13300, UV_UDP_REUSEADDR);
+    // udp->SetBroadcast(true);
     udp->StartRead();
 
     loop->Start();

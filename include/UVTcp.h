@@ -1,6 +1,6 @@
 
-#ifndef UVTCP_H_
-#define UVTCP_H_
+#ifndef _UVTCP_H_
+#define _UVTCP_H_
 
 #include "EndPointAddress.h"
 #include "UVStream.h"
@@ -55,6 +55,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVTCP_H_
+#endif // _UVTCP_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

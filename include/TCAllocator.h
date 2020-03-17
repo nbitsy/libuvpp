@@ -1,6 +1,6 @@
 
-#ifndef TCALLOCATOR_H_
-#define TCALLOCATOR_H_
+#ifndef _TCALLOCATOR_H_
+#define _TCALLOCATOR_H_
 
 #include "gperftools/tcmalloc.h"
 
@@ -24,6 +24,6 @@ public:
 
 } // namespace XNode
 
-#endif // TCALLOCATOR_H_
+#endif // _TCALLOCATOR_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

@@ -1,6 +1,6 @@
 
-#ifndef UVREQ_H_
-#define UVREQ_H_
+#ifndef _UVREQ_H_
+#define _UVREQ_H_
 
 #include "UVDataHelper.h"
 
@@ -32,6 +32,6 @@ protected:
 
 } // namespace XNode
 
-#endif // UVREQ_H_
+#endif // _UVREQ_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

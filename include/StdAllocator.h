@@ -1,6 +1,6 @@
 
-#ifndef STDALLOCATOR_H_
-#define STDALLOCATOR_H_
+#ifndef _STDALLOCATOR_H_
+#define _STDALLOCATOR_H_
 
 #include <stdlib.h> // XXX: for malloc,free
 #include <cstdlib> // XXX: for std::size_t
@@ -24,6 +24,6 @@ public:
 
 } // namespace XNode
 
-#endif // STDALLOCATOR_H_
+#endif // _STDALLOCATOR_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

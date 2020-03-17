@@ -1,6 +1,6 @@
 
-#ifndef UVIDLE_H_
-#define UVIDLE_H_
+#ifndef _UVIDLE_H_
+#define _UVIDLE_H_
 
 #include "UVHandle.h"
 
@@ -26,7 +26,7 @@ public:
 
 } // namespace XNode
 
-#endif // UVIDLE_H_
+#endif // _UVIDLE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

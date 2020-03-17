@@ -1,6 +1,6 @@
 
-#ifndef UVTIMER_H_
-#define UVTIMER_H_
+#ifndef _UVTIMER_H_
+#define _UVTIMER_H_
 
 #include "UVHandle.h"
 #include "Timestamp.h"
@@ -48,6 +48,6 @@ private:
 
 } // namespace XNode
 
-#endif // UVTIMER_H_
+#endif // _UVTIMER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

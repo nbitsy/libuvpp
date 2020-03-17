@@ -1,6 +1,6 @@
 
-#ifndef UVLOOP_H_
-#define UVLOOP_H_
+#ifndef _UVLOOP_H_
+#define _UVLOOP_H_
 
 #include "UVDataHelper.h"
 #include "UVPoolHelper.h"
@@ -52,6 +52,6 @@ protected:
 
 } // namespace XNode
 
-#endif // UVLOOP_H_
+#endif // _UVLOOP_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
