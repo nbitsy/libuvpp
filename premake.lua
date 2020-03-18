@@ -8,8 +8,8 @@ project "uvpp"
     kind "StaticLib" -- ConsoleApp,SharedLib,StaticLib
     files { "**.cpp", "**.c", "**.h", "**.hpp" }
     excludes { "tests/*" }
-    includedirs { "include", "3Party/libuv", "3Party/tcmalloc", "3Party/protobuf/include" } 
-    libdirs { "lib", "3Party/libuv/lib", "3Party/tcmalloc/lib", "3Party/protobuf/lib" }
+    includedirs { "include", "3Party/libuv", "3Party/tcmalloc" } 
+    libdirs { "lib", "3Party/libuv/lib", "3Party/tcmalloc/lib" }
     configuration { "not vs* or codeblocks" }
     buildoptions { "-std=c++11", "-fPIC" }
 
@@ -20,7 +20,7 @@ project "uvpp"
         targetdir "lib"
         buildoptions { "-g3" }
         buildoptions { "-std=c++11" }
-        links { "uv", "tcmalloc_minimal", "protobuf-lite" }
+        links { "uv", "tcmalloc_minimal" }
 
     configuration { "ReleaseLib" }
         symbols "On"
@@ -29,5 +29,5 @@ project "uvpp"
         buildoptions { "-O3" }
         linkoptions { "-g3" }
         buildoptions { "-std=c++11" }
-        links { "uv", "tcmalloc_minimal", "protobuf-lite" }
+        links { "uv", "tcmalloc_minimal" }
 
