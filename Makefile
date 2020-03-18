@@ -8,8 +8,8 @@
 
 OS := $(shell uname)
 
-TARGETDIR=~/PRG/XNode/3Party
-TARGETDIR2=~/PRG/XNetTop/3Party
+TARGETDIR=~/PRG/XNode/3party
+TARGETDIR2=~/PRG/XNetTop/3party
 LIBUVPPTAR=${TARGETDIR}/libuvpp
 LIBUVPPTAR2=${TARGETDIR2}/libuvpp
 
@@ -25,7 +25,7 @@ install: all xnode xnettop
 
 xnode:
 	mkdir -p ${TARGETDIR}
-	cp -rf 3Party/* ${TARGETDIR}
+	cp -rf 3party/* ${TARGETDIR}
 	mkdir -p ${LIBUVPPTAR}/include
 	mkdir -p ${LIBUVPPTAR}/lib
 	cp -rf include/* ${LIBUVPPTAR}/include
@@ -33,7 +33,7 @@ xnode:
 
 xnettop:
 	mkdir -p ${TARGETDIR2}
-	cp -rf 3Party/* ${TARGETDIR2}
+	cp -rf 3party/* ${TARGETDIR2}
 	mkdir -p ${LIBUVPPTAR2}/include
 	mkdir -p ${LIBUVPPTAR2}/lib
 	cp -rf include/* ${LIBUVPPTAR2}/include
