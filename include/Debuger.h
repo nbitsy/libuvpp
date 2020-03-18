@@ -2,10 +2,15 @@
 #ifndef _DEBUGER_H_
 #define _DEBUGER_H_
 
+#ifdef _DEBUG
 #include <stdlib.h>
+#include <stdio.h>
+#endif
 
 namespace XNode
 {
+
+#ifdef _DEBUG
 
 #define DEBUG_GREENnBACK "\033[1;32;40m"  // debug
 #define DEBUG_WHITEnBACK ""               // log
@@ -27,8 +32,6 @@ namespace XNode
 #ifndef DEBUG_LEVEL
 #define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
 #endif
-
-#ifdef _DEBUG
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_DEBUG
 #define DEBUG(...)                                                                     \
