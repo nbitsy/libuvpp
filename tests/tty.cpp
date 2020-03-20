@@ -6,7 +6,7 @@ extern "C" {
 
 #include "UVPP.h"
 
-using namespace XNode;
+using namespace XSpace;
 
 int main(int argc, char* argv[])
 {

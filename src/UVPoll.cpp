@@ -2,7 +2,7 @@
 #include "UVPoll.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnPoll(uv_poll_t *handle, int status, int events)
@@ -75,6 +75,6 @@ void UVPoll::OnPoll(int status, int events)
     DEBUG("Object @%p\n", this);
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

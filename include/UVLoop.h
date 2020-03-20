@@ -7,7 +7,7 @@
 #include <string>
 #include <thread>
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop : public UVDataHelper, public UVPoolHelper
@@ -51,7 +51,7 @@ protected:
     bool _running;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVLOOP_H_
 

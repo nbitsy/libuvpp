@@ -2,7 +2,7 @@
 #include "UVTty.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 UVTty::UVTty(UVLoop *loop, int fd, bool readable, int flags) : UVIODevice(loop, flags)
@@ -54,6 +54,6 @@ void UVTty::OnShutdown()
     DEBUG("\n");
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

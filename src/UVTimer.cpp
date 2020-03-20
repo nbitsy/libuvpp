@@ -2,7 +2,7 @@
 #include "UVTimer.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 UVTimer::UVTimer(UVLoop *loop) : UVHandle(loop)
@@ -124,6 +124,6 @@ void UVTimer::Tick(const Timestamp* now)
     }
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

@@ -2,7 +2,7 @@
 #include "UVLoop.h"
 #include "Allocator.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static UVLoop gDefaultLoop("Default", true);
@@ -136,6 +136,6 @@ void UVLoop::OnStopped()
     DEBUG("\n");
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

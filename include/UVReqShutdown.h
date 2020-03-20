@@ -4,7 +4,7 @@
 
 #include "UVReq.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVStream;
@@ -24,7 +24,7 @@ private:
     UVStream* _stream;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVREQSHUTDOWN_H_
 

@@ -2,7 +2,7 @@
 #include "UVUdp.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 UVUdp::UVUdp(UVLoop *loop, int flags) : UVIODevice(loop, flags)
@@ -134,6 +134,6 @@ void UVUdp::Release()
     _handle = NULL;
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

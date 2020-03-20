@@ -2,7 +2,7 @@
 #include "UVReq.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 UVReq::UVReq(bool gc) : _req(NULL)
@@ -28,6 +28,6 @@ void UVReq::ClearData()
     UVDataHelper::ClearData(_req);
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

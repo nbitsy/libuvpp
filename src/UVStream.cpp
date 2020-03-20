@@ -4,7 +4,7 @@
 #include "UVReqShutdown.h"
 #include "UVReqWrite.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnNewConnection(uv_stream_t *server, int status)
@@ -113,6 +113,6 @@ void UVStream::SetBlocking(bool v)
     uv_stream_set_blocking(GetHandle<uv_stream_t>(), v);
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

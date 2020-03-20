@@ -3,7 +3,7 @@
 #include "Debuger.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnAsync(uv_async_t *async)
@@ -79,6 +79,6 @@ void UVAsync::OnAsync()
     DEBUG("")
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

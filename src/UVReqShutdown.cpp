@@ -2,7 +2,7 @@
 #include "UVReqShutdown.h"
 #include "UVStream.h"
 
-namespace XNode
+namespace XSpace
 {
 
 void __OnShutdown(uv_shutdown_t *req, int status)
@@ -68,6 +68,6 @@ UVLoop *UVReqShutdown::GetLoop()
     return _stream->GetLoop();
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

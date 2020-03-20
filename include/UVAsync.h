@@ -4,7 +4,7 @@
 
 #include "UVHandle.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -30,7 +30,7 @@ public:
     virtual void Append(void* data) = 0;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVASYNC_H_
 

@@ -8,7 +8,7 @@
 
 OS := $(shell uname)
 
-TARGETDIR=~/PRG/XNode/3party
+TARGETDIR=~/PRG/XSpace/3party
 TARGETDIR2=~/PRG/XNetTop/3party
 LIBUVPPTAR=${TARGETDIR}/libuvpp
 LIBUVPPTAR2=${TARGETDIR2}/libuvpp

@@ -7,7 +7,7 @@ extern "C" {
 #include "TCAllocator.h"
 #include <iostream>
 
-using namespace XNode;
+using namespace XSpace;
 
 int main(int argc, char* argv[])
 {

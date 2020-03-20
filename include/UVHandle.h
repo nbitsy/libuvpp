@@ -5,7 +5,7 @@
 #include "uv.h"
 #include "UVDataHelper.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -44,7 +44,7 @@ protected:
     uv_handle_t *_handle;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVHANDLE_H_
 

@@ -4,7 +4,7 @@
 
 #include "UVReq.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVIODevice;
@@ -87,7 +87,7 @@ private:
     };
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVREQWRITE_H_
 

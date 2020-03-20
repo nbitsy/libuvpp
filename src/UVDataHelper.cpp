@@ -2,7 +2,7 @@
 #include "UVDataHelper.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 void UVDataHelper::SetData(void *target, void *data, bool force, int type)
@@ -154,6 +154,6 @@ void UVDataHelper::BufFree(const uv_buf_t *buf, UVLoop* loop)
     loop->Free(buf->base);
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

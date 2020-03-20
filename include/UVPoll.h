@@ -5,7 +5,7 @@
 #include "UVTypes.h"
 #include "UVHandle.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -24,7 +24,7 @@ public:
     void Release();
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVPOLL_H_
 

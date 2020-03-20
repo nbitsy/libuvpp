@@ -3,7 +3,7 @@
 #include "UVIODevice.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnWrite(uv_write_t *req, int status)
@@ -312,6 +312,6 @@ void UVReqWrite::Release()
     _req = NULL;
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

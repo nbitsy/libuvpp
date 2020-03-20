@@ -2,7 +2,7 @@
 #include "UVPrepare.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnPrepare(uv_prepare_t* handle)
@@ -75,7 +75,7 @@ void UVPrepare::OnPrepare()
     DEBUG("Object @%p\n", this);
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

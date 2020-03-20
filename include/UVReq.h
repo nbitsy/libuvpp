@@ -4,7 +4,7 @@
 
 #include "UVDataHelper.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVReq : public UVDataHelper
@@ -30,7 +30,7 @@ protected:
     uv_req_t *_req;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVREQ_H_
 

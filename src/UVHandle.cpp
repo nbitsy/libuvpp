@@ -2,7 +2,7 @@
 #include "UVHandle.h"
 #include <iostream>
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnClosed(uv_handle_t *handle)
@@ -129,7 +129,7 @@ void UVHandle::Release()
     delete this; // TODO:
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

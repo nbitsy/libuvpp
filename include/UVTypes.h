@@ -2,7 +2,7 @@
 #ifndef _UVTYPES_H_
 #define _UVTYPES_H_
 
-namespace XNode
+namespace XSpace
 {
 
 enum UVEventType
@@ -14,7 +14,7 @@ enum UVEventType
     UVET_ALL
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // UVTYPES_H_
 

@@ -6,7 +6,7 @@
 #include "UVStream.h"
 #include <iostream>
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -53,7 +53,7 @@ private:
     ~UVTcp();
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVTCP_H_
 

@@ -2,7 +2,7 @@
 #include "UVIdle.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnIdle(uv_idle_t* handle)
@@ -75,6 +75,6 @@ void UVIdle::OnIdle()
     DEBUG("\n");
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

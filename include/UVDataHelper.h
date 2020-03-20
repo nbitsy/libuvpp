@@ -6,7 +6,7 @@
 #include "ObjectPool.h"
 #include "uv.h"
 
-namespace XNode
+namespace XSpace
 {
 
 enum UVDataType
@@ -122,7 +122,7 @@ protected:
     bool _bgc;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVDATAHELPER_H_
 

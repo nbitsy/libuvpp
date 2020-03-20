@@ -2,7 +2,7 @@
 #ifndef _UVBUF_H_
 #define _UVBUF_H_
 
-namespace XNode
+namespace XSpace
 {
 
 class UVBuf
@@ -19,7 +19,7 @@ private:
     int _length;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVBUF_H_
 

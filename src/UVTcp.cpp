@@ -3,7 +3,7 @@
 #include "UVReqConnect.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 UVTcp::UVTcp(UVLoop *loop, int flags) : UVStream(loop, flags)
@@ -116,6 +116,6 @@ void UVTcp::Release()
     _handle = NULL;
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

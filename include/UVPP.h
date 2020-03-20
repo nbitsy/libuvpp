@@ -23,7 +23,7 @@
 #include "UVUdp.h"
 #include "UVTty.h"
 
-namespace XNode
+namespace XSpace
 {
 
 inline const char* Version()
@@ -31,7 +31,7 @@ inline const char* Version()
     return uv_version_string();
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVPP_H_
 

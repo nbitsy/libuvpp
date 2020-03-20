@@ -4,7 +4,7 @@
 
 #include "UVIODevice.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -21,7 +21,7 @@ public:
     void OnShutdown();
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVTTY_H_
 

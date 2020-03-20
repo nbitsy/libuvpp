@@ -5,7 +5,7 @@
 #include "UVHandle.h"
 #include "Timestamp.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -45,7 +45,7 @@ private:
     Timestamp _timestamp;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVTIMER_H_
 

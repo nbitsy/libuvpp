@@ -2,7 +2,7 @@
 #include "UVCheck.h"
 #include "UVLoop.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnCheck(uv_check_t *handle)
@@ -75,6 +75,6 @@ void UVCheck::OnCheck()
     DEBUG("\n");
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

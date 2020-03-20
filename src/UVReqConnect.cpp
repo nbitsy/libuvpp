@@ -1,7 +1,7 @@
 
 #include "UVReqConnect.h"
 
-namespace XNode
+namespace XSpace
 {
 
 void __OnConnected(uv_connect_t *req, int status)
@@ -96,6 +96,6 @@ UVLoop *UVReqConnect::GetLoop()
     return _handle->GetLoop();
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

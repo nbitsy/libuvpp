@@ -6,7 +6,7 @@
 #include "UVDataHelper.h"
 #include "UVReqWrite.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVPoolHelper
@@ -89,7 +89,7 @@ protected:
     MemPool<Allocator> _mempool; // 用于大块内存的管理
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVPOOLHELPER_H_
 

@@ -6,7 +6,7 @@
 #include "EndPointAddress.h"
 #include "UVTcp.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVReqConnect : public UVReq
@@ -27,7 +27,7 @@ private:
     EndPointAddress _address;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVREQCONNECT_H_
 

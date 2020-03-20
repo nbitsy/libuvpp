@@ -5,7 +5,7 @@
 #include "uv.h"
 #include "UVIODevice.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -68,7 +68,7 @@ private:
     EUVStreamType _type;
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVSTREAM_H_
 

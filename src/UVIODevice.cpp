@@ -4,7 +4,7 @@
 #include "UVLoop.h"
 #include "UVReqWrite.h"
 
-namespace XNode
+namespace XSpace
 {
 
 static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
@@ -298,6 +298,6 @@ bool UVIODevice::TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr)
     return false;
 }
 
-} // namespace XNode
+} // namespace XSpace
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

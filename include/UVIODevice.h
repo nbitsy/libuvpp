@@ -7,7 +7,7 @@
 #include "uv.h"
 #include <string>
 
-namespace XNode
+namespace XSpace
 {
 
 class UVLoop;
@@ -57,7 +57,7 @@ protected:
     };
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVIODEVICE_H_
 

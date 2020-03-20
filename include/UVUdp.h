@@ -5,7 +5,7 @@
 #include "EndPointAddress.h"
 #include "UVIODevice.h"
 
-namespace XNode
+namespace XSpace
 {
 
 class UVUdp : public UVIODevice
@@ -52,7 +52,7 @@ private:
     ~UVUdp();
 };
 
-} // namespace XNode
+} // namespace XSpace
 
 #endif // _UVUDP_H_
 
