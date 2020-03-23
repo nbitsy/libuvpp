@@ -2,7 +2,7 @@
 #ifndef _UVTCP_H_
 #define _UVTCP_H_
 
-#include "EndPointAddress.h"
+#include "NetAddress.h"
 #include "UVStream.h"
 #include <iostream>
 

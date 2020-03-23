@@ -3,7 +3,7 @@
 #define _UVREQCONNECT_H_
 
 #include "UVReq.h"
-#include "EndPointAddress.h"
+#include "NetAddress.h"
 #include "UVTcp.h"
 
 namespace XSpace
@@ -12,7 +12,7 @@ namespace XSpace
 class UVReqConnect : public UVReq
 {
 public:
-    UVReqConnect(UVTcp* handle, EndPointAddress address);
+    UVReqConnect(UVTcp* handle, NetAddress address);
     UVReqConnect(UVTcp* handle, const std::string& ip, int port);
     ~UVReqConnect();
 
@@ -24,7 +24,7 @@ public:
 
 private:
     UVTcp* _handle;
-    EndPointAddress _address;
+    NetAddress _address;
 };
 
 } // namespace XSpace

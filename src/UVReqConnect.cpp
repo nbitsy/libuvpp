@@ -21,7 +21,7 @@ void __OnConnected(uv_connect_t *req, int status)
     uvreqconnect->Release();
 }
 
-UVReqConnect::UVReqConnect(UVTcp *handle, EndPointAddress address) : _handle(handle), _address(address)
+UVReqConnect::UVReqConnect(UVTcp *handle, NetAddress address) : _handle(handle), _address(address)
 {
     _req = (uv_req_t*)Allocator::malloc(sizeof(uv_connect_t));
     if (_req != NULL)
@@ -54,12 +54,12 @@ bool UVReqConnect::Start()
 
     if (af == AF_INET6)
     {
-        uv_ip6_addr(_address._ip.c_str(), _address._port, &_addr6);
+        uv_ip6_addr(_address.Ip.c_str(), _address.Port, &_addr6);
         addr = (struct sockaddr *)&_addr6;
     }
     else
     {
-        uv_ip4_addr(_address._ip.c_str(), _address._port, &_addr);
+        uv_ip4_addr(_address.Ip.c_str(), _address.Port, &_addr);
         addr = (struct sockaddr *)&_addr;
     }
 

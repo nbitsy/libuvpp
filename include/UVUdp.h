@@ -2,7 +2,7 @@
 #ifndef _UVUDP_H_
 #define _UVUDP_H_
 
-#include "EndPointAddress.h"
+#include "NetAddress.h"
 #include "UVIODevice.h"
 
 namespace XSpace

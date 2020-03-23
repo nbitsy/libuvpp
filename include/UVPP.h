@@ -3,7 +3,7 @@
 #define _UVPP_H_
 
 #include "uv.h"
-#include "EndPointAddress.h"
+#include "NetAddress.h"
 #include "UVTypes.h"
 #include "UVLoop.h"
 #include "UVAsync.h"

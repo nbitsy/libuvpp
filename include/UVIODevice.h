@@ -2,7 +2,7 @@
 #ifndef _UVIODEVICE_H_
 #define _UVIODEVICE_H_
 
-#include "EndPointAddress.h"
+#include "NetAddress.h"
 #include "UVHandle.h"
 #include "uv.h"
 #include <string>
@@ -28,8 +28,8 @@ public:
     bool TryWrite(void *data, int nsize, const struct sockaddr *addr);
     bool TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr);
 
-    const EndPointAddress LocalAddress() const;
-    const EndPointAddress RemoteAddress(const struct sockaddr *remote = NULL) const;
+    const NetAddress LocalAddress() const;
+    const NetAddress RemoteAddress(const struct sockaddr *remote = NULL) const;
     int GetAf() const;
 
     // TCP/PIPE
@@ -38,7 +38,7 @@ public:
     virtual void OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags) {}
 
 private:
-    void GetAddress(int type, EndPointAddress &address, const struct sockaddr *addr = NULL) const;
+    void GetAddress(int type, NetAddress &address, const struct sockaddr *addr = NULL) const;
 
 protected:
     void InitAddress();
