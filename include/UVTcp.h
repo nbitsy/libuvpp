@@ -27,6 +27,12 @@ public:
     }
 
 public:
+    /**
+     * 构造函数和析构函数放这里说明不允许在栈里去构造一个UVTcp对象
+    */
+    UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
+    ~UVTcp();
+
     bool Bind(const std::string &ip, int port, unsigned int flags = 0);
 
     inline void SetNoDelay() { SetDelay(false); }
@@ -44,13 +50,6 @@ public:
     void OnClosed();
     void OnShutdown();
     void Release();
-
-private:
-    /**
-     * 构造函数和析构函数放这里说明不允许在栈里去构造一个UVTcp对象
-    */
-    UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
-    ~UVTcp();
 };
 
 } // namespace XSpace

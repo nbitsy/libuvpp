@@ -8,9 +8,10 @@
 
 OS := $(shell uname)
 
-TARGETDIR=~/PRG/XSpace/3party
+TARGETDIR1=~/PRG/XNode/3party
+LIBUVPPTAR1=${TARGETDIR1}/libuvpp
+
 TARGETDIR2=~/PRG/XNetTop/3party
-LIBUVPPTAR=${TARGETDIR}/libuvpp
 LIBUVPPTAR2=${TARGETDIR2}/libuvpp
 
 .PHONY: all premake install clean distclean 
@@ -24,12 +25,12 @@ all: .build .obj
 install: all xnode xnettop
 
 xnode:
-	mkdir -p ${TARGETDIR}
-	cp -rf 3party/* ${TARGETDIR}
-	mkdir -p ${LIBUVPPTAR}/include
-	mkdir -p ${LIBUVPPTAR}/lib
-	cp -rf include/* ${LIBUVPPTAR}/include
-	cp -rf lib/* ${LIBUVPPTAR}/lib
+	mkdir -p ${TARGETDIR1}
+	cp -rf 3party/* ${TARGETDIR1}
+	mkdir -p ${LIBUVPPTAR1}/include
+	mkdir -p ${LIBUVPPTAR1}/lib
+	cp -rf include/* ${LIBUVPPTAR1}/include
+	cp -rf lib/* ${LIBUVPPTAR1}/lib
 
 xnettop:
 	mkdir -p ${TARGETDIR2}

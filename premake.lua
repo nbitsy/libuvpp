@@ -8,8 +8,8 @@ project "uvpp"
     kind "StaticLib" -- ConsoleApp,SharedLib,StaticLib
     files { "**.cpp", "**.c", "**.h", "**.hpp" }
     excludes { "tests/*" }
-    includedirs { "include", "3party/libuv", "../Core/include", "../Core/3party/tcmalloc/include" }
-    libdirs { "lib", "3party/libuv/lib", "../Core/lib", "../Core/3party/tcmalloc/lib" }
+    includedirs { "include", "3party/libuv", "3party/libcore/include", "3party/tcmalloc/include" }
+    libdirs { "lib", "3party/libuv/lib", "3party/libcore/lib", "3party/tcmalloc/lib" }
     configuration { "not vs* or codeblocks" }
     buildoptions { "-std=c++11", "-fPIC" }
 
