@@ -1,5 +1,6 @@
 
 #include "UVReqConnect.h"
+#include "Allocator.h"
 
 namespace XSpace
 {
@@ -34,6 +35,13 @@ UVReqConnect::UVReqConnect(UVTcp *handle, NetAddress address) : _handle(handle),
 
 UVReqConnect::UVReqConnect(UVTcp *handle, const std::string &ip, int port) : _handle(handle), _address(ip, port)
 {
+    _req = (uv_req_t*)Allocator::malloc(sizeof(uv_connect_t));
+    if (_req != NULL)
+    {
+        uv_req_set_data(_req, NULL);
+        SetData(NULL);
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 UVReqConnect::~UVReqConnect()
@@ -83,7 +91,7 @@ void UVReqConnect::Release()
     ClearData();
     Allocator::free(_req);
     if (GetGC())
-        delete this; // TODO:
+        Allocator::Destroy(this);
 
     _req = NULL;
 }

@@ -1,7 +1,9 @@
 
+#include <iostream>
 #include "UVReqWrite.h"
 #include "UVIODevice.h"
 #include "UVLoop.h"
+#include "Allocator.h"
 
 namespace XSpace
 {

@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include "UVStream.h"
 #include "UVLoop.h"
 #include "UVReqShutdown.h"

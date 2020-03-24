@@ -1,6 +1,7 @@
 
 #include "UVReqShutdown.h"
 #include "UVStream.h"
+#include "Allocator.h"
 
 namespace XSpace
 {

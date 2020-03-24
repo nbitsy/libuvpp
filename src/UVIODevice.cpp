@@ -231,7 +231,7 @@ bool UVIODevice::Write(void *data, int nsize, UVIODevice *other, const struct so
         return false;
     }
 
-    UVReqWrite *req = loop->Construct2<UVReqWrite>(this, other, data, nsize, false, true);
+    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, data, nsize, false, true);
     if (req != NULL)
         return req->Start();
 
@@ -250,7 +250,7 @@ bool UVIODevice::Write(void *bufs[], int nbuf, UVIODevice *other, const struct s
         return false;
     }
 
-    UVReqWrite *req = loop->Construct2<UVReqWrite>(this, other, bufs, nbuf, false, true);
+    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, bufs, nbuf, false, true);
     if (req != NULL)
         return req->Start();
 

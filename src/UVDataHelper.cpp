@@ -1,6 +1,7 @@
 
 #include "UVDataHelper.h"
 #include "UVLoop.h"
+#include <iostream>
 
 namespace XSpace
 {

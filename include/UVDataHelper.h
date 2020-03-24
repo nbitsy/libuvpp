@@ -3,7 +3,6 @@
 #define _UVDATAHELPER_H_
 
 #include "Debuger.h"
-#include "ObjectPool.h"
 #include "uv.h"
 
 namespace XSpace

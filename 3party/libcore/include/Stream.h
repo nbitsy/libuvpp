@@ -95,7 +95,8 @@ public:
         {
             unsigned int nsize = Max() + K_TRUNK_SIZE * ((K_TRUNK_SIZE + size + 8) / K_TRUNK_SIZE);
             _data.resize(nsize, 0); // XXX: data copyed
-            _max = nsize;
+            if (_data.size() == nsize)
+                _max = nsize;
         }
     }
 
@@ -645,6 +646,11 @@ public:
         // do nothing
     }
 
+    inline size_type size() const
+    {
+        return S;
+    }
+
 private:
     T _data[S];
 };
@@ -676,11 +682,11 @@ public:
     typedef T value_type;
 
 public:
-    explicit MemHolder(pointer data) : _data(data)
+    explicit MemHolder(pointer data) : _data(data), _size(0)
     {
     }
 
-    explicit MemHolder(size_type) : _data(NULL)
+    explicit MemHolder(pointer data, size_type size) : _data(data), _size(size)
     {
     }
 
@@ -699,8 +705,14 @@ public:
         // do nothing
     }
 
+    inline size_type size() const
+    {
+        return _size;
+    }
+
 private:
     pointer _data;
+    size_type _size;
 };
 
 class OStream : public OutStream<>
@@ -717,10 +729,12 @@ class MemStream : public InStream<MemHolder<unsigned char>>, public OutStream<Me
 {
 public:
     typedef MemHolder<unsigned char> Container;
+    using InStream<MemHolder<unsigned char>>::ReadSize;
+    using OutStream<MemHolder<unsigned char>>::WriteSize;
 
 public:
-    explicit MemStream(unsigned char *data, unsigned int size)
-        : StreamBase<Container>(data, size), InStream<Container>(data, size), OutStream<Container>(data, size)
+    explicit MemStream(unsigned char *data, unsigned int size, unsigned int wpos = 0)
+        : StreamBase<Container>(data, size, wpos), InStream<Container>(data, size), OutStream<Container>(data, size)
     {
     }
 

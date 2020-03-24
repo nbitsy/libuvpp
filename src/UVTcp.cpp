@@ -1,7 +1,8 @@
 
 #include "UVTcp.h"
-#include "UVReqConnect.h"
+#include "Allocator.h"
 #include "UVLoop.h"
+#include "UVReqConnect.h"
 
 namespace XSpace
 {
@@ -51,7 +52,7 @@ void UVTcp::OnAccept(UVStream *client)
 
 bool UVTcp::StartConnect(const std::string &ip, int port)
 {
-    UVReqConnect *req = new UVReqConnect(this, ip, port); // TODO:
+    UVReqConnect *req = Allocator::Construct<UVReqConnect>(this, ip, port);
     if (req != NULL)
         return req->Start();
 
@@ -61,7 +62,7 @@ bool UVTcp::StartConnect(const std::string &ip, int port)
 UVStream *UVTcp::OnNewConnection()
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    auto tcp = new UVTcp(GetLoop());
+    auto tcp = Allocator::Construct<UVTcp>(GetLoop());
     return tcp;
 }
 
@@ -75,9 +76,9 @@ void UVTcp::OnConnected()
 void UVTcp::OnRead(void *data, int nread)
 {
     DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str())
-    ((char*)data)[nread-1] = '\0';
-    DEBUG("data: %s, len: %d\n", (char*)data, nread);
-    Write((char*)"BACK", 4);
+    ((char *)data)[nread - 1] = '\0';
+    DEBUG("data: %s, len: %d\n", (char *)data, nread);
+    Write((char *)"BACK", 4);
 }
 
 void UVTcp::OnAccepted(UVStream *server)
@@ -107,11 +108,11 @@ void UVTcp::Release()
     auto loop = GetLoop();
     if (NULL == loop)
         return;
-    
+
     ClearData();
-    loop->Destroy((uv_tcp_t*)_handle);
+    loop->Destroy((uv_tcp_t *)_handle);
     if (GetGC())
-        delete this; // TODO:
+        Allocator::Destroy(this);
 
     _handle = NULL;
 }

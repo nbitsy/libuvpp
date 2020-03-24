@@ -15,7 +15,7 @@ namespace XSpace
 #define NEXT(cur) *((std::ptrdiff_t *)(cur))
 
 template <typename T, typename Allocator = Allocator>
-class ObjectPool : public MemPool<Allocator>
+class ObjectPool : protected MemPool<Allocator>
 {
 public:
     /**

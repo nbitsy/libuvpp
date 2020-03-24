@@ -2,30 +2,36 @@
 #ifndef _MES_H_
 #define _MES_H_
 
+#include "Slice.h"
+
 namespace XSpace
 {
 
-class Msg
+const unsigned short MSG_FLAG_DYN = ((unsigned short)0x1 << 0); // 是否是变长包
+
+#define MSG_FLAG_GET(T) (MsgFlags & MSG_FLAG_##T)
+#define MSG_FLAG_SET(T, v)             \
+    {                                  \
+        if ((v))                       \
+            MsgFlags |= MSG_FLAG_##T;  \
+        else                           \
+            MsgFlags &= ~MSG_FLAG_##T; \
+    }
+
+struct Msg : public Slice
 {
-public:
     Msg() {}
-    Msg(unsigned short msgid) : _msgid(msgid) {}
+    Msg(unsigned short msgid) : MsgID(msgid) {}
     ~Msg() {}
 
-    inline unsigned short MsgID() const { return _msgid; }
-    inline void SetMsgID(unsigned short msgid) { _msgid = msgid; }
+    inline bool IsDynamic() const { return MSG_FLAG_GET(DYN); }
+    inline void SetDynamic(bool v) { MSG_FLAG_SET(DYN, v); }
 
-    inline unsigned int MsgLength() const { return _msglen; }
-    inline void SetMsgLength(unsigned int len) { _msglen = len; }
+    // 对于变长表来说，消息休就跟随在包头后面，固定长数据包不需要这个功能
+    inline void *MsgBody() { return &MsgFlags + 1; }
 
-    inline unsigned short& FLags() { return _flags; }
-    inline void SetFlags(unsigned short flag) { _flags = flag; }
-
-
-protected:
-    unsigned short _msgid = 0;  // 消息编号
-    unsigned short _flags = 0;   // 标记位具体应用自己解释它的作用
-    unsigned int _msglen = 0;   // 不包括Msg大小的消息长
+    unsigned short MsgID;    // 消息编号
+    unsigned short MsgFlags; // 标记位具体应用自己解释它的作用
 };
 
 } // namespace XSpace
@@ -33,4 +39,3 @@ protected:
 #endif // _MES_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

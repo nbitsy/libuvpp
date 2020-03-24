@@ -24,6 +24,9 @@ $(YAFFS): ../3Party/libuv/lib/libuv.a ../lib/libuvpp.a
 
 .libuvpp : ../lib/libuvpp.a
 
+install :
+	make install -C ..
+
 clean:
 	make clean -C ..
 	rm -rf $(YAFFS:.c=) $(YAdSYM) .DS_Store
