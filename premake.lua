@@ -18,7 +18,8 @@ project "uvpp"
         defines "_DEBUG"
         defines { "USE_TC_MALLOC", "MEMPOOL_CHECK_OVERFLOW" }
         targetdir "lib"
-        buildoptions { "-g3", "-gdwarf-2", "-std=c++11" }
+        -- buildoptions { "-g3", "-gdwarf-2", "-std=c++11" }
+        buildoptions { "-g3", "-std=c++11" }
         -- linkoptions { "-pagezero_size 0x10000", "-image_base 100000000" }
         links { "uv", "tcmalloc_minimal", "core" }
 

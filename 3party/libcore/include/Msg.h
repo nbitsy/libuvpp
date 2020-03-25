@@ -2,7 +2,10 @@
 #ifndef _MES_H_
 #define _MES_H_
 
-#include "Slice.h"
+/**
+ * Msg是对于Slice来说相对上层一点，一个Msg肯定是一个完整数据包，不用考虑粘包问题。
+ * Msg内部的内容可以是一个protobuf格式的数据，或者其他自定义格式。
+*/
 
 namespace XSpace
 {
@@ -18,7 +21,7 @@ const unsigned short MSG_FLAG_DYN = ((unsigned short)0x1 << 0); // 是否是变�
             MsgFlags &= ~MSG_FLAG_##T; \
     }
 
-struct Msg : public Slice
+struct Msg
 {
     Msg() {}
     Msg(unsigned short msgid) : MsgID(msgid) {}
@@ -28,10 +31,13 @@ struct Msg : public Slice
     inline void SetDynamic(bool v) { MSG_FLAG_SET(DYN, v); }
 
     // 对于变长表来说，消息休就跟随在包头后面，固定长数据包不需要这个功能
-    inline void *MsgBody() { return &MsgFlags + 1; }
+    inline void *Body() { return &MsgFlags + 1; }
+    inline unsigned short BodyLength() const { return MsgLength >= sizeof(Msg) ? MsgLength - sizeof(Msg) : 0; }
 
-    unsigned short MsgID;    // 消息编号
-    unsigned short MsgFlags; // 标记位具体应用自己解释它的作用
+    unsigned short MsgLength; // 消息长
+    unsigned short MsgID;     // 消息编号
+    unsigned int MsgSeq;      // 消息顺号
+    unsigned short MsgFlags;  // 标记位具体应用自己解释它的作用
 };
 
 } // namespace XSpace

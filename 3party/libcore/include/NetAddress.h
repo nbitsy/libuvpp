@@ -10,8 +10,15 @@ namespace XSpace
 struct NetAddress
 {
     NetAddress() : Port(0) {}
-    NetAddress(const std::string& ip, int port) : Ip(ip), Port(port) {}
-    NetAddress(const NetAddress& other) : Ip(other.Ip), Port(other.Port) {}
+    NetAddress(const std::string &ip, int port) : Ip(ip), Port(port) {}
+    NetAddress(const NetAddress &other) : Ip(other.Ip), Port(other.Port) {}
+
+    NetAddress &operator=(NetAddress &other)
+    {
+        Ip = other.Ip;
+        Port = other.Port;
+        return *this;
+    }
 
     inline std::string ToString() const { return Ip + ":" + std::to_string(Port); }
 

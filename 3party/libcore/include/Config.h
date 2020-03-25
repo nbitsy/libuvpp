@@ -203,6 +203,11 @@ typedef u32_t ptr_t;
 #define _IN
 #endif
 
+// 不要修改任何与这个值有关的数据，包括指针指向的内容
+#ifndef _NOMODIFY
+#define _NOMODIFY
+#endif
+
 #endif // CONFIG_H_
 
 /* vim: set si ai nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

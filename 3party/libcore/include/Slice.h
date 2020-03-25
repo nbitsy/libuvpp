@@ -8,6 +8,13 @@ namespace XSpace
 {
 
 /**
+ * Slice是最低层的通信包结构，很简单，只有一个长度，所有数据跟在长度后面，而Msg是基于
+ * Slice的实现，对于一个Slice的数据包来说，他的包内容可以是Msg，或者其他种类的Msg。
+ * 基于TCP协议的连接收到的一个Slice可能是不完整的，所以需要进行拼包处理。但是基于UDP
+ * 协议的连接一个Slice就是一个包，因为UDP不分包。
+*/
+
+/**
  * 对于一个Slice对象来说，本质上是一个变长对象，但分配对象内存时，需要把分片的长度加上去
 */
 
@@ -36,6 +43,7 @@ struct Slice
     Slice() {}
     ~Slice() {}
 
+    inline int SliceLength() const { return Length; }
     inline int HeadLength() const { return sizeof(Slice); }
     inline void *Body() { return &_all + 1; }
     inline int BodyLength() const { return Length >= sizeof(Slice) ? Length - sizeof(Slice) : 0; }
