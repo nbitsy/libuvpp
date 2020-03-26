@@ -7,6 +7,7 @@ namespace XSpace
 
 void __OnConnected(uv_connect_t *req, int status)
 {
+    DEBUG("\n");
     if (NULL == req)
         return;
 
@@ -46,6 +47,7 @@ UVReqConnect::UVReqConnect(UVTcp *handle, const std::string &ip, int port) : _ha
 
 UVReqConnect::~UVReqConnect()
 {
+    DEBUG("Object @%p\n", this);
 }
 
 bool UVReqConnect::Start()
@@ -79,12 +81,19 @@ bool UVReqConnect::Start()
 
 void UVReqConnect::OnReq(int status)
 {
+    DEBUG("\n");
     if (_handle != NULL)
-        _handle->OnConnected();
+    {
+        if (status == 0)
+            _handle->OnConnected();
+        else
+            _handle->OnError(status);
+    }
 }
 
 void UVReqConnect::Release()
 {
+    DEBUG("\n");
     if (NULL == _req)
         return;
 

@@ -7,6 +7,7 @@ extern "C"
 
 #include "Allocator.h"
 #include "Slice.h"
+#include "Msg.h"
 #include "UVPP.h"
 
 using namespace XSpace;
@@ -23,6 +24,8 @@ void test1()
 
 void *pp = Allocator::malloc(64 * 1024);
 bool writed = false;
+int length = 0;
+Msg msg1;
 
 class MyTcp;
 void test4(MyTcp *tcp);
@@ -41,34 +44,21 @@ public:
 
     void OnConnected()
     {
-#if 0
-        void *p = Allocator::malloc(64 * 1024);
-        Slice *s = new (p) Slice();
-        s->Length = 7;
-        snprintf((char *)s->Body(), 4, "fuck");
-        this->Write(p, 7);
-
-        Slice* ss = new ((char*)p+7) Slice();
-        ss->Length = 10;
-        snprintf((char *)ss->Body(), 7, "fuck u");
-        this->Write((char*)p+7, 10);
-#endif
-// 比包头还小的包
-#if 1
         Slice *s = new (pp) Slice();
-        s->Length = 10;
-        snprintf((char *)s->Body(), 7, "fuck u");
+        s->Length = sizeof(*s) + sizeof(msg1) + 6;
+        length = s->Length;
+        msg1.MsgLength = sizeof(msg1) + 6;
+        memcpy(msg1.Body(), "fuck u", 6);
+        memcpy(s->Body(), &msg1, sizeof(msg1)+6);
         this->Write(pp, 3);
-#endif
     }
 
     void OnRead(void *data, int nread)
     {
         if (!writed)
         {
-            this->Write((char *)pp + 3, 7);
+            this->Write((char *)pp + 3, length - 3);
             writed = true;
-            test4(this);
         }
     }
 
@@ -78,20 +68,6 @@ public:
         UVTcp::Release();
     }
 };
-
-void test4(MyTcp *tcp)
-{
-    void *p = Allocator::malloc(64 * 1024);
-    Slice *s = new (p) Slice();
-    s->Length = 7;
-    snprintf((char *)s->Body(), 4, "fuck");
-    tcp->Write(p, 7);
-
-    Slice *ss = new ((char *)p + 7) Slice();
-    ss->Length = 10;
-    snprintf((char *)ss->Body(), 7, "Im yyf");
-    tcp->Write((char *)p + 7, 10);
-}
 
 // 一个包分多次发送
 void test2()
@@ -103,26 +79,11 @@ void test2()
     tcp->StartConnect("127.0.0.1", 13200);
     tcp->StartRead();
     loop->Start();
-    // delete tcp;
-    delete loop;
-}
-
-void test3()
-{
-    UVLoop *loop = new UVLoop("Loop");
-    UVTcp *tcp = new UVTcp(loop);
-    tcp->SetNoDelay();
-    tcp->SetBlocking(true);
-    tcp->StartConnect("127.0.0.1", 13200, 3000);
-    tcp->StartRead();
-    loop->Start();
     delete loop;
 }
 
 int main(int argc, char *argv[])
 {
-    //test1();
-    //test2();
-    test3();
+    test2();
     return 0;
 }

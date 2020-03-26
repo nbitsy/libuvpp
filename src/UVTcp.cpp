@@ -3,23 +3,78 @@
 #include "Allocator.h"
 #include "UVLoop.h"
 #include "UVReqConnect.h"
+#include "UVTimer.h"
 
 namespace XSpace
 {
 
-UVTcp::UVTcp(UVLoop *loop, int flags) : UVStream(loop, flags)
+class UVTcpConnectTimeoutTimer : public UVTimer
+{
+public:
+    UVTcpConnectTimeoutTimer(UVLoop *loop, UVTcp *tcp)
+        : UVTimer(loop), _tcp(tcp)
+    {
+    }
+    ~UVTcpConnectTimeoutTimer()
+    {
+    }
+
+    void Tick(const Timestamp *now)
+    {
+        if (!_tcp->IsConnected())
+        {
+            _tcp->Reconnect();
+        }
+        else
+        {
+            Stop();
+            _tcp->Close();
+        }
+    }
+
+private:
+    UVTcp *_tcp;
+};
+
+UVTcp::UVTcp(UVLoop *loop, int flags)
+    : UVStream(loop, flags), _timeoutTimer(NULL), _connected(false), _timeout(0)
 {
     if (NULL == _loop)
         return;
+    Init();
+    DEBUG("Object @%p\n", this);
+}
 
-    _handle = (uv_handle_t *)_loop->Construct<uv_tcp_t>();
+void UVTcp::Clear()
+{
+    auto loop = GetLoop();
+    if (NULL == loop)
+        return;
+
+    ClearData();
+    loop->Destroy((uv_tcp_t *)_handle);
+}
+
+bool UVTcp::Init()
+{
     if (_handle != NULL)
     {
-        uv_tcp_init_ex(_loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, flags);
+        Clear();
+        _handle = NULL;
+    }
+
+    _handle = (uv_handle_t *)_loop->Construct<uv_tcp_t>();
+    if (NULL == _handle)
+        return false;
+
+    if (_handle != NULL)
+    {
+        uv_tcp_init_ex(_loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, _flags);
         uv_handle_set_data(_handle, NULL);
         SetData(NULL);
     }
-    DEBUG("Object @%p\n", this);
+
+    return true;
 }
 
 UVTcp::~UVTcp()
@@ -50,13 +105,67 @@ void UVTcp::OnAccept(UVStream *client)
     ((UVTcp *)client)->InitAddress();
 }
 
-bool UVTcp::StartConnect(const std::string &ip, int port)
+bool UVTcp::StartConnect(const std::string &ip, int port, int timeout)
 {
+    DEBUG("\n");
     UVReqConnect *req = Allocator::Construct<UVReqConnect>(this, ip, port);
-    if (req != NULL)
-        return req->Start();
+    if (NULL == req)
+        return false;
 
-    return false;
+    _timeout = timeout;
+    _local.Ip = ip;
+    _local.Port = port;
+
+    if (!req->Start())
+        return false;
+
+    if (NULL == _timeoutTimer)
+    {
+        _timeoutTimer = Allocator::Construct<UVTcpConnectTimeoutTimer>(GetLoop(), this);
+        if (_timeoutTimer != NULL)
+        _timeoutTimer->Start(_timeout, _timeout);
+    }
+
+    return true;
+}
+
+void UVTcp::Reconnect()
+{
+    DEBUG("\n");
+    if (_timeout > 0)
+    {
+        Init();
+        StartConnect(_local.Ip, _local.Port, _timeout);
+        StartRead();
+    }
+    else
+    {
+        if (_timeoutTimer != NULL)
+        {
+            _timeoutTimer->Stop();
+            _timeoutTimer = NULL;
+        }
+        Close();
+    }
+}
+
+void UVTcp::OnError(int status)
+{
+    DEBUG("\n");
+    _connected = false;
+    if (_timeout > 0)
+    {
+        if (NULL == _timeoutTimer)
+        {
+            _timeoutTimer = Allocator::Construct<UVTcpConnectTimeoutTimer>(GetLoop(), this);
+            if (_timeoutTimer != NULL)
+                _timeoutTimer->Start(_timeout);
+        }
+    }
+    else
+    {
+        Close();
+    }
 }
 
 UVStream *UVTcp::OnNewConnection()
@@ -68,6 +177,15 @@ UVStream *UVTcp::OnNewConnection()
 
 void UVTcp::OnConnected()
 {
+    DEBUG("\n");
+    _connected = true;
+
+    if (_timeoutTimer != NULL)
+    {
+        _timeoutTimer->Stop();
+        _timeoutTimer = NULL;
+    }
+
     DEBUG("%s Connected To %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
     const char *msg = "hello";
     Write((void *)msg, 5);
@@ -75,6 +193,9 @@ void UVTcp::OnConnected()
 
 void UVTcp::OnRead(void *data, int nread)
 {
+    if (nread < 0)
+        OnError(-1);
+
     DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str())
     ((char *)data)[nread - 1] = '\0';
     DEBUG("data: %s, len: %d\n", (char *)data, nread);

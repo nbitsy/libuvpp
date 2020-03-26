@@ -9,6 +9,7 @@
 namespace XSpace
 {
 
+class UVTimer;
 class UVLoop;
 
 class UVTcp : public UVStream
@@ -33,23 +34,37 @@ public:
     UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
     ~UVTcp();
 
+    bool Init();
+    void Clear();
+
     bool Bind(const std::string &ip, int port, unsigned int flags = 0);
 
     inline void SetNoDelay() { SetDelay(false); }
     void SetDelay(bool delay);
     void KeepAlive(bool v, unsigned int delay);
 
-    bool StartConnect(const std::string &ip, int port);
+    // timeout : 断线重连间隔或连接超时
+    bool StartConnect(const std::string &ip, int port, int timeout = 0);
 
     UVStream *OnNewConnection();
     void OnAccepted(UVStream *server);
     void OnAccept(UVStream *client);
     virtual void OnConnected();
+    void OnError(int status);
+    void Reconnect();
+
+    inline bool IsConnected() const { return _connected; }
 
     void OnRead(void *data, int nread);
     void OnClosed();
     void OnShutdown();
     void Release();
+
+private:
+    UVTimer* _timeoutTimer;
+    bool _connected;
+    int _timeout;
+    NetAddress _local;
 };
 
 } // namespace XSpace

@@ -36,6 +36,7 @@ public:
     virtual void OnRead(void *data, int nread) {}
     // UDP
     virtual void OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags) {}
+    virtual void OnError(int status) {}
 
 private:
     void GetAddress(int type, NetAddress &address, const struct sockaddr *addr = NULL) const;
