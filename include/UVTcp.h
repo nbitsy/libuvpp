@@ -34,9 +34,6 @@ public:
     UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
     ~UVTcp();
 
-    bool Init();
-    void Clear();
-
     bool Bind(const std::string &ip, int port, unsigned int flags = 0);
 
     inline void SetNoDelay() { SetDelay(false); }
@@ -49,8 +46,10 @@ public:
     UVStream *OnNewConnection();
     void OnAccepted(UVStream *server);
     void OnAccept(UVStream *client);
+
     virtual void OnConnected();
     void OnError(int status);
+
     void Reconnect();
 
     inline bool IsConnected() const { return _connected; }
@@ -59,6 +58,15 @@ public:
     void OnClosed();
     void OnShutdown();
     void Release();
+
+    void OnConnectedAction();
+    void OnErrorAction(int status);
+
+private:
+    bool Init();
+    void Clear();
+    void StartReconnectTimer();
+    void StopReconnectTimer();
 
 private:
     UVTimer* _timeoutTimer;

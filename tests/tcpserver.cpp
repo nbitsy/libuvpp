@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 
     UVTcp* tcp = UVTcp::Create(loop);
 
-    tcp->Bind("127.0.0.1", 13300);
+    tcp->Bind("127.0.0.1", 13200);
     tcp->Listen(10000);
     loop->Start();
 

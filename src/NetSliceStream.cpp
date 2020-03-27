@@ -141,11 +141,6 @@ Slice* NetSliceStream::DealFlags(_NOMODIFY Slice* slice)
 
 void NetSliceStream::OnRead(void *data, int nread)
 {
-#if 0
-    // TODO: for test
-    Write((void *)"1", 1);
-#endif
-
     DEBUG("\n");
     MemStream ms((unsigned char *)data, nread, nread);
     MemStream *pms = &ms;
@@ -227,7 +222,7 @@ bool NetSliceStream::Write(void *data, int nsize)
     }
 
     Allocator::free(_writeSlice);
-    return false;
+    return true;
 }
 
 bool NetSliceStream::WriteSlice(Slice* slice)

@@ -2,7 +2,7 @@
 #ifndef _UVDATAHELPER_H_
 #define _UVDATAHELPER_H_
 
-#include "Debuger.h"
+#include "Debugger.h"
 #include "uv.h"
 
 namespace XSpace

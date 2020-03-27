@@ -57,6 +57,7 @@ public:
 
     inline iterator_type begin() { return _queue.begin(); }
     inline iterator_type end() { return _queue.end(); }
+    inline size_t size() const { return _queue.size(); }
 
 private:
     container_type _queue;

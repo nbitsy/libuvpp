@@ -2,7 +2,7 @@
 #ifndef _RPCSERVICE_H_
 #define _RPCSERVICE_H_
 
-#include "Debuger.h"
+#include "Debugger.h"
 #include "Serialization.h"
 #include "Stream.h"
 #include <functional>

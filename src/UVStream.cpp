@@ -66,6 +66,7 @@ bool UVStream::Accept(UVStream *client)
         client->StartRead();
 
     OnAccept(client);
+    InitAddress();
     client->OnAccepted(this);
     return true;
 }

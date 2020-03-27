@@ -104,6 +104,7 @@ int UVIODevice::GetAf() const
 
 void UVIODevice::InitAddress()
 {
+    DEBUG("\n");
     struct sockaddr_in *addr = NULL;
     int len = sizeof(_addr);
     int af = GetAf();
@@ -187,6 +188,7 @@ const NetAddress UVIODevice::RemoteAddress(const struct sockaddr *remote) const
 
 bool UVIODevice::StartRead()
 {
+    DEBUG("\n");
     if (NULL == _handle)
         return false;
 
@@ -231,7 +233,7 @@ bool UVIODevice::Write(void *data, int nsize, UVIODevice *other, const struct so
         return false;
     }
 
-    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, data, nsize, false, true);
+    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, data, nsize, true, true);
     if (req != NULL)
         return req->Start();
 
@@ -250,7 +252,7 @@ bool UVIODevice::Write(void *bufs[], int nbuf, UVIODevice *other, const struct s
         return false;
     }
 
-    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, bufs, nbuf, false, true);
+    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, bufs, nbuf, true, true);
     if (req != NULL)
         return req->Start();
 

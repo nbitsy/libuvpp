@@ -103,9 +103,7 @@ size_t UVUdp::SendQueueCount() const
 // test
 void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags)
 {
-    DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str());
-    ((char*)data)[nread-1] = '\0';
-    DEBUG("data: %s len: %d\n", (char*)data, nread);
+    DEBUG("\n");
 }
 
 /**

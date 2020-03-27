@@ -11,7 +11,7 @@ project "uvpp"
     includedirs { "include", "3party/libuv", "3party/libcore/include", "3party/tcmalloc/include" }
     libdirs { "lib", "3party/libuv/lib", "3party/libcore/lib", "3party/tcmalloc/lib" }
     configuration { "not vs* or codeblocks" }
-    buildoptions { "-std=c++11", "-fPIC" }
+    buildoptions { "-std=c++11" }
 
     configuration { "DebugLib" }
         symbols "On"
@@ -19,7 +19,7 @@ project "uvpp"
         defines { "USE_TC_MALLOC", "MEMPOOL_CHECK_OVERFLOW" }
         targetdir "lib"
         -- buildoptions { "-g3", "-gdwarf-2", "-std=c++11" }
-        buildoptions { "-g3", "-std=c++11" }
+        buildoptions { "-g3", "-gdwarf-2" }
         -- linkoptions { "-pagezero_size 0x10000", "-image_base 100000000" }
         links { "uv", "tcmalloc_minimal", "core" }
 
@@ -28,6 +28,5 @@ project "uvpp"
         defines "NDEBUG"
         defines { "USE_TC_MALLOC" }
         targetdir "lib"
-        buildoptions { "-O3", "-std=c++11" }
-        -- linkoptions { "-pagezero_size 0x10000", "-image_base 100000000" }
+        buildoptions { "-O3" }
         links { "uv", "tcmalloc_minimal", "core" }

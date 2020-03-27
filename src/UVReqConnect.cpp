@@ -85,9 +85,15 @@ void UVReqConnect::OnReq(int status)
     if (_handle != NULL)
     {
         if (status == 0)
+        {
+            _handle->OnConnectedAction();
             _handle->OnConnected();
+        }
         else
+        {
+            _handle->OnErrorAction(status);
             _handle->OnError(status);
+        }
     }
 }
 

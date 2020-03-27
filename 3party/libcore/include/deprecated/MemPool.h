@@ -7,7 +7,7 @@
 
 #include "Allocator.h"
 #include "Config.h"
-#include "Debuger.h"
+#include "Debugger.h"
 
 #include <iostream>
 

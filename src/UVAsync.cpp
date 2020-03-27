@@ -1,6 +1,6 @@
 
 #include "UVAsync.h"
-#include "Debuger.h"
+#include "Debugger.h"
 #include "UVLoop.h"
 
 namespace XSpace
