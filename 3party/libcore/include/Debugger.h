@@ -3,9 +3,9 @@
 #define _DEBUGGER_H_
 
 #ifdef _DEBUG
+#include "DateTime.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "DateTime.h"
 using XSpace::DateTime;
 #endif
 
@@ -39,40 +39,40 @@ namespace XSpace
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_DEBUG
-#define DEBUG(...)                                                                                 \
-    {                                                                                              \
+#define DEBUG(...)                                                                                           \
+    {                                                                                                        \
         fprintf(stderr, "%s%s %s:%d%s ", DEBUG_GREENnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                            \
+        fprintf(stderr, ##__VA_ARGS__);                                                                      \
     }
 #else
 #define DEBUG(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_LOG
-#define LOG(...)                                                                      \
-    {                                                                                 \
+#define LOG(...)                                                                 \
+    {                                                                            \
         fprintf(stderr, "%s%s:%d ", DEBUG_WHITEnBACK, ___FUNCTION___, __LINE__); \
-        fprintf(stdout, ##__VA_ARGS__);                                               \
+        fprintf(stdout, ##__VA_ARGS__);                                          \
     }
 #else
 #define LOG(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
-#define INFO(...)                                                                                 \
-    {                                                                                             \
+#define INFO(...)                                                                            \
+    {                                                                                        \
         fprintf(stderr, "%s%s:%d %s", DEBUG_BLUEnBACK, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stdout, ##__VA_ARGS__);                                                           \
+        fprintf(stdout, ##__VA_ARGS__);                                                      \
     }
 #else
 #define INFO(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
-#define WARN(...)                                                                                    \
-    {                                                                                                \
+#define WARN(...)                                                                               \
+    {                                                                                           \
         fprintf(stderr, "%s%s:%d %s ", DEBUG_YALLOWnBACK, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                              \
+        fprintf(stderr, ##__VA_ARGS__);                                                         \
     }
 #else
 #define WARN(...)

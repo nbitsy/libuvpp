@@ -16,11 +16,12 @@ public:
     UVReqConnect(UVTcp* handle, const std::string& ip, int port);
     ~UVReqConnect();
 
-    UVLoop *GetLoop();
+    UVLoop *GetLoop() OVERRIDE;
 
-    bool Start();
-    void OnReq(int status);
-    void Release();
+    bool Start() OVERRIDE;
+    void Release() OVERRIDE;
+
+    void OnReq(int status) OVERRIDE;
 
 private:
     UVTcp* _handle;

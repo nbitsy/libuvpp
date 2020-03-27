@@ -4,6 +4,7 @@
 
 #include "UVDataHelper.h"
 #include "UVPoolHelper.h"
+#include "Config.h"
 #include <string>
 #include <thread>
 
@@ -31,8 +32,9 @@ public:
     bool IsAlive() const;
     inline const std::string& Name() const { return _name; }
 
-    UVLoop *GetLoop() { return this; }
-    void Release() {/*do nothing*/}
+    UVLoop *GetLoop() OVERRIDE { return this; }
+    void Release() OVERRIDE {/*do nothing*/}
+
     static UVLoop *DefaultLoop();
 
     template <typename T>

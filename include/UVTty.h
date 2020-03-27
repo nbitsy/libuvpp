@@ -15,9 +15,9 @@ public:
     explicit UVTty(UVLoop *loop, int fd, bool readable = true, int flag = 0);
     ~UVTty();
 
-    void OnRead(void *data, int nread);
-    void OnClosed();
-    void Release();
+    void OnRead(void *data, int nread) OVERRIDE;
+    void OnClosed() OVERRIDE;
+    void Release() OVERRIDE;
     void OnShutdown();
 };
 

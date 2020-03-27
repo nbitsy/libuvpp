@@ -19,9 +19,10 @@ public:
     bool Start();
     bool Stop();
 
-    void OnClosed();
+    void OnClosed() OVERRIDE;
+    void Release() OVERRIDE;
+
     virtual void OnIdle();
-    void Release();
 };
 
 } // namespace XSpace

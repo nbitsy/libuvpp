@@ -11,7 +11,6 @@
 #include <map>
 #include <set>
 
-
 namespace XSpace
 {
 

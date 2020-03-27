@@ -37,9 +37,10 @@ public:
     void SetRepeat(unsigned long long repeat);
     unsigned long long GetRepeat() const;
 
-    void OnClosed();
+    void OnClosed() OVERRIDE;
+    void Release() OVERRIDE;
+
     virtual void Tick(const Timestamp* now);
-    void Release();
 
 private:
     Timestamp _timestamp;

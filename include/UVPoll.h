@@ -19,9 +19,10 @@ public:
     bool Start(int events = UVET_ALL);
     bool Stop();
 
-    void OnClosed();
+    void OnClosed() OVERRIDE;
+    void Release() OVERRIDE;
+
     virtual void OnPoll(int status, int event);
-    void Release();
 };
 
 } // namespace XSpace

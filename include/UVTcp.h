@@ -34,7 +34,7 @@ public:
     UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
     ~UVTcp();
 
-    bool Bind(const std::string &ip, int port, unsigned int flags = 0);
+    bool Bind(const std::string &ip, int port, unsigned int flags = 0) OVERWRITE;
 
     inline void SetNoDelay() { SetDelay(false); }
     void SetDelay(bool delay);
@@ -43,21 +43,21 @@ public:
     // timeout : 断线重连间隔或连接超时
     bool StartConnect(const std::string &ip, int port, int timeout = 0);
 
-    UVStream *OnNewConnection();
-    void OnAccepted(UVStream *server);
-    void OnAccept(UVStream *client);
+    UVStream *OnNewConnection() OVERRIDE;
+    void OnAccepted(UVStream *server) OVERRIDE;
+    void OnAccept(UVStream *client) OVERRIDE;
 
     virtual void OnConnected();
-    void OnError(int status);
+    void OnError(int status) OVERRIDE;
 
     void Reconnect();
 
     inline bool IsConnected() const { return _connected; }
 
-    void OnRead(void *data, int nread);
-    void OnClosed();
-    void OnShutdown();
-    void Release();
+    void OnRead(void *data, int nread) OVERRIDE;
+    void OnClosed() OVERRIDE;
+    void OnShutdown() OVERRIDE;
+    void Release() OVERRIDE;
 
     void OnConnectedAction();
     void OnErrorAction(int status);

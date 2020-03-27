@@ -136,10 +136,6 @@
 #error need alignment
 #endif
 
-#ifndef OVERRIDE
-#define OVERRIDE
-#endif
-
 #if __COMPILER_GCC || __COMPILER_CXX
 #define ATTR_NORETURN __attribute__((noreturn))
 #define ATTR_PRINTF(F, V) __attribute__((format(printf, F, V)))
@@ -207,6 +203,23 @@ typedef u32_t ptr_t;
 #ifndef _NOMODIFY
 #define _NOMODIFY
 #endif
+
+#if __cplusplus <= 199711L &&                  \
+    (!defined(_MSC_VER) || _MSC_VER < 1600) && \
+    (!defined(__GNUC__) ||                     \
+     (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__ < 40603))
+#error A C++11 compatible compiler is required for FlatBuffers.
+#error __cplusplus _MSC_VER __GNUC__  __GNUC_MINOR__  __GNUC_PATCHLEVEL__
+#else
+#define CXX11 1
+#endif
+
+#ifdef CXX11
+#define OVERRIDE override
+#else
+#define OVERRIDE
+#endif
+#define OVERWRITE
 
 #endif // CONFIG_H_
 

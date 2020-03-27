@@ -21,8 +21,8 @@ public:
 
     bool Send(void* data);
 
-    void OnClosed();
-    void Release();
+    void OnClosed() OVERRIDE;
+    void Release() OVERRIDE;
 
     // 同步消息调起后处理函数
     virtual void OnAsync();

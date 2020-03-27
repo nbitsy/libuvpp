@@ -34,9 +34,9 @@ public:
     NetSliceStream(UVLoop *loop, int flags = AF_UNSPEC);
     ~NetSliceStream();
 
-    UVStream *OnNewConnection();
-    void OnRead(void *data, int nread);
-    void Release();
+    UVStream *OnNewConnection() OVERRIDE;
+    void OnRead(void *data, int nread) OVERRIDE;
+    void Release() OVERRIDE;
 
     // 收到一个完整的Slice
     virtual void PushSlice(void *data, int nsize);

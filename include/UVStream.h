@@ -58,7 +58,7 @@ public:
     */
     virtual void OnAccepted(UVStream *server) = 0;
 
-    virtual void OnClosed() {}
+    virtual void OnClosed() OVERRIDE {}
     virtual void OnShutdown() = 0;
 
 public:

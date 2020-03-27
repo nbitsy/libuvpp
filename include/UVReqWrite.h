@@ -53,10 +53,10 @@ public:
 
     ~UVReqWrite();
 
-    UVLoop *GetLoop();
-    bool Start();
-    void OnReq(int status);
-    void Release();
+    UVLoop *GetLoop() OVERRIDE;
+    bool Start() OVERRIDE;
+    void OnReq(int status) OVERRIDE;
+    void Release() OVERRIDE;
 
 private:
     void Init(UVIODevice* uviodevice, void* data, int nsize, bool copy);

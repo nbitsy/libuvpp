@@ -3,6 +3,7 @@
 #define _UVREQ_H_
 
 #include "UVDataHelper.h"
+#include "Config.h"
 
 namespace XSpace
 {

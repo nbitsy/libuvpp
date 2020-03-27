@@ -43,9 +43,9 @@ public:
     size_t SendQueueSize() const;
     size_t SendQueueCount() const;
 
-    void OnRead(void *data, int nread, const struct sockaddr* addr, unsigned int flags);
-    void OnClosed();
-    void Release();
+    void OnRead(void *data, int nread, const struct sockaddr* addr, unsigned int flags) OVERRIDE;
+    void OnClosed() OVERRIDE;
+    void Release() OVERRIDE;
 
 private:
     UVUdp(UVLoop *loop, int flags);

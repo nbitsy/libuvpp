@@ -3,6 +3,7 @@
 #define _UVHANDLE_H_
 
 #include "uv.h"
+#include "Config.h"
 #include "UVDataHelper.h"
 
 namespace XSpace

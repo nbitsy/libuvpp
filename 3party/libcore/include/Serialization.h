@@ -3,6 +3,7 @@
 #define _SERIALIZATION_H_
 
 #include "Stream.h"
+#include "Config.h"
 
 namespace XSpace
 {
@@ -19,8 +20,8 @@ class Serializable : public ISerialization
 {
     Serializable() {}
     ~Serializable() {}
-    virtual void serialize(OStream &) const {}
-    virtual void unserialize(IStream &) {}
+    virtual void Serialize(OStream &) const OVERRIDE {}
+    virtual void Unserialize(IStream &) OVERRIDE {}
 };
 
 } // namespace XSpace
