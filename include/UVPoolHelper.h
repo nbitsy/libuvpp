@@ -2,8 +2,8 @@
 #ifndef _UVPOOLHELPER_H_
 #define _UVPOOLHELPER_H_
 
-#include "UVDataHelper.h"
 #include "Allocator.h"
+#include "UVDataHelper.h"
 
 namespace XSpace
 {

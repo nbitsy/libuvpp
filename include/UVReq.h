@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include "UVDataHelper.h"
 #include "Config.h"
+#include "UVDataHelper.h"
 
 namespace XSpace
 {

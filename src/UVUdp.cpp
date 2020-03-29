@@ -103,7 +103,7 @@ size_t UVUdp::SendQueueCount() const
 // test
 void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags)
 {
-    ((char*)data)[nread-1] = '\0';
+    ((char *)data)[nread - 1] = '\0';
     DEBUG("RECV: %s LEN: %d\n", data, nread);
 }
 

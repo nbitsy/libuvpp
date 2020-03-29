@@ -60,7 +60,7 @@ bool UVReqConnect::Start()
         return false;
 
     auto handle = _handle.lock();
-    UVTcp* tcp = (UVTcp*)handle.get();
+    UVTcp *tcp = (UVTcp *)handle.get();
     int af = tcp->GetAf();
     struct sockaddr *addr = NULL;
     union {
@@ -87,11 +87,11 @@ bool UVReqConnect::Start()
 
 void UVReqConnect::OnReq(int status)
 {
-    DEBUG("\n");
+    DEBUG("status: %d\n", status);
     if (!_handle.expired())
     {
         auto handle = _handle.lock();
-        UVTcp* t = (UVTcp*)handle.get();
+        UVTcp *t = (UVTcp *)handle.get();
         if (status == 0)
         {
             t->OnConnectedAction();

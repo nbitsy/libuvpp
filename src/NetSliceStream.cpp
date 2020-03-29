@@ -6,7 +6,7 @@
 namespace XSpace
 {
 
-NetSliceStream::NetSliceStream(std::weak_ptr<UVLoop>& loop, int flags)
+NetSliceStream::NetSliceStream(std::weak_ptr<UVLoop> &loop, int flags)
     : UVTcp(loop, flags), _readBroken(false), _readBrokenBuffer(0), _writeSlice(0), _writeSliceLength(0)
 {
     DEBUG("\n");
@@ -132,7 +132,7 @@ bool NetSliceStream::HasSpliceSlice() const
 }
 
 // 这个slice参数所指向的内容也不允许修改
-Slice* NetSliceStream::DealFlags(_NOMODIFY Slice* slice)
+Slice *NetSliceStream::DealFlags(_NOMODIFY Slice *slice)
 {
     DEBUG("LEN(flags:%x): %d => %s\n", slice->Flags, slice->Length, slice->Body());
     // TODO: 需要对应解压和加密选项的处理
@@ -141,7 +141,7 @@ Slice* NetSliceStream::DealFlags(_NOMODIFY Slice* slice)
 
 void NetSliceStream::OnRead(void *data, int nread)
 {
-    // Write(data, nread);
+    Write(data, nread);
     DEBUG("RECV: %d\n", nread);
     MemStream ms((unsigned char *)data, nread, nread);
     MemStream *pms = &ms;
@@ -161,8 +161,8 @@ void NetSliceStream::OnRead(void *data, int nread)
                 // 有不完整包休的包
                 if (slice->Length > pms->ReadSize())
                     break;
-                
-                Slice* realslice = DealFlags(slice);
+
+                Slice *realslice = DealFlags(slice);
                 PushSlice(realslice->Body(), realslice->BodyLength());
                 pms->ReadFlipSilence(slice->Length);
             }
@@ -204,11 +204,11 @@ bool NetSliceStream::Write(void *data, int nsize)
     int total = nsize + sizeof(*_writeSlice);
     while (size < total)
         size <<= 1;
-    
+
     if (size > WRITE_BUFFER_SIZE_MAX)
         return false;
-    
-    _writeSlice = (Slice*)Allocator::malloc(size);
+
+    _writeSlice = (Slice *)Allocator::malloc(size);
     if (NULL == _writeSlice)
         return false;
 
@@ -216,7 +216,7 @@ bool NetSliceStream::Write(void *data, int nsize)
     memcpy(_writeSlice->Body(), data, nsize);
     // TODO: flags
 
-    if (!UVTcp::Write((void*)_writeSlice, total))
+    if (!UVTcp::Write((void *)_writeSlice, total))
     {
         Allocator::free(_writeSlice);
         return false;
@@ -226,9 +226,9 @@ bool NetSliceStream::Write(void *data, int nsize)
     return true;
 }
 
-bool NetSliceStream::WriteSlice(Slice* slice)
+bool NetSliceStream::WriteSlice(Slice *slice)
 {
-    return Write((void*)slice, slice->Length);
+    return Write((void *)slice, slice->Length);
 }
 
 #if 0

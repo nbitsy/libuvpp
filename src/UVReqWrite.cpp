@@ -152,18 +152,21 @@ void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf,
 UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy)
     : UVReq(), _bCopye(copy), _iohandle(iohandle), _other(other), _bBuffers(false)
 {
+    DEBUG("Object @%p\n", this);
     Init(iohandle, data, nsize, copy);
 }
 
 UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _other(other), _bBuffers(true)
 {
+    DEBUG("Object @%p\n", this);
     Init(iohandle, bufs, nbuf, copy);
 }
 
 UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(false), _addr(NULL)
 {
+    DEBUG("Object @%p\n", this);
     Init(iohandle, data, nsize, copy);
     InitAddress(addr);
 }
@@ -171,6 +174,7 @@ UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr 
 UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(true), _addr(NULL)
 {
+    DEBUG("Object @%p\n", this);
     Init(iohandle, bufs, nbuf, copy);
     InitAddress(addr);
 }
@@ -191,6 +195,7 @@ void UVReqWrite::InitAddress(const struct sockaddr *addr)
 
 UVReqWrite::~UVReqWrite()
 {
+    DEBUG("Object @%p\n", this);
     if (!_bBuffers)
     {
         if (_bCopye && d._data != NULL)

@@ -2,9 +2,9 @@
 #ifndef _NETSLICESTREAM_H_
 #define _NETSLICESTREAM_H_
 
+#include "Config.h"
 #include "Stream.h"
 #include "UVTcp.h"
-#include "Config.h"
 
 /**
  * 对于一个SliceStream来说，本质上是一个UVTcp，只不过把收到数据缓存起来，而且是分片缓存
@@ -41,12 +41,12 @@ public:
 
     // 收到一个完整的Slice
     virtual void PushSlice(void *data, int nsize);
-    virtual Slice* DealFlags(_NOMODIFY Slice* slice);
+    virtual Slice *DealFlags(_NOMODIFY Slice *slice);
     bool Write(void *data, int nsize);
-    bool WriteSlice(Slice* slice);
+    bool WriteSlice(Slice *slice);
 
 private:
-    NetSliceStream(std::weak_ptr<UVLoop>& loop, int flags = AF_UNSPEC);
+    NetSliceStream(std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
     MemStream *GetSpliceBuffer(int nread);
     bool HasSpliceSlice() const;
     void ClearReadBrokenBuffer();
@@ -60,7 +60,7 @@ private:
     // 用于控制拼包缓存
     MemStream *_readBrokenBufferStream;
     // 用于发送消息的缓存
-    Slice* _writeSlice;
+    Slice *_writeSlice;
     // 发送缓存大小
     int _writeSliceLength;
 };

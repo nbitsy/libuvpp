@@ -16,7 +16,7 @@ public:
     UV_CREATE_HANDLE(UVIdle)
 
 public:
-    UVIdle(std::weak_ptr<UVLoop>& loop);
+    UVIdle(std::weak_ptr<UVLoop> &loop);
     virtual ~UVIdle();
 
     bool Start();
@@ -32,4 +32,3 @@ public:
 #endif // _UVIDLE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

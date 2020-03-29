@@ -13,9 +13,7 @@ namespace XSpace
 class NetFragStream
 {
 public:
-
 private:
-
 };
 
 } // namespace XSpace
@@ -23,4 +21,3 @@ private:
 #endif // _NETFRAGSTREAM_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

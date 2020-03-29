@@ -12,7 +12,7 @@ static void __OnClosed(uv_handle_t *handle)
     if (NULL == uvdata)
         std::cout << "@" << handle << " 's owner has released already." << std::endl;
 
-    UVHandle* h = uvdata->GetPtr<UVHandle>();
+    UVHandle *h = uvdata->GetPtr<UVHandle>();
     if (NULL == h)
         return;
     h->OnClosed();

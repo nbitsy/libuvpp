@@ -2,15 +2,15 @@
 #ifndef _UVLOOP_H_
 #define _UVLOOP_H_
 
+#include <memory>
 #include <string>
 #include <thread>
-#include <memory>
 
+#include "Allocator.h"
+#include "Config.h"
+#include "TypeTraits.h"
 #include "UVDataHelper.h"
 #include "UVPoolHelper.h"
-#include "Config.h"
-#include "Allocator.h"
-#include "TypeTraits.h"
 
 namespace XSpace
 {
@@ -19,7 +19,7 @@ class UVLoop : public UVDataHelper, public std::enable_shared_from_this<UVLoop>
 {
 public:
     template <typename T = UVLoop>
-    static std::shared_ptr<UVLoop> Create(const std::string& name, bool useDefault = false)
+    static std::shared_ptr<UVLoop> Create(const std::string &name, bool useDefault = false)
     {
         if (is_subclass<T, UVLoop>::value)
         {
@@ -53,7 +53,7 @@ public:
 
     int RawFd() const;
     bool IsAlive() const;
-    inline const std::string& Name() const { return _name; }
+    inline const std::string &Name() const { return _name; }
 
     std::weak_ptr<UVLoop> GetLoop() { return shared_from_this(); }
 

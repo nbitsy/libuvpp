@@ -16,7 +16,7 @@ public:
     UV_CREATE_HANDLE(UVPrepare)
 
 public:
-    UVPrepare(std::weak_ptr<UVLoop>& loop);
+    UVPrepare(std::weak_ptr<UVLoop> &loop);
     virtual ~UVPrepare();
 
     bool Start();
@@ -32,4 +32,3 @@ public:
 #endif // _UVPREPARE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

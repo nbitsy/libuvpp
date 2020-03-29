@@ -1,9 +1,9 @@
 
-#include <iostream>
 #include "UVStream.h"
 #include "UVLoop.h"
 #include "UVReqShutdown.h"
 #include "UVReqWrite.h"
+#include <iostream>
 
 namespace XSpace
 {
@@ -29,7 +29,7 @@ static void __OnNewConnection(uv_stream_t *server, int status)
     uvstream->Accept(stream);
 }
 
-UVStream::UVStream(std::weak_ptr<UVLoop>& loop, int flags, EUVStreamType type)
+UVStream::UVStream(std::weak_ptr<UVLoop> &loop, int flags, EUVStreamType type)
     : UVIODevice(loop, flags), _type(type)
 {
     DEBUG("Object @%p\n", this);
@@ -55,7 +55,7 @@ bool UVStream::Listen(int backlog)
     return true;
 }
 
-bool UVStream::Accept(std::weak_ptr<UVHandle>& client)
+bool UVStream::Accept(std::weak_ptr<UVHandle> &client)
 {
     if (NULL == _handle || client.expired())
         return false;
@@ -67,7 +67,7 @@ bool UVStream::Accept(std::weak_ptr<UVHandle>& client)
     if (uv_accept(GetHandle<uv_stream_t>(), c->GetHandle<uv_stream_t>()))
         return false;
 
-    UVStream* stream = (UVStream*)c.get();
+    UVStream *stream = (UVStream *)c.get();
     if (_type & EUVS_READ)
         stream->StartRead();
 
@@ -106,7 +106,7 @@ bool UVStream::Shutdown()
 {
     if (NULL == _handle)
         return false;
-    
+
     std::weak_ptr<UVHandle> self(shared_from_this());
     std::shared_ptr<UVReqShutdown> req = UVReqShutdown::Create<UVReqShutdown>(self);
     if (req != NULL)

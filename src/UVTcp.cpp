@@ -12,7 +12,7 @@ class UVTcpConnectTimeoutTimer : public UVTimer
 {
 public:
     UVTcpConnectTimeoutTimer(std::weak_ptr<UVLoop> &loop, std::weak_ptr<UVHandle> &tcp)
-        : UVTimer(loop, 0), _tcp(tcp)
+        : UVTimer(loop), _tcp(tcp)
     {
     }
     ~UVTcpConnectTimeoutTimer()
@@ -28,7 +28,7 @@ public:
             return;
         }
 
-        UVTcp* t = (UVTcp*)tcp.get();
+        UVTcp *t = (UVTcp *)tcp.get();
         if (!t->IsConnected())
         {
             t->Reconnect();
@@ -103,6 +103,7 @@ void UVTcp::KeepAlive(bool v, unsigned int delay)
 
 bool UVTcp::Bind(const std::string &ip, int port, unsigned int flags)
 {
+    _connector = false;
     return UVIODevice::Bind(GetHandle<uv_handle_t>(), ip, port, flags);
 }
 
@@ -114,12 +115,14 @@ void UVTcp::OnAccept(std::weak_ptr<UVHandle> &client)
 bool UVTcp::StartConnect(const std::string &ip, int port, int timeout)
 {
     DEBUG("\n");
+    _connector = true;
     std::weak_ptr<UVHandle> self(shared_from_this());
     std::shared_ptr<UVReqConnect> req = UVReqConnect::Create(self, ip, port);
     if (NULL == req)
         return false;
 
-    _timeout = timeout;
+    if (_timeout == 0)
+        _timeout = timeout;
     _local.Ip = ip;
     _local.Port = port;
 
@@ -136,7 +139,8 @@ void UVTcp::Reconnect()
     if (_timeout > 0)
     {
         Init();
-        StartConnect(_local.Ip, _local.Port, _timeout);
+        StartConnect(_local.Ip, _local.Port); // _timeout);
+        SetData(NULL, true);                  // Init把数据清了，这里再重置一下
     }
     else
     {
@@ -172,9 +176,10 @@ void UVTcp::OnError(int status)
 
 void UVTcp::OnErrorAction(int status)
 {
-    DEBUG("\n");
+    DEBUG("status :%d\n", status);
     _connected = false;
-    if (_timeout > 0)
+
+    if (IsConnector() && _timeout > 0)
     {
         if (NULL == _timeoutTimer)
         {
@@ -193,7 +198,7 @@ void UVTcp::OnErrorAction(int status)
 std::shared_ptr<UVHandle> UVTcp::OnNewConnection()
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    return UVTcp::Create(GetLoop());
+    return UVTcp::CreateStrong(GetLoop());
 }
 
 void UVTcp::OnConnected()
@@ -220,7 +225,7 @@ void UVTcp::OnConnectedAction()
 
 void UVTcp::OnRead(void *data, int nread)
 {
-    DEBUG("RECV FROM %s\n", RemoteAddress().ToString().c_str())
+    DEBUG("RECV FROM %s nread: %d\n", RemoteAddress().ToString().c_str(), nread)
     if (nread < 0)
     {
         OnError(-1);

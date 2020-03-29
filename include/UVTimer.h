@@ -2,9 +2,9 @@
 #ifndef _UVTIMER_H_
 #define _UVTIMER_H_
 
-#include "UVHandle.h"
 #include "Timestamp.h"
 #include "TypeTraits.h"
+#include "UVHandle.h"
 
 namespace XSpace
 {
@@ -18,8 +18,9 @@ public:
 
 public:
     virtual ~UVTimer();
-    // timeout: 第一次开始时的延迟时间
-    // repeat: 下一次的回调的间隔时间,ms
+    // timeout 第一次开始时的延迟时间
+    // repeat 下一次的回调的间隔时间,ms
+    // ticks 几个tick之后停止
     bool Start(uint64_t repeat = 5, uint64_t timeout = 0, long long ticks = -1);
     void Stop();
 
@@ -28,10 +29,10 @@ public:
 
     void OnClosed() OVERRIDE;
 
-    virtual void Tick(const Timestamp* now);
+    virtual void Tick(const Timestamp *now);
 
 protected:
-    UVTimer(std::weak_ptr<UVLoop>& loop, long long ticks = 0);
+    UVTimer(std::weak_ptr<UVLoop> &loop, long long ticks = -1);
 
 public:
     long long Ticks;

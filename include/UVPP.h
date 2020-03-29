@@ -2,15 +2,13 @@
 #ifndef _UVPP_H_
 #define _UVPP_H_
 
-#include "uv.h"
 #include "NetAddress.h"
-#include "UVTypes.h"
-#include "UVLoop.h"
 #include "UVAsync.h"
 #include "UVBuf.h"
 #include "UVCheck.h"
 #include "UVHandle.h"
 #include "UVIdle.h"
+#include "UVLoop.h"
 #include "UVPoll.h"
 #include "UVPrepare.h"
 #include "UVReq.h"
@@ -20,13 +18,15 @@
 #include "UVStream.h"
 #include "UVTcp.h"
 #include "UVTimer.h"
-#include "UVUdp.h"
 #include "UVTty.h"
+#include "UVTypes.h"
+#include "UVUdp.h"
+#include "uv.h"
 
 namespace XSpace
 {
 
-inline const char* Version()
+inline const char *Version()
 {
     return uv_version_string();
 }

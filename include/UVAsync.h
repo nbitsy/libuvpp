@@ -21,16 +21,16 @@ public:
 public:
     virtual ~UVAsync();
 
-    bool Send(void* data);
+    bool Send(void *data);
     void OnClosed() OVERRIDE;
 
     // 同步消息调起后处理函数
     virtual void OnAsync();
     // 放入同步对象的数据怎么处理
-    virtual void Append(void* data) = 0;
+    virtual void Append(void *data) = 0;
 
 private:
-    explicit UVAsync(std::weak_ptr<UVLoop>& loop);
+    explicit UVAsync(std::weak_ptr<UVLoop> &loop);
 };
 
 } // namespace XSpace

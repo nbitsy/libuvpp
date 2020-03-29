@@ -2,8 +2,8 @@
 #ifndef _UVPOLL_H_
 #define _UVPOLL_H_
 
-#include "UVTypes.h"
 #include "UVHandle.h"
+#include "UVTypes.h"
 
 namespace XSpace
 {
@@ -16,7 +16,7 @@ public:
     UV_CREATE_HANDLE(UVPoll)
 
 public:
-    UVPoll(std::weak_ptr<UVLoop>& loop, int fd);
+    UVPoll(std::weak_ptr<UVLoop> &loop, int fd);
     ~UVPoll();
 
     bool Start(int events = UVET_ALL);

@@ -25,8 +25,9 @@ static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 
     if (nread <= 0)
     {
-        uviodevice->OnError(nread); // XXX: OnError里去决定是否要关闭连接
+        uviodevice->OnError(nread); // XXX: OnError里去做一些关闭关的操作
         UVDataHelper::BufFree(buf);
+        uviodevice->Close();
         return;
     }
 

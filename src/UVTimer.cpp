@@ -5,7 +5,7 @@
 namespace XSpace
 {
 
-UVTimer::UVTimer(std::weak_ptr<UVLoop>& loop, long long ticks) : UVHandle(loop), Ticks(ticks)
+UVTimer::UVTimer(std::weak_ptr<UVLoop> &loop, long long ticks) : UVHandle(loop), Ticks(ticks)
 {
     if (_loop.expired())
         return;
@@ -30,15 +30,15 @@ UVTimer::~UVTimer()
 
 void __OnTimer(uv_timer_t *timer)
 {
-    UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t*)timer);
+    UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)timer);
     if (NULL == uvdata || NULL == uvdata->_self)
         return;
-    
-    UVTimer* t = uvdata->GetPtr<UVTimer>();
+
+    UVTimer *t = uvdata->GetPtr<UVTimer>();
     if (NULL == t)
         return;
 
-    Timestamp* timestamp = (Timestamp*)uvdata->_data;
+    Timestamp *timestamp = (Timestamp *)uvdata->_data;
     if (timestamp != NULL)
         timestamp->Update();
 
@@ -46,7 +46,7 @@ void __OnTimer(uv_timer_t *timer)
 
     if (t->Ticks == 0)
         t->Stop();
-    else
+    else if (t->Ticks > 0)
         --t->Ticks;
 }
 
@@ -57,7 +57,7 @@ bool UVTimer::Start(uint64_t repeat, uint64_t timeout, long long ticks)
     if (NULL == _handle || !_handle->flags)
         return false;
 
-    if (ticks > 0)
+    if (ticks >= 0)
         Ticks = ticks;
 
     return !uv_timer_start(GetHandle<uv_timer_t>(), __OnTimer, timeout, repeat);
@@ -93,7 +93,7 @@ void UVTimer::OnClosed()
     DEBUG("\n");
 }
 
-void UVTimer::Tick(const Timestamp* now)
+void UVTimer::Tick(const Timestamp *now)
 {
     static int i = 0;
 

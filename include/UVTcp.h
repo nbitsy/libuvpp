@@ -39,6 +39,8 @@ public:
     void Reconnect();
 
     inline bool IsConnected() const { return _connected; }
+    inline bool IsConnector() const { return _connector; }
+    inline bool IsServer() const { return !_connector; }
 
     void OnRead(void *data, int nread) OVERRIDE;
     void OnClosed() OVERRIDE;
@@ -59,6 +61,7 @@ private:
 private:
     std::shared_ptr<UVTimer> _timeoutTimer;
     bool _connected;
+    bool _connector;
     int _timeout;
     NetAddress _local;
 };
