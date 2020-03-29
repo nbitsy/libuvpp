@@ -12,17 +12,17 @@ class UVStream;
 class UVReqShutdown : public UVReq
 {
 public:
-    UVReqShutdown(UVStream* stream);
+    UV_CREATE_REQ_STRONG(UVReqShutdown)
+
+public:
+    UVReqShutdown(std::weak_ptr<UVHandle>& handle);
     ~UVReqShutdown();
 
-    UVLoop *GetLoop() OVERRIDE;
     bool Start() OVERRIDE;
-    void Release() OVERRIDE;
-
     void OnReq(int status) OVERRIDE;
 
 private:
-    UVStream* _stream;
+    std::weak_ptr<UVHandle> _handle;
 };
 
 } // namespace XSpace

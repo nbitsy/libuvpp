@@ -5,33 +5,26 @@
 namespace XSpace
 {
 
-static UVLoop gDefaultLoop("Default", true);
+static std::shared_ptr<UVLoop> gDefaultLoop;
 
-UVLoop *UVLoop::DefaultLoop()
+template <typename T>
+std::weak_ptr<UVLoop> UVLoop::DefaultLoop()
 {
-    return &gDefaultLoop;
+    if (gDefaultLoop == NULL)
+        gDefaultLoop = UVLoop::Create<T>("Default", true);
+    return gDefaultLoop;
 }
 
-UVLoop::UVLoop(const std::string &name, bool useDefault)
-    : UVDataHelper(), UVPoolHelper(), _name(name), _loop(NULL), _running(false)
+UVLoop::UVLoop(const std::string &name)
+    : UVDataHelper(), _name(name), _loop(NULL), _running(false)
 {
     uv_replace_allocator(Allocator::malloc, Allocator::realloc, Allocator::calloc, Allocator::free);
 
-    if (useDefault)
-    {
-        _loop = uv_default_loop();
-        SetGC(false);
-    }
-    else
-    {
-        _loop = (uv_loop_t *)Allocator::malloc(sizeof(*_loop));
-    }
-
+    _loop = (uv_loop_t *)Allocator::malloc(sizeof(*_loop));
     if (_loop != NULL)
     {
         uv_loop_init(_loop);
         uv_loop_set_data(_loop, NULL);
-        SetData(NULL, true); // set this
     }
 
     _threadId = std::this_thread::get_id();
@@ -40,28 +33,19 @@ UVLoop::UVLoop(const std::string &name, bool useDefault)
 
 UVLoop::~UVLoop()
 {
+    DEBUG("Object @%p\n", this);
     if (_loop != NULL)
     {
         ClearData();
-
-        if (GetGC())
-        {
-            uv_loop_close(_loop);
-            Allocator::free(_loop);
-        }
-        else
-        {
-            uv_loop_close(_loop);
-        }
-
+        uv_loop_close(_loop);
+        Allocator::free(_loop);
         _loop = NULL;
     }
-    DEBUG("Object @%p\n", this);
 }
 
 void UVLoop::SetData(void *data, bool force)
 {
-    UVDataHelper::SetData(_loop, data, force);
+    UVDataHelper::SetData(this, _loop, data, force, false);
 }
 
 UVData *UVLoop::GetData() const

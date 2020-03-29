@@ -5,7 +5,7 @@
 namespace XSpace
 {
 
-UVReq::UVReq(bool gc) : _req(NULL)
+UVReq::UVReq() : _req(NULL)
 {
 }
 
@@ -13,9 +13,9 @@ UVReq::~UVReq()
 {
 }
 
-void UVReq::SetData(void *data, bool force)
+void UVReq::SetData(void *data, bool force, bool strong)
 {
-    UVDataHelper::SetData(_req, data, force);
+    UVDataHelper::SetData(this, _req, data, force, strong);
 }
 
 UVData *UVReq::GetData() const

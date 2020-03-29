@@ -7,22 +7,18 @@ namespace XSpace
 
 static void __OnClosed(uv_handle_t *handle)
 {
-    UVData* data = (UVData*)handle->data;
-    if (NULL == data)
+    DEBUG("Free @%p\n", handle);
+    UVData *uvdata = (UVData *)handle->data;
+    if (NULL == uvdata)
         std::cout << "@" << handle << " 's owner has released already." << std::endl;
 
-    UVHandle* uvhandle = (UVHandle*)data->_self;
-    if (data != NULL && uvhandle != NULL)
-        uvhandle->OnClosed();
-
-    DEBUG("Free @%p\n", handle);
-
-    // 如果没用调用到Release可能会导致资源泄漏
-    if (uvhandle != NULL)
-        uvhandle->Release();
+    UVHandle* h = uvdata->GetPtr<UVHandle>();
+    if (NULL == h)
+        return;
+    h->OnClosed();
 }
 
-UVHandle::UVHandle(UVLoop* loop) : _loop(loop), _handle(NULL)
+UVHandle::UVHandle(std::weak_ptr<UVLoop> &loop) : _loop(loop), _handle(NULL)
 {
     DEBUG("Object @%p\n", this);
 }
@@ -39,9 +35,9 @@ UVHandle::~UVHandle()
     DEBUG("Object @%p\n", this);
 }
 
-void UVHandle::SetData(void *data, bool force)
+void UVHandle::SetData(void *data, bool force, bool strong)
 {
-    UVDataHelper::SetData(_handle, data, force);
+    UVDataHelper::SetData(this, _handle, data, force, strong);
 }
 
 const UVData *UVHandle::GetData() const
@@ -54,29 +50,11 @@ void UVHandle::ClearData()
     UVDataHelper::ClearData(_handle);
 }
 
-#if 0
-UVLoop* UVHandle::GetLoop()
-{
-    if (NULL == _handle)
-        return NULL;
-    
-    uv_loop_t* loop = (uv_loop_t*)uv_handle_get_loop(_handle);
-    if (NULL == loop)
-        return NULL;
-    
-    UVData* pdata = (UVData*)uv_loop_get_data(loop);
-    if (NULL == pdata)
-        return NULL;
-    
-    return (UVLoop*)pdata->_self;
-}
-#endif
-
 bool UVHandle::IsActive() const
 {
     if (NULL == _handle)
         return false;
-    
+
     return uv_is_active(_handle);
 }
 
@@ -123,14 +101,6 @@ int UVHandle::RecvBufferSize() const
     return value;
 }
 
-void UVHandle::Release()
-{
-    DEBUG("Release");
-    delete this; // TODO:
-}
-
 } // namespace XSpace
 
-
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

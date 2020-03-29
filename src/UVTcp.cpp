@@ -11,8 +11,8 @@ namespace XSpace
 class UVTcpConnectTimeoutTimer : public UVTimer
 {
 public:
-    UVTcpConnectTimeoutTimer(UVLoop *loop, UVTcp *tcp)
-        : UVTimer(loop), _tcp(tcp)
+    UVTcpConnectTimeoutTimer(std::weak_ptr<UVLoop> &loop, std::weak_ptr<UVHandle> &tcp)
+        : UVTimer(loop, 0), _tcp(tcp)
     {
     }
     ~UVTcpConnectTimeoutTimer()
@@ -21,39 +21,44 @@ public:
 
     void Tick(const Timestamp *now)
     {
-        if (!_tcp->IsConnected())
+        auto tcp = _tcp.lock();
+        if (NULL == tcp)
         {
-            _tcp->Reconnect();
+            Stop();
+            return;
+        }
+
+        UVTcp* t = (UVTcp*)tcp.get();
+        if (!t->IsConnected())
+        {
+            t->Reconnect();
         }
         else
         {
             Stop();
-            _tcp->Close();
+            t->Close();
         }
     }
 
 private:
-    UVTcp *_tcp;
+    std::weak_ptr<UVHandle> _tcp;
 };
 
-UVTcp::UVTcp(UVLoop *loop, int flags)
+UVTcp::UVTcp(std::weak_ptr<UVLoop> &loop, int flags)
     : UVStream(loop, flags), _timeoutTimer(NULL), _connected(false), _timeout(0)
 {
-    if (NULL == _loop)
+    if (loop.expired())
         return;
+
     Init();
     DEBUG("Object @%p\n", this);
 }
 
 void UVTcp::Clear()
 {
-    auto loop = GetLoop();
-    if (NULL == loop)
-        return;
-
     StopRead();
     ClearData();
-    loop->Destroy((uv_tcp_t *)_handle);
+    Allocator::Destroy((uv_tcp_t *)_handle);
 }
 
 bool UVTcp::Init()
@@ -64,15 +69,18 @@ bool UVTcp::Init()
         _handle = NULL;
     }
 
-    _handle = (uv_handle_t *)_loop->Construct<uv_tcp_t>();
+    auto loop = _loop.lock();
+    if (NULL == loop)
+        return false;
+
+    _handle = (uv_handle_t *)Allocator::Construct<uv_tcp_t>();
     if (NULL == _handle)
         return false;
 
     if (_handle != NULL)
     {
-        uv_tcp_init_ex(_loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, _flags);
+        uv_tcp_init_ex(loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, _flags);
         uv_handle_set_data(_handle, NULL);
-        SetData(NULL);
     }
 
     return true;
@@ -98,7 +106,7 @@ bool UVTcp::Bind(const std::string &ip, int port, unsigned int flags)
     return UVIODevice::Bind(GetHandle<uv_handle_t>(), ip, port, flags);
 }
 
-void UVTcp::OnAccept(UVStream *client)
+void UVTcp::OnAccept(std::weak_ptr<UVHandle> &client)
 {
     DEBUG("\n");
 }
@@ -106,7 +114,8 @@ void UVTcp::OnAccept(UVStream *client)
 bool UVTcp::StartConnect(const std::string &ip, int port, int timeout)
 {
     DEBUG("\n");
-    UVReqConnect *req = Allocator::Construct<UVReqConnect>(this, ip, port);
+    std::weak_ptr<UVHandle> self(shared_from_this());
+    std::shared_ptr<UVReqConnect> req = UVReqConnect::Create(self, ip, port);
     if (NULL == req)
         return false;
 
@@ -139,9 +148,10 @@ void UVTcp::Reconnect()
 
 void UVTcp::StartReconnectTimer()
 {
-    if (NULL == _timeoutTimer)
+    if (NULL == _timeoutTimer && _timeout > 0)
     {
-        _timeoutTimer = Allocator::Construct<UVTcpConnectTimeoutTimer>(GetLoop(), this);
+        std::weak_ptr<UVHandle> self(shared_from_this());
+        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), self);
         if (_timeoutTimer != NULL)
             _timeoutTimer->Start(_timeout, _timeout);
     }
@@ -168,7 +178,8 @@ void UVTcp::OnErrorAction(int status)
     {
         if (NULL == _timeoutTimer)
         {
-            _timeoutTimer = Allocator::Construct<UVTcpConnectTimeoutTimer>(GetLoop(), this);
+            std::weak_ptr<UVHandle> self(shared_from_this());
+            _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), self);
             if (_timeoutTimer != NULL)
                 _timeoutTimer->Start(_timeout, _timeout);
         }
@@ -179,11 +190,10 @@ void UVTcp::OnErrorAction(int status)
     }
 }
 
-UVStream *UVTcp::OnNewConnection()
+std::shared_ptr<UVHandle> UVTcp::OnNewConnection()
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    auto tcp = Allocator::Construct<UVTcp>(GetLoop());
-    return tcp;
+    return UVTcp::Create(GetLoop());
 }
 
 void UVTcp::OnConnected()
@@ -218,8 +228,9 @@ void UVTcp::OnRead(void *data, int nread)
     }
 }
 
-void UVTcp::OnAccepted(UVStream *server)
+void UVTcp::OnAccepted(std::weak_ptr<UVHandle> &server)
 {
+
     DEBUG("%s => %s\n", RemoteAddress().ToString().c_str(), LocalAddress().ToString().c_str());
 }
 
@@ -234,24 +245,6 @@ void UVTcp::OnClosed()
 void UVTcp::OnShutdown()
 {
     DEBUG("%s %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
-}
-
-void UVTcp::Release()
-{
-    DEBUG("\n");
-    if (NULL == _handle)
-        return;
-
-    auto loop = GetLoop();
-    if (NULL == loop)
-        return;
-
-    ClearData();
-    loop->Destroy((uv_tcp_t *)_handle);
-    if (GetGC())
-        Allocator::Destroy(this);
-
-    _handle = NULL;
 }
 
 } // namespace XSpace

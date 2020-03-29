@@ -3,72 +3,130 @@
 #define _UVREQWRITE_H_
 
 #include "UVReq.h"
+#include "TypeTraits.h"
 
 namespace XSpace
 {
 
-class UVIODevice;
+class UVHandle;
 
 class UVReqWrite : public UVReq
 {
 public:
-    /**
-     * UVIODevice 输出目标流对象
-     * other 管道目标流对象
-     * data 数据
-     * nsize 数据长
-     * copy 是否把数据复制到Req对象
-     * gc 完成任务后是否回收Req对象本身
-    */
-    UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *data, int nsize, bool copy = false, bool gc = true);
+    template <typename T>
+    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle>& iohandle, std::weak_ptr<UVHandle>& other, void *data, int nsize, bool copy = false)
+    {
+        if (is_subclass<T, UVReqWrite>::value)
+        {
+            std::shared_ptr<UVReqWrite> ptr(new T(iohandle, other, data, nsize, copy));
+            if (ptr != NULL)
+                ptr->SetData(NULL, true, true);
 
-    /**
-     * UVIODevice 输出目标流对象
-     * other 管道目标流对象
-     * bufs 数据缓存对象数组，每个数据包的数据长度在头4个字节中，就是 *(int*)bufs[i] 为这个包的长度，不包括sizeof(int)
-     * nbuf 缓存区中数据包个数
-     * copy 是否把数据复制到Req对象
-     * gc 完成任务后是否回收Req对象本身
-    */
-    UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *bufs[], int nbuf, bool copy = false, bool gc = true);
+            return ptr;
+        }
 
-    /**
-     * UVIODevice 输出目标流对象
-     * addr UDP时的目标地址
-     * data 数据
-     * nsize 数据长
-     * copy 是否把数据复制到Req对象
-     * gc 完成任务后是否回收Req对象本身
-    */
-    UVReqWrite(UVIODevice *uviodevice, const struct sockaddr* addr, void *data, int nsize, bool copy = false, bool gc = true);
-    /**
-     * UVIODevice 输出目标流对象
-     * addr UDP时的目标地址
-     * bufs 数据缓存对象数组，每个数据包的数据长度在头4个字节中，就是 *(int*)bufs[i] 为这个包的长度，不包括sizeof(int)
-     * nbuf 缓存区中数据包个数
-     * copy 是否把数据复制到Req对象
-     * gc 完成任务后是否回收Req对象本身
-    */
-    UVReqWrite(UVIODevice *uviodevice, const struct sockaddr* addr, void *bufs[], int nbuf, bool copy = false, bool gc = true);
+        return NULL;
+    }
+    template <typename T>
+    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle>& iohandle, std::weak_ptr<UVHandle>& other, void *bufs[], int nbuf, bool copy = false)
+    {
+        if (is_subclass<T, UVReqWrite>::value)
+        {
+            std::shared_ptr<UVReqWrite> ptr(new T(iohandle, other, bufs, nbuf, copy));
+            if (ptr != NULL)
+                ptr->SetData(NULL, true, true);
 
-    ~UVReqWrite();
+            return ptr;
+        }
 
-    UVLoop *GetLoop() OVERRIDE;
-    bool Start() OVERRIDE;
-    void OnReq(int status) OVERRIDE;
-    void Release() OVERRIDE;
+        return NULL;
+    }
+    template <typename T>
+    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle>& iohandle, const struct sockaddr* addr, void *data, int nsize, bool copy = false, bool gc = true)
+    {
+        if (is_subclass<T, UVReqWrite>::value)
+        {
+            std::shared_ptr<UVReqWrite> ptr(new T(iohandle, addr, data, nsize, copy));
+            if (ptr != NULL)
+                ptr->SetData(NULL, true, true);
+
+            return ptr;
+        }
+
+        return NULL;
+    }
+    template <typename T>
+    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle>& iohandle, const struct sockaddr* addr, void *bufs[], int nbuf, bool copy = false)
+    {
+        if (is_subclass<T, UVReqWrite>::value)
+        {
+            std::shared_ptr<UVReqWrite> ptr(new T(iohandle, bufs, nbuf, copy));
+            if (ptr != NULL)
+                ptr->SetData(NULL, true, true);
+
+            return ptr;
+        }
+
+        return NULL;
+    }
 
 private:
-    void Init(UVIODevice* uviodevice, void* data, int nsize, bool copy);
-    void Init(UVIODevice* uviodevice, void* bufs[], int nbuf, bool copy);
-    void InitReq(UVIODevice* uviodevice);
+    /**
+     * UVHandle 输出目标流对象
+     * other 管道目标流对象
+     * data 数据
+     * nsize 数据长
+     * copy 是否把数据复制到Req对象
+     * gc 完成任务后是否回收Req对象本身
+    */
+    UVReqWrite(std::weak_ptr<UVHandle>& iohandle, std::weak_ptr<UVHandle>& other, void *data, int nsize, bool copy = false);
+
+    /**
+     * UVHandle 输出目标流对象
+     * other 管道目标流对象
+     * bufs 数据缓存对象数组，每个数据包的数据长度在头4个字节中，就是 *(int*)bufs[i] 为这个包的长度，不包括sizeof(int)
+     * nbuf 缓存区中数据包个数
+     * copy 是否把数据复制到Req对象
+     * gc 完成任务后是否回收Req对象本身
+    */
+    UVReqWrite(std::weak_ptr<UVHandle>& iohandle, std::weak_ptr<UVHandle>& other, void *bufs[], int nbuf, bool copy = false);
+
+    /**
+     * UVHandle 输出目标流对象
+     * addr UDP时的目标地址
+     * data 数据
+     * nsize 数据长
+     * copy 是否把数据复制到Req对象
+     * gc 完成任务后是否回收Req对象本身
+    */
+    UVReqWrite(std::weak_ptr<UVHandle>& iohandle, const struct sockaddr* addr, void *data, int nsize, bool copy = false);
+    /**
+     * UVHandle 输出目标流对象
+     * addr UDP时的目标地址
+     * bufs 数据缓存对象数组，每个数据包的数据长度在头4个字节中，就是 *(int*)bufs[i] 为这个包的长度，不包括sizeof(int)
+     * nbuf 缓存区中数据包个数
+     * copy 是否把数据复制到Req对象
+     * gc 完成任务后是否回收Req对象本身
+    */
+    UVReqWrite(std::weak_ptr<UVHandle>& iohandle, const struct sockaddr* addr, void *bufs[], int nbuf, bool copy = false);
+
+public:
+    ~UVReqWrite();
+
+    bool Start() OVERRIDE;
+    void OnReq(int status) OVERRIDE;
+
+private:
+    void Init(std::weak_ptr<UVHandle>& iohandle, void* data, int nsize, bool copy);
+    void Init(std::weak_ptr<UVHandle>& iohandle, void* bufs[], int nbuf, bool copy);
+    void InitReq(std::weak_ptr<UVHandle>& iohandle);
     void InitAddress(const struct sockaddr* addr);
 
 private:
     // 是否复制源数据
     bool _bCopye;
-    UVIODevice *_uviodevice;
-    UVIODevice *_other;
+    std::weak_ptr<UVHandle> _iohandle;
+    std::weak_ptr<UVHandle> _other;
     struct sockaddr* _addr;
 
     bool _bBuffers;

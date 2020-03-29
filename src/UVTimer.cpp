@@ -5,17 +5,17 @@
 namespace XSpace
 {
 
-UVTimer::UVTimer(UVLoop *loop) : UVHandle(loop)
+UVTimer::UVTimer(std::weak_ptr<UVLoop>& loop, long long ticks) : UVHandle(loop), Ticks(ticks)
 {
-    if (NULL == _loop)
+    if (_loop.expired())
         return;
 
-    _handle = (uv_handle_t *)_loop->Construct<uv_timer_t>();
-    if (_handle != NULL && _loop != NULL && _loop->GetRawLoop<uv_loop_t>() != NULL)
+    auto l = _loop.lock();
+    _handle = (uv_handle_t *)Allocator::Construct<uv_timer_t>();
+    if (_handle != NULL && l->GetRawLoop<uv_loop_t>() != NULL)
     {
-        uv_timer_init(_loop->GetRawLoop<uv_loop_t>(), GetHandle<uv_timer_t>());
+        uv_timer_init(l->GetRawLoop<uv_loop_t>(), GetHandle<uv_timer_t>());
         uv_handle_set_data(_handle, NULL);
-        SetData(&_timestamp);
     }
     DEBUG("Object @%p\n", this);
 }
@@ -28,46 +28,37 @@ UVTimer::~UVTimer()
     DEBUG("Object @%p\n", this);
 }
 
-void UVTimer::Release()
-{
-    if (NULL == _handle)
-        return;
-    
-    auto loop = GetLoop();
-    if (NULL == loop)
-        return;
-
-    ClearData();
-    loop->Destroy((uv_timer_t*)_handle);
-    if (GetGC())
-        delete this; // TODO:
-
-    _handle = NULL;
-}
-
 void __OnTimer(uv_timer_t *timer)
 {
-    UVData *data = (UVData *)uv_handle_get_data((uv_handle_t*)timer);
-    if (NULL == data)
-        return;
-
-    UVTimer *uvtimer = (UVTimer *)data->_self;
-    if (NULL == uvtimer)
+    UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t*)timer);
+    if (NULL == uvdata || NULL == uvdata->_self)
         return;
     
-    Timestamp* timestamp = (Timestamp*)data->_data;
+    UVTimer* t = uvdata->GetPtr<UVTimer>();
+    if (NULL == t)
+        return;
+
+    Timestamp* timestamp = (Timestamp*)uvdata->_data;
     if (timestamp != NULL)
         timestamp->Update();
 
-    uvtimer->Tick(timestamp);
+    t->Tick(timestamp);
+
+    if (t->Ticks == 0)
+        t->Stop();
+    else
+        --t->Ticks;
 }
 
 // timeout: 第一次开始时的延迟时间
 // repeat: 下一次的回调的间隔时间,ms
-bool UVTimer::Start(uint64_t repeat, uint64_t timeout)
+bool UVTimer::Start(uint64_t repeat, uint64_t timeout, long long ticks)
 {
     if (NULL == _handle || !_handle->flags)
         return false;
+
+    if (ticks > 0)
+        Ticks = ticks;
 
     return !uv_timer_start(GetHandle<uv_timer_t>(), __OnTimer, timeout, repeat);
 }

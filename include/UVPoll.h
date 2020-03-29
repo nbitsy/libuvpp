@@ -13,14 +13,16 @@ class UVLoop;
 class UVPoll : public UVHandle
 {
 public:
-    UVPoll(UVLoop *loop, int fd);
+    UV_CREATE_HANDLE(UVPoll)
+
+public:
+    UVPoll(std::weak_ptr<UVLoop>& loop, int fd);
     ~UVPoll();
 
     bool Start(int events = UVET_ALL);
     bool Stop();
 
     void OnClosed() OVERRIDE;
-    void Release() OVERRIDE;
 
     virtual void OnPoll(int status, int event);
 };

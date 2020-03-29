@@ -1,15 +1,16 @@
 
-#include <iostream>
 #include "UVReqWrite.h"
-#include "UVIODevice.h"
-#include "UVLoop.h"
 #include "Allocator.h"
+#include "UVHandle.h"
+#include "UVLoop.h"
+#include <iostream>
 
 namespace XSpace
 {
 
 static void __OnWrite(uv_write_t *req, int status)
 {
+    DEBUG("status: %d\n", status);
     if (NULL == req)
         return;
 
@@ -17,23 +18,32 @@ static void __OnWrite(uv_write_t *req, int status)
     {
         if (req->handle != NULL)
         {
+            // XXX: _iohandle
             UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)req->handle);
             if (uvdata != NULL && uvdata->_self != NULL)
-                ((UVIODevice *)uvdata->_self)->Close();
+            {
+                auto handle = uvdata->GetPtr<UVHandle>();
+                if (handle != NULL)
+                    handle->Close();
+            }
         }
     }
 
-    // OnReq必须在最后面被调用
     UVData *uvdata = (UVData *)uv_req_get_data((uv_req_t *)req);
-    if (NULL == uvdata)
+    if (NULL == uvdata || NULL == uvdata->_self)
         return;
 
-    UVReqWrite* uvreqwrite = (UVReqWrite*)uvdata->_self;
-    if (NULL == uvreqwrite)
+    UVReqWrite *self = uvdata->GetPtr<UVReqWrite>();
+    if (NULL == self)
         return;
 
-    uvreqwrite->OnReq(status);
-    uvreqwrite->Release();
+    // OnReq必须在最后面被调用
+    self->OnReq(status);
+
+    // 如果Req里注册的是强引用，则释放引用，一般来说Req使用完后需要回收
+    auto strong = uvdata->GetStrongPtr<UVReqWrite>();
+    if (strong != NULL)
+        strong->reset();
 }
 
 static void __OnWriteUDP(uv_udp_send_t *req, int status)
@@ -47,24 +57,27 @@ static void __OnWriteUDP(uv_udp_send_t *req, int status)
         {
             UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)req->handle);
             if (uvdata != NULL && uvdata->_self != NULL)
-                ((UVIODevice *)uvdata->_self)->Close();
+            {
+                auto device = uvdata->GetPtr<UVHandle>();
+                if (device != NULL)
+                    device->Close();
+            }
         }
     }
 
-    // OnReq必须在最后面被调用
     UVData *uvdata = (UVData *)uv_req_get_data((uv_req_t *)req);
-    if (NULL == uvdata)
+    if (NULL == uvdata || NULL == uvdata->_self)
         return;
 
-    UVReqWrite* uvreqwrite = (UVReqWrite*)uvdata->_self;
-    if (NULL == uvreqwrite)
+    UVReqWrite *self = uvdata->GetPtr<UVReqWrite>();
+    if (NULL == self)
         return;
 
-    uvreqwrite->OnReq(status);
-    uvreqwrite->Release();
+    // OnReq必须在最后面被调用
+    self->OnReq(status);
 }
 
-void UVReqWrite::Init(UVIODevice *uviodevice, void *data, int nsize, bool copy)
+void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *data, int nsize, bool copy)
 {
     d._data = data;
     d._nsize = nsize;
@@ -79,29 +92,26 @@ void UVReqWrite::Init(UVIODevice *uviodevice, void *data, int nsize, bool copy)
         }
     }
 
-    InitReq(uviodevice);
+    InitReq(iohandle);
 }
 
-void UVReqWrite::InitReq(UVIODevice *uviodevice)
+void UVReqWrite::InitReq(std::weak_ptr<UVHandle> &iohandle)
 {
-    auto loop = GetLoop();
-    if (NULL == loop)
-    {
-        std::cerr << "GetLoop get a null value!!!" << std::endl;
+    auto device = iohandle.lock();
+    if (NULL == device)
         return;
-    }
 
-    uv_handle_t* handle = uviodevice->GetHandle<uv_handle_t>();
+    uv_handle_t *handle = device->GetHandle<uv_handle_t>();
     if (NULL == handle)
         return;
 
     if (handle->type == UV_TCP || handle->type == UV_TTY)
     {
-        _req = (uv_req_t *)loop->Construct<uv_write_t>();
+        _req = (uv_req_t *)Allocator::Construct<uv_write_t>();
     }
     else if (handle->type == UV_UDP)
     {
-        _req = (uv_req_t *)loop->Construct<uv_udp_send_t>();
+        _req = (uv_req_t *)Allocator::Construct<uv_udp_send_t>();
     }
     else
     {
@@ -109,13 +119,10 @@ void UVReqWrite::InitReq(UVIODevice *uviodevice)
     }
 
     if (_req != NULL)
-    {
         uv_req_set_data(_req, NULL);
-        SetData(NULL);
-    }
 }
 
-void UVReqWrite::Init(UVIODevice *uviodevice, void *bufs[], int nbuf, bool copy)
+void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf, bool copy)
 {
     d2._bufs = bufs;
     d2._nbuf = nbuf;
@@ -139,32 +146,32 @@ void UVReqWrite::Init(UVIODevice *uviodevice, void *bufs[], int nbuf, bool copy)
         }
     }
 
-    InitReq(uviodevice);
+    InitReq(iohandle);
 }
 
-UVReqWrite::UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *data, int nsize, bool copy, bool gc)
-    : UVReq(gc), _bCopye(copy), _uviodevice(uviodevice), _other(other), _bBuffers(false)
+UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy)
+    : UVReq(), _bCopye(copy), _iohandle(iohandle), _other(other), _bBuffers(false)
 {
-    Init(uviodevice, data, nsize, copy);
+    Init(iohandle, data, nsize, copy);
 }
 
-UVReqWrite::UVReqWrite(UVIODevice *uviodevice, UVIODevice *other, void *bufs[], int nbuf, bool copy, bool gc)
-    : UVReq(gc), _bCopye(false), _uviodevice(uviodevice), _other(other), _bBuffers(true)
+UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy)
+    : UVReq(), _bCopye(false), _iohandle(iohandle), _other(other), _bBuffers(true)
 {
-    Init(uviodevice, bufs, nbuf, copy);
+    Init(iohandle, bufs, nbuf, copy);
 }
 
-UVReqWrite::UVReqWrite(UVIODevice *uviodevice, const struct sockaddr *addr, void *data, int nsize, bool copy, bool gc)
-    : UVReq(gc), _bCopye(false), _uviodevice(uviodevice), _bBuffers(false), _other(NULL), _addr(NULL)
+UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy)
+    : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(false), _addr(NULL)
 {
-    Init(uviodevice, data, nsize, copy);
+    Init(iohandle, data, nsize, copy);
     InitAddress(addr);
 }
 
-UVReqWrite::UVReqWrite(UVIODevice *uviodevice, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy, bool gc)
-    : UVReq(gc), _bCopye(false), _uviodevice(uviodevice), _bBuffers(true), _other(NULL), _addr(NULL)
+UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy)
+    : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(true), _addr(NULL)
 {
-    Init(uviodevice, bufs, nbuf, copy);
+    Init(iohandle, bufs, nbuf, copy);
     InitAddress(addr);
 }
 
@@ -188,7 +195,7 @@ UVReqWrite::~UVReqWrite()
     {
         if (_bCopye && d._data != NULL)
         {
-            free(d._data); // TODO:
+            Allocator::free(d._data); // TODO:
             d._data = NULL;
             d._nsize = 0;
         }
@@ -198,9 +205,9 @@ UVReqWrite::~UVReqWrite()
         if (_bCopye && d2._bufs && d2._nbuf > 0)
         {
             for (int i = 0; i < d2._nbuf; ++i)
-                free(d2._bufs[i]); // TODO:
+                Allocator::free(d2._bufs[i]); // TODO:
 
-            free(d2._bufs); // TODO:
+            Allocator::free(d2._bufs); // TODO:
         }
 
         d2._bufs = NULL;
@@ -209,16 +216,18 @@ UVReqWrite::~UVReqWrite()
 
     if (_addr != NULL)
     {
-        free(_addr); // TODO:
+        Allocator::free(_addr); // TODO:
         _addr = NULL;
     }
 }
 
 bool UVReqWrite::Start()
 {
-    if (NULL == _req || NULL == _uviodevice)
-        return false; // TODO: 回收自己
-    uv_handle_t *uvhandle = _uviodevice->GetHandle<uv_handle_t>();
+    auto device = _iohandle.lock();
+    if (NULL == _req || NULL == device)
+        return false;
+
+    uv_handle_t *uvhandle = device->GetHandle<uv_handle_t>();
     if (NULL == uvhandle)
         return false;
 
@@ -258,14 +267,15 @@ bool UVReqWrite::Start()
     int type = uvhandle->type;
     if (type == UV_TCP || type == UV_TTY)
     {
-        if (NULL == _other)
+        auto other = _other.lock();
+        if (NULL == other)
         {
             if (!uv_write(GetReq<uv_write_t>(), (uv_stream_t *)uvhandle, uvbuf, nbufs, __OnWrite))
                 return true;
         }
         else
         {
-            if (!uv_write2(GetReq<uv_write_t>(), (uv_stream_t *)uvhandle, uvbuf, nbufs, _other->GetHandle<uv_stream_t>(), __OnWrite))
+            if (!uv_write2(GetReq<uv_write_t>(), (uv_stream_t *)uvhandle, uvbuf, nbufs, other->GetHandle<uv_stream_t>(), __OnWrite))
                 return true;
         }
     }
@@ -280,38 +290,9 @@ bool UVReqWrite::Start()
     return false; // TODO: 回收自己
 }
 
-UVLoop *UVReqWrite::GetLoop()
-{
-    if (NULL == _uviodevice)
-        return NULL;
-
-    return _uviodevice->GetLoop();
-}
-
 void UVReqWrite::OnReq(int status)
 {
     DEBUG("\n");
-}
-
-void UVReqWrite::Release()
-{
-    // XXX: 这里释放的顺序不能乱
-    if (NULL ==_req)
-        return;
-
-    auto loop = GetLoop();
-    if (NULL == loop)
-    {
-        DEBUG("********************loop is null!!!********************\n");
-        return;
-    }
-
-    ClearData();
-    loop->Destroy((uv_write_t*)_req);
-    if (GetGC())
-        loop->Destroy(this);
-
-    _req = NULL;
 }
 
 } // namespace XSpace

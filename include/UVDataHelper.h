@@ -2,11 +2,70 @@
 #ifndef _UVDATAHELPER_H_
 #define _UVDATAHELPER_H_
 
+#include <memory>
+
+#include "Allocator.h"
 #include "Debugger.h"
+#include "TypeTraits.h"
 #include "uv.h"
 
 namespace XSpace
 {
+
+// XXX: 所有Handle和UVLoop都是弱引用的，外部需要强引用管理，而Req一般都是弱引用的，OnReq后需要回收
+#define UV_CREATE_HANDLE(TYPE)                                                         \
+    template <typename T = TYPE, typename... U>                                        \
+    inline static std::shared_ptr<TYPE> Create(std::weak_ptr<UVLoop> &loop, U... args) \
+    {                                                                                  \
+        return CreateWeak<T, U...>(loop, args...);                                     \
+    }                                                                                  \
+    template <typename T = TYPE, typename... U>                                        \
+    static std::shared_ptr<TYPE> CreateWeak(std::weak_ptr<UVLoop> &loop, U... args)    \
+    {                                                                                  \
+        if (is_subclass<T, TYPE>::value)                                               \
+        {                                                                              \
+            std::shared_ptr<TYPE> ptr(new T(loop, args...));                           \
+            if (ptr != NULL)                                                           \
+                ptr->SetData(NULL, true, false);                                       \
+                                                                                       \
+            return ptr;                                                                \
+        }                                                                              \
+                                                                                       \
+        return NULL;                                                                   \
+    }                                                                                  \
+    template <typename T = TYPE, typename... U>                                        \
+    static std::shared_ptr<TYPE> CreateStrong(std::weak_ptr<UVLoop> &loop, U... args)  \
+    {                                                                                  \
+        if (is_subclass<T, TYPE>::value)                                               \
+        {                                                                              \
+            std::shared_ptr<TYPE> ptr(new T(loop, args...));                           \
+            if (ptr != NULL)                                                           \
+                ptr->SetData(NULL, true, true);                                        \
+                                                                                       \
+            return ptr;                                                                \
+        }                                                                              \
+                                                                                       \
+        return NULL;                                                                   \
+    }
+
+#define UV_CREATE_REQ(TYPE, STRONG)                    \
+    template <typename T = TYPE, typename... U>        \
+    static std::shared_ptr<TYPE> Create(U... args)     \
+    {                                                  \
+        if (is_subclass<T, TYPE>::value)               \
+        {                                              \
+            std::shared_ptr<TYPE> ptr(new T(args...)); \
+            if (ptr != NULL)                           \
+                ptr->SetData(NULL, true, STRONG);      \
+                                                       \
+            return ptr;                                \
+        }                                              \
+                                                       \
+        return NULL;                                   \
+    }
+
+#define UV_CREATE_REQ_WEAK(TYPE) UV_CREATE_REQ(TYPE, false)
+#define UV_CREATE_REQ_STRONG(TYPE) UV_CREATE_REQ(TYPE, true)
 
 enum UVDataType
 {
@@ -18,46 +77,74 @@ enum UVDataType
 
 class UVLoop;
 
-// TODO：对象池
 struct UVData
 {
-    UVData() : _self(NULL), _data(NULL) {}
-    UVData(void *self, void *data) : _self(self), _data(data) {}
+    UVData() : _strong(false), _self(NULL), _data(NULL) {}
+    UVData(bool strong, void *self, void *data);
+    ~UVData();
 
-    ~UVData()
+    template <typename T>
+    inline std::weak_ptr<T> *GetWeakPtr()
     {
-        DEBUG("_self: %p, _data: %p\n", _self, _data);
+        if (_strong)
+            return NULL;
+        return (std::weak_ptr<T> *)_self;
     }
 
-    void *_self; // 本对象的原始对象
-    void *_data; // 外部数据
+    template <typename T>
+    inline std::shared_ptr<T> *GetStrongPtr()
+    {
+        if (!_strong)
+            return NULL;
+        return (std::shared_ptr<T> *)_self;
+    }
+
+    template <typename T>
+    inline T *GetPtr()
+    {
+        T *t = NULL;
+        if (_strong)
+        {
+            auto uvtimer = GetStrongPtr<T>();
+            t = uvtimer->get();
+        }
+        else
+        {
+            auto uvtimer = GetWeakPtr<T>();
+            if (!uvtimer->expired())
+                t = uvtimer->lock().get();
+        }
+        return t;
+    }
+
+    bool _strong; // _self是一个强引用
+    void *_self;  // 本对象的weak_ptr指针
+    void *_data;  // 外部数据
 };
 
 class UVDataHelper
 {
 public:
-    UVDataHelper() : _bgc(true) {}
+    UVDataHelper() {}
     virtual ~UVDataHelper() {}
 
-    /**
-     * target 设置数据的目标对象
-     * data 需要设置的数据
-     * force 是否强制设置，不管对象是否已经设置过数据
-    */
-    template <typename T>
-    void SetData(T *target, void *data, bool force);
+    template <typename T, typename U>
+    void SetData(T *object, U *target, void *data, bool force, bool strong);
 
-    inline void SetData(uv_loop_t *target, void *data, bool force)
+    template <typename T>
+    inline void SetData(T *object, uv_loop_t *target, void *data, bool force, bool strong)
     {
-        SetData(target, data, force, UVDT_LOOP);
+        SetData(object, target, data, force, UVDT_LOOP, strong);
     }
-    inline void SetData(uv_handle_t *target, void *data, bool force)
+    template <typename T>
+    inline void SetData(T *object, uv_handle_t *target, void *data, bool force, bool strong)
     {
-        SetData(target, data, force, UVDT_HANDLE);
+        SetData(object, target, data, force, UVDT_HANDLE, strong);
     }
-    inline void SetData(uv_req_t *target, void *data, bool force)
+    template <typename T>
+    inline void SetData(T *object, uv_req_t *target, void *data, bool force, bool strong)
     {
-        SetData(target, data, force, UVDT_REQ);
+        SetData(object, target, data, force, UVDT_REQ, strong);
     }
 
     template <typename T>
@@ -92,33 +179,62 @@ public:
         return GetData(target, UVDT_REQ);
     }
 
-    virtual UVLoop *GetLoop() = 0;
-    /**
-     * Release里干的是一些释放资源的工作，包括对象自己，因为进入UVLoop的对象已经不受自己控制了
-    */
-    virtual void Release() = 0;
-
-    inline void SetGC(bool gc = true) { _bgc = gc; }
-    inline bool GetGC() const { return _bgc; }
-
     static void BufAlloc(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf);
-    static void BufFree(const uv_buf_t *buf, UVLoop *loop);
-
-    template <typename T>
-    static T *HandleAlloc();
-    static void HandleFree(uv_handle_t *handle);
-
-    template <typename T>
-    static T *ReqAlloc();
-    static void ReqFree(uv_req_t *req);
+    static void BufFree(const uv_buf_t *buf);
 
 private:
-    void SetData(void *target, void *data, bool force, int type);
+    /**
+     * object 目标对象对象的C++包装
+     * target 设置数据的目标对象
+     * data 需要设置的数据
+     * force 是否强制设置，不管对象是否已经设置过数据
+     * type 对象类型
+     * strong 对于object是否强引用
+    */
+    template <typename T>
+    void SetData(T *object, void *target, void *data, bool force, int type, bool strong)
+    {
+        if (NULL == target)
+            return;
+
+        void *self = NULL;
+        if (strong)
+            self = Allocator::Construct<std::shared_ptr<UVDataHelper>>(object->shared_from_this());
+        else
+            self = Allocator::Construct<std::weak_ptr<UVDataHelper>>(object->shared_from_this());
+
+        if (NULL == self)
+            return;
+
+        UVData *uvdata = GetData(target, type);
+        if (uvdata != NULL && force)
+            Allocator::Destroy(uvdata);
+
+        uvdata = Allocator::Construct<UVData>(strong, self, data);
+        if (NULL == uvdata)
+        {
+            ERROR("ERROR: alloc UVData!!!\n");
+            return;
+        }
+
+        switch (type)
+        {
+        case UVDT_LOOP:
+            uv_loop_set_data((uv_loop_t *)target, uvdata);
+            break;
+        case UVDT_HANDLE:
+            uv_handle_set_data((uv_handle_t *)target, uvdata);
+            break;
+        case UVDT_REQ:
+            uv_req_set_data((uv_req_t *)target, uvdata);
+            break;
+        default:
+            break;
+        }
+    }
+
     void ClearData(void *target, int type);
     UVData *GetData(void *target, int type) const;
-
-protected:
-    bool _bgc;
 };
 
 } // namespace XSpace

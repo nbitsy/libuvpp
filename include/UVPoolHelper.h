@@ -3,7 +3,6 @@
 #define _UVPOOLHELPER_H_
 
 #include "UVDataHelper.h"
-#include "UVReqWrite.h"
 #include "Allocator.h"
 
 namespace XSpace
@@ -26,13 +25,13 @@ public:
     }
 
     template <typename T, typename... U>
-    T *Construct(U... args)
+    static T *Construct(U... args)
     {
         return Allocator::Construct<T>(args...);
     }
 
     template <typename T>
-    void Destroy(T *p)
+    static void Destroy(T *p)
     {
         Allocator::Destroy<T>(p);
     }

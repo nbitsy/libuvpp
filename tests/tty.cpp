@@ -10,16 +10,16 @@ using namespace XSpace;
 
 int main(int argc, char* argv[])
 {
-    UVLoop* loop = new UVLoop("Test");
-    UVTty* tty = new UVTty(loop, 1, true);
+    std::shared_ptr<UVLoop> loop = UVLoop::Create<>("Loop");
+    std::weak_ptr<UVLoop> l(loop);
+    std::shared_ptr<UVTty> tty = UVTty::Create<>(l, 1, true);
     const char* message = "***********************************FUCK\n";
     tty->StartRead();
     tty->Write((void*)message, strlen(message));
 
-    UVTimer* timer = UVTimer::Create(loop);
+    std::shared_ptr<UVTimer> timer = UVTimer::Create<>(l);
     timer->Start(1000, 3);
 
     loop->Start();
-    delete loop;
 	return 0;
 }

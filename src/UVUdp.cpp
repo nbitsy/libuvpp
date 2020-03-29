@@ -1,21 +1,21 @@
 
 #include "UVUdp.h"
+#include "Allocator.h"
 #include "UVLoop.h"
 
 namespace XSpace
 {
 
-UVUdp::UVUdp(UVLoop *loop, int flags) : UVIODevice(loop, flags)
+UVUdp::UVUdp(std::weak_ptr<UVLoop> &loop, int flags) : UVIODevice(loop, flags)
 {
-    if (NULL == _loop)
+    if (_loop.expired())
         return;
 
-    _handle = (uv_handle_t *)_loop->Construct<uv_udp_t>();
+    _handle = (uv_handle_t *)Allocator::Construct<uv_udp_t>();
     if (_handle != NULL)
     {
-        uv_udp_init_ex(_loop->GetRawLoop<uv_loop_t>(), (uv_udp_t *)_handle, flags);
+        uv_udp_init_ex(_loop.lock()->GetRawLoop<uv_loop_t>(), (uv_udp_t *)_handle, flags);
         uv_handle_set_data(_handle, NULL);
-        SetData(NULL);
     }
     DEBUG("Object @%p\n", this);
 }
@@ -103,7 +103,8 @@ size_t UVUdp::SendQueueCount() const
 // test
 void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags)
 {
-    DEBUG("\n");
+    ((char*)data)[nread-1] = '\0';
+    DEBUG("RECV: %s LEN: %d\n", data, nread);
 }
 
 /**
@@ -112,24 +113,6 @@ void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned 
 void UVUdp::OnClosed()
 {
     DEBUG("RECV FROM %s => %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
-}
-
-void UVUdp::Release()
-{
-    DEBUG("\n");
-    if (NULL == _handle)
-        return;
-
-    auto loop = GetLoop();
-    if (NULL == loop)
-        return;
-    
-    ClearData();
-    loop->Destroy((uv_udp_t*)_handle);
-    if (GetGC())
-        delete this; // TODO:
-
-    _handle = NULL;
 }
 
 } // namespace XSpace

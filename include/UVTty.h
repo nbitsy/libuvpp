@@ -9,15 +9,17 @@ namespace XSpace
 
 class UVLoop;
 
-class UVTty : public UVIODevice 
+class UVTty : public UVIODevice
 {
 public:
-    explicit UVTty(UVLoop *loop, int fd, bool readable = true, int flag = 0);
+    UV_CREATE_HANDLE(UVTty)
+
+public:
+    explicit UVTty(std::weak_ptr<UVLoop> &loop, int fd, bool readable = true, int flag = 0);
     ~UVTty();
 
     void OnRead(void *data, int nread) OVERRIDE;
     void OnClosed() OVERRIDE;
-    void Release() OVERRIDE;
     void OnShutdown();
 };
 

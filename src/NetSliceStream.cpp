@@ -6,7 +6,7 @@
 namespace XSpace
 {
 
-NetSliceStream::NetSliceStream(UVLoop *loop, int flags)
+NetSliceStream::NetSliceStream(std::weak_ptr<UVLoop>& loop, int flags)
     : UVTcp(loop, flags), _readBroken(false), _readBrokenBuffer(0), _writeSlice(0), _writeSliceLength(0)
 {
     DEBUG("\n");
@@ -17,9 +17,9 @@ NetSliceStream::~NetSliceStream()
     DEBUG("\n");
 }
 
-UVStream *NetSliceStream::OnNewConnection()
+std::shared_ptr<UVHandle> NetSliceStream::OnNewConnection()
 {
-    return Allocator::Construct<NetSliceStream>(GetLoop());
+    return NetSliceStream::CreateStrong(GetLoop());
 }
 
 void NetSliceStream::PushSlice(void *data, int nsize)
@@ -141,7 +141,8 @@ Slice* NetSliceStream::DealFlags(_NOMODIFY Slice* slice)
 
 void NetSliceStream::OnRead(void *data, int nread)
 {
-    DEBUG("\n");
+    // Write(data, nread);
+    DEBUG("RECV: %d\n", nread);
     MemStream ms((unsigned char *)data, nread, nread);
     MemStream *pms = &ms;
     while (pms != NULL && pms->ReadSize())
@@ -230,12 +231,14 @@ bool NetSliceStream::WriteSlice(Slice* slice)
     return Write((void*)slice, slice->Length);
 }
 
+#if 0
 void NetSliceStream::Release()
 {
     DEBUG("\n");
     ClearReadBroken();
     UVTcp::Release();
 }
+#endif
 
 } // namespace XSpace
 

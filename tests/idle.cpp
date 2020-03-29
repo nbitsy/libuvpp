@@ -12,13 +12,11 @@ using namespace XSpace;
 
 int main(int argc, char* argv[])
 {
-    UVLoop* loop = new UVLoop("Test");
-
-    UVIdle* obj = new UVIdle(loop);
+    std::shared_ptr<UVLoop> loop = UVLoop::Create<>("TEst");
+    std::weak_ptr<UVLoop> l(loop);
+    std::shared_ptr<UVIdle> obj = UVIdle::Create(l);
     obj->Start();
     loop->Start();
-
     obj->Stop();
-    delete loop;
 	return 0;
 }

@@ -14,21 +14,22 @@ static void __OnNewConnection(uv_stream_t *server, int status)
     if (NULL == uvdata)
         return;
 
-    UVStream *uvstream = (UVStream *)uvdata->_self;
+    UVStream *uvstream = uvdata->GetPtr<UVStream>();
     if (NULL == uvstream)
         return;
 
-    UVStream *newuvstream = uvstream->OnNewConnection();
+    std::shared_ptr<UVHandle> newuvstream = uvstream->OnNewConnection();
     if (NULL == newuvstream)
     {
         std::cerr << "Create connection error!!!" << std::endl;
         return;
     }
 
-    uvstream->Accept(newuvstream);
+    std::weak_ptr<UVHandle> stream(newuvstream);
+    uvstream->Accept(stream);
 }
 
-UVStream::UVStream(UVLoop *loop, int flags, EUVStreamType type)
+UVStream::UVStream(std::weak_ptr<UVLoop>& loop, int flags, EUVStreamType type)
     : UVIODevice(loop, flags), _type(type)
 {
     DEBUG("Object @%p\n", this);
@@ -54,20 +55,26 @@ bool UVStream::Listen(int backlog)
     return true;
 }
 
-bool UVStream::Accept(UVStream *client)
+bool UVStream::Accept(std::weak_ptr<UVHandle>& client)
 {
-    if (NULL == _handle || NULL == client || NULL == client->GetHandle<uv_handle_t>())
+    if (NULL == _handle || client.expired())
         return false;
 
-    if (uv_accept(GetHandle<uv_stream_t>(), client->GetHandle<uv_stream_t>()))
+    auto c = client.lock();
+    if (c->GetHandle<uv_handle_t>() == NULL)
         return false;
 
+    if (uv_accept(GetHandle<uv_stream_t>(), c->GetHandle<uv_stream_t>()))
+        return false;
+
+    UVStream* stream = (UVStream*)c.get();
     if (_type & EUVS_READ)
-        client->StartRead();
+        stream->StartRead();
 
     OnAccept(client);
     InitAddress();
-    client->OnAccepted(this);
+    std::weak_ptr<UVHandle> ss(shared_from_this());
+    stream->OnAccepted(ss);
     return true;
 }
 
@@ -99,9 +106,10 @@ bool UVStream::Shutdown()
 {
     if (NULL == _handle)
         return false;
-
-    UVReqShutdown *req = new UVReqShutdown(this);
-    if (req)
+    
+    std::weak_ptr<UVHandle> self(shared_from_this());
+    std::shared_ptr<UVReqShutdown> req = UVReqShutdown::Create<UVReqShutdown>(self);
+    if (req != NULL)
         return req->Start();
 
     return false;

@@ -15,23 +15,9 @@ class UVLoop;
 class UVTcp : public UVStream
 {
 public:
-    static UVTcp *Create(UVLoop *loop, int flags = AF_UNSPEC)
-    {
-        return new UVTcp(loop, flags); // TODO:
-    }
-
-    static void Destroy(UVTcp *tcp)
-    {
-        if (NULL == tcp)
-            return;
-        tcp->Close();
-    }
+    UV_CREATE_HANDLE(UVTcp)
 
 public:
-    /**
-     * 构造函数和析构函数放这里说明不允许在栈里去构造一个UVTcp对象
-    */
-    UVTcp(UVLoop *loop, int flags = AF_UNSPEC);
     ~UVTcp();
 
     bool Bind(const std::string &ip, int port, unsigned int flags = 0) OVERWRITE;
@@ -43,9 +29,9 @@ public:
     // timeout : 断线重连间隔或连接超时
     bool StartConnect(const std::string &ip, int port, int timeout = 0);
 
-    UVStream *OnNewConnection() OVERRIDE;
-    void OnAccepted(UVStream *server) OVERRIDE;
-    void OnAccept(UVStream *client) OVERRIDE;
+    std::shared_ptr<UVHandle> OnNewConnection() OVERRIDE;
+    void OnAccepted(std::weak_ptr<UVHandle> &server) OVERRIDE;
+    void OnAccept(std::weak_ptr<UVHandle> &client) OVERRIDE;
 
     virtual void OnConnected();
     void OnError(int status) OVERRIDE;
@@ -57,10 +43,12 @@ public:
     void OnRead(void *data, int nread) OVERRIDE;
     void OnClosed() OVERRIDE;
     void OnShutdown() OVERRIDE;
-    void Release() OVERRIDE;
 
     void OnConnectedAction();
     void OnErrorAction(int status);
+
+protected:
+    UVTcp(std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
 
 private:
     bool Init();
@@ -69,7 +57,7 @@ private:
     void StopReconnectTimer();
 
 private:
-    UVTimer* _timeoutTimer;
+    std::shared_ptr<UVTimer> _timeoutTimer;
     bool _connected;
     int _timeout;
     NetAddress _local;

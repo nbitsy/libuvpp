@@ -11,14 +11,13 @@ using namespace XSpace;
 
 int main(int argc, char* argv[])
 {
-    UVLoop* loop = new UVLoop("");
-    NetSliceStream nss(loop);
+    std::shared_ptr<UVLoop> loop = UVLoop::Create<>("Loop");
+    std::weak_ptr<UVLoop> l(loop);
+    std::shared_ptr<NetSliceStream> nss = NetSliceStream::Create<>(l);
 
-    nss.Bind("127.0.0.1", 13200);
-    nss.Listen(10000);
-
+    nss->Bind("127.0.0.1", 13200);
+    nss->Listen(10000);
     loop->Start();
 
-    delete loop;
 	return 0;
 }

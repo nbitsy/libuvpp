@@ -13,14 +13,16 @@ class UVLoop;
 class UVPrepare : public UVHandle
 {
 public:
-    UVPrepare(UVLoop* loop);
+    UV_CREATE_HANDLE(UVPrepare)
+
+public:
+    UVPrepare(std::weak_ptr<UVLoop>& loop);
     virtual ~UVPrepare();
 
     bool Start();
     bool Stop();
 
     void OnClosed() OVERRIDE;
-    void Release() OVERRIDE;
 
     virtual void OnPrepare();
 };

@@ -2,27 +2,28 @@
 #ifndef _UVREQ_H_
 #define _UVREQ_H_
 
+#include <memory>
+
 #include "UVDataHelper.h"
 #include "Config.h"
 
 namespace XSpace
 {
 
-class UVReq : public UVDataHelper
+class UVReq : public UVDataHelper, public std::enable_shared_from_this<UVReq>
 {
 public:
-    explicit UVReq(bool gc = true);
+    explicit UVReq();
     virtual ~UVReq();
 
-    void SetData(void *data, bool force = false);
+    // strong 强引用加入loop调起后自动回收
+    void SetData(void *data, bool force = false, bool strong = true);
     UVData *GetData() const;
 
     void ClearData();
 
     template <typename T>
     inline T *GetReq() { return (T *)_req; }
-
-    virtual UVLoop* GetLoop() { return NULL; }
 
     virtual bool Start() = 0;
     virtual void OnReq(int status) = 0;

@@ -4,6 +4,7 @@
 
 #include "UVHandle.h"
 #include "Timestamp.h"
+#include "TypeTraits.h"
 
 namespace XSpace
 {
@@ -13,34 +14,27 @@ class UVLoop;
 class UVTimer : public UVHandle
 {
 public:
-    static UVTimer *Create(UVLoop *loop)
-    {
-        return new UVTimer(loop); // TODO:
-    }
-
-    static void Destroy(UVTimer *timer)
-    {
-        if (NULL == timer)
-            return;
-        timer->Stop();
-    }
-
-    UVTimer(UVLoop *loop);
-    virtual ~UVTimer();
+    UV_CREATE_HANDLE(UVTimer)
 
 public:
+    virtual ~UVTimer();
     // timeout: 第一次开始时的延迟时间
     // repeat: 下一次的回调的间隔时间,ms
-    bool Start(uint64_t repeat = 5, uint64_t timeout = 0);
+    bool Start(uint64_t repeat = 5, uint64_t timeout = 0, long long ticks = -1);
     void Stop();
 
     void SetRepeat(unsigned long long repeat);
     unsigned long long GetRepeat() const;
 
     void OnClosed() OVERRIDE;
-    void Release() OVERRIDE;
 
     virtual void Tick(const Timestamp* now);
+
+protected:
+    UVTimer(std::weak_ptr<UVLoop>& loop, long long ticks = 0);
+
+public:
+    long long Ticks;
 
 private:
     Timestamp _timestamp;

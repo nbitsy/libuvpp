@@ -13,14 +13,16 @@ class UVLoop;
 class UVIdle : public UVHandle
 {
 public:
-    UVIdle(UVLoop* loop);
+    UV_CREATE_HANDLE(UVIdle)
+
+public:
+    UVIdle(std::weak_ptr<UVLoop>& loop);
     virtual ~UVIdle();
 
     bool Start();
     bool Stop();
 
     void OnClosed() OVERRIDE;
-    void Release() OVERRIDE;
 
     virtual void OnIdle();
 };

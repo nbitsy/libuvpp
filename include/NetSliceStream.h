@@ -31,12 +31,13 @@ public:
 #endif
 
 public:
-    NetSliceStream(UVLoop *loop, int flags = AF_UNSPEC);
+    UV_CREATE_HANDLE(NetSliceStream)
+
+public:
     ~NetSliceStream();
 
-    UVStream *OnNewConnection() OVERRIDE;
+    std::shared_ptr<UVHandle> OnNewConnection() OVERRIDE;
     void OnRead(void *data, int nread) OVERRIDE;
-    void Release() OVERRIDE;
 
     // 收到一个完整的Slice
     virtual void PushSlice(void *data, int nsize);
@@ -45,6 +46,7 @@ public:
     bool WriteSlice(Slice* slice);
 
 private:
+    NetSliceStream(std::weak_ptr<UVLoop>& loop, int flags = AF_UNSPEC);
     MemStream *GetSpliceBuffer(int nread);
     bool HasSpliceSlice() const;
     void ClearReadBrokenBuffer();

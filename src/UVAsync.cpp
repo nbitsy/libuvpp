@@ -1,4 +1,5 @@
 
+#include "Allocator.h"
 #include "UVAsync.h"
 #include "Debugger.h"
 #include "UVLoop.h"
@@ -9,28 +10,24 @@ namespace XSpace
 static void __OnAsync(uv_async_t *async)
 {
     UVData* uvdata = (UVData*)uv_handle_get_data((uv_handle_t*)async);
-    if (NULL == uvdata)
+    if (NULL == uvdata || NULL == uvdata->_self)
         return;
     
-    UVAsync* self = (UVAsync*)uvdata->_self;
-    if (NULL == self)
-        return;
-    
-    self->OnAsync();
-    self->Release();
+    UVAsync* self = uvdata->GetPtr<UVAsync>();
+    if (self != NULL)
+        self->OnAsync();
 }
 
-UVAsync::UVAsync(UVLoop *loop) : UVHandle(loop)
+UVAsync::UVAsync(std::weak_ptr<UVLoop>& loop) : UVHandle(loop)
 {
-    if (NULL == _loop)
+    if (_loop.expired())
         return;
 
-    _handle = (uv_handle_t *)loop->Construct<uv_async_t>();
-    if (_loop != NULL && _handle != NULL)
+    _handle = (uv_handle_t *) Allocator::Construct<uv_async_t>();
+    if (_handle != NULL)
     {
-        uv_async_init(loop->GetRawLoop<uv_loop_t>(), (uv_async_t *)_handle, __OnAsync);
+        uv_async_init(loop.lock()->GetRawLoop<uv_loop_t>(), (uv_async_t *)_handle, __OnAsync);
         uv_handle_set_data(_handle, NULL);
-        SetData(NULL);
     }
     DEBUG("Object @%p\n", this);
 }
@@ -40,25 +37,9 @@ UVAsync::~UVAsync()
     DEBUG("Object @%p\n", this);
 }
 
-void UVAsync::Release()
-{
-    auto loop = GetLoop();
-    if (NULL == loop)
-    {
-        return;
-    }
-
-    ClearData();
-    loop->Destroy((uv_async_t*)_handle);
-    if (GetGC())
-        delete this; // TODO:
-
-    _handle = NULL;
-}
-
 bool UVAsync::Send(void* data)
 {
-    if (NULL == _loop || _loop->GetRawLoop<uv_loop_t>() == NULL || NULL == _handle)
+    if (_loop.expired() || _loop.lock()->GetRawLoop<uv_loop_t>() == NULL || NULL == _handle)
         return false;
     
     Append(data);

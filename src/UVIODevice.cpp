@@ -9,44 +9,44 @@ namespace XSpace
 
 static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-    UVData *data = (UVData *)stream->data;
-    if (NULL == data)
+    UVData *uvdata = (UVData *)stream->data;
+    if (NULL == uvdata || NULL == uvdata->_self)
     {
-        UVDataHelper::BufFree(buf, NULL);
+        UVDataHelper::BufFree(buf);
         return;
     }
 
-    UVIODevice *uviodevice = (UVIODevice *)data->_self;
+    auto uviodevice = uvdata->GetPtr<UVIODevice>();
     if (NULL == uviodevice)
     {
-        UVDataHelper::BufFree(buf, NULL);
+        UVDataHelper::BufFree(buf);
         return;
     }
 
     if (nread <= 0)
     {
         uviodevice->OnError(nread); // XXX: OnError里去决定是否要关闭连接
-        UVDataHelper::BufFree(buf, uviodevice->GetLoop());
+        UVDataHelper::BufFree(buf);
         return;
     }
 
     uviodevice->OnRead(buf->base, nread);
-    UVDataHelper::BufFree(buf, uviodevice->GetLoop());
+    UVDataHelper::BufFree(buf);
 }
 
 static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, const struct sockaddr *addr, unsigned flags)
 {
-    UVData *data = (UVData *)stream->data;
-    if (NULL == data)
+    UVData *uvdata = (UVData *)stream->data;
+    if (NULL == uvdata)
     {
-        UVDataHelper::BufFree(buf, NULL);
+        UVDataHelper::BufFree(buf);
         return;
     }
 
-    UVIODevice *uviodevice = (UVIODevice *)data->_self;
+    auto uviodevice = uvdata->GetPtr<UVIODevice>();
     if (NULL == uviodevice)
     {
-        UVDataHelper::BufFree(buf, NULL);
+        UVDataHelper::BufFree(buf);
         return;
     }
 
@@ -55,12 +55,12 @@ static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, co
         if (nread < 0)
             uviodevice->Close();
 
-        UVDataHelper::BufFree(buf, uviodevice->GetLoop());
+        UVDataHelper::BufFree(buf);
         return;
     }
 
     uviodevice->OnRead(buf->base, nread, addr, flags);
-    UVDataHelper::BufFree(buf, uviodevice->GetLoop());
+    UVDataHelper::BufFree(buf);
 }
 
 bool UVIODevice::Bind(uv_handle_t *handle, const std::string &ip, int port, unsigned int flags)
@@ -221,40 +221,28 @@ bool UVIODevice::StopRead()
     return false;
 }
 
-bool UVIODevice::Write(void *data, int nsize, UVIODevice *other, const struct sockaddr *addr)
+bool UVIODevice::Write(void *data, int nsize, std::weak_ptr<UVHandle> other, const struct sockaddr *addr)
 {
     if (NULL == _handle)
         return false;
 
-    auto loop = GetLoop();
-    if (NULL == loop)
-    {
-        DEBUG("*********************loop is null!!!***********************");
-        return false;
-    }
-
-    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, data, nsize, true, true);
-    if (req != NULL)
-        return req->Start();
+    std::weak_ptr<UVHandle> iohandle(shared_from_this());
+    std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(iohandle, other, data, nsize, true);
+    if (!req.expired())
+        return req.lock()->Start();
 
     return false;
 }
 
-bool UVIODevice::Write(void *bufs[], int nbuf, UVIODevice *other, const struct sockaddr *addr)
+bool UVIODevice::Write(void *bufs[], int nbuf, std::weak_ptr<UVHandle> other, const struct sockaddr *addr)
 {
     if (NULL == _handle)
         return false;
 
-    auto loop = GetLoop();
-    if (NULL == loop)
-    {
-        DEBUG("*********************loop is null!!!***********************");
-        return false;
-    }
-
-    UVReqWrite *req = loop->Construct<UVReqWrite>(this, other, bufs, nbuf, true, true);
-    if (req != NULL)
-        return req->Start();
+    std::weak_ptr<UVHandle> iodevice(shared_from_this());
+    std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(iodevice, other, bufs, nbuf, true);
+    if (!req.expired())
+        return req.lock()->Start();
 
     return false;
 }
