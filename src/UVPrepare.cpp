@@ -18,7 +18,7 @@ static void __OnPrepare(uv_prepare_t *handle)
     self->OnPrepare();
 }
 
-UVPrepare::UVPrepare(std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
+UVPrepare::UVPrepare(const std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
 {
     _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_prepare_t));
     if (!_loop.expired() && _handle != NULL)

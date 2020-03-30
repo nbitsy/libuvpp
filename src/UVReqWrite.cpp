@@ -77,7 +77,7 @@ static void __OnWriteUDP(uv_udp_send_t *req, int status)
     self->OnReq(status);
 }
 
-void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *data, int nsize, bool copy)
+void UVReqWrite::Init(const std::weak_ptr<UVHandle> &iohandle, void *data, int nsize, bool copy)
 {
     d._data = data;
     d._nsize = nsize;
@@ -95,7 +95,7 @@ void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *data, int nsize, 
     InitReq(iohandle);
 }
 
-void UVReqWrite::InitReq(std::weak_ptr<UVHandle> &iohandle)
+void UVReqWrite::InitReq(const std::weak_ptr<UVHandle> &iohandle)
 {
     auto device = iohandle.lock();
     if (NULL == device)
@@ -122,7 +122,7 @@ void UVReqWrite::InitReq(std::weak_ptr<UVHandle> &iohandle)
         uv_req_set_data(_req, NULL);
 }
 
-void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf, bool copy)
+void UVReqWrite::Init(const std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf, bool copy)
 {
     d2._bufs = bufs;
     d2._nbuf = nbuf;
@@ -149,21 +149,21 @@ void UVReqWrite::Init(std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf,
     InitReq(iohandle);
 }
 
-UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy)
+UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy)
     : UVReq(), _bCopye(copy), _iohandle(iohandle), _other(other), _bBuffers(false)
 {
     DEBUG("Object @%p\n", this);
     Init(iohandle, data, nsize, copy);
 }
 
-UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy)
+UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _other(other), _bBuffers(true)
 {
     DEBUG("Object @%p\n", this);
     Init(iohandle, bufs, nbuf, copy);
 }
 
-UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy)
+UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(false), _addr(NULL)
 {
     DEBUG("Object @%p\n", this);
@@ -171,7 +171,7 @@ UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr 
     InitAddress(addr);
 }
 
-UVReqWrite::UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy)
+UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(true), _addr(NULL)
 {
     DEBUG("Object @%p\n", this);

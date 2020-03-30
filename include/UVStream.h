@@ -20,7 +20,7 @@ enum EUVStreamType
 class UVStream : public UVIODevice
 {
 public:
-    UVStream(std::weak_ptr<UVLoop> &loop, int flags, EUVStreamType type = EUVS_RW);
+    UVStream(const std::weak_ptr<UVLoop> &loop, int flags, EUVStreamType type = EUVS_RW);
     ~UVStream();
 
     bool Listen(int backlog = 10000);

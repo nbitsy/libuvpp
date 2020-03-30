@@ -30,7 +30,7 @@ public:
     virtual void Append(void *data) = 0;
 
 protected:
-    explicit UVAsync(std::weak_ptr<UVLoop> loop);
+    UVAsync(const std::weak_ptr<UVLoop>& loop);
 };
 
 } // namespace XSpace

@@ -18,7 +18,7 @@ static void __OnIdle(uv_idle_t *handle)
     self->OnIdle();
 }
 
-UVIdle::UVIdle(std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
+UVIdle::UVIdle(const std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
 {
     _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_idle_t));
     if (!_loop.expired() && _handle != NULL)

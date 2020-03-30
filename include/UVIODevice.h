@@ -15,7 +15,7 @@ class UVLoop;
 class UVIODevice : public UVHandle
 {
 public:
-    UVIODevice(std::weak_ptr<UVLoop> &loop, int flags) : UVHandle(loop), _flags(flags) {}
+    UVIODevice(const std::weak_ptr<UVLoop> &loop, int flags) : UVHandle(loop), _flags(flags) {}
     ~UVIODevice() {}
 
     bool Bind(uv_handle_t *handle, const std::string &ip, int port, unsigned int flags = 0);

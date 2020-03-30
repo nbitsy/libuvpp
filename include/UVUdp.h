@@ -51,7 +51,7 @@ public:
     void OnClosed() OVERRIDE;
 
 protected:
-    UVUdp(std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
+    UVUdp(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
 };
 
 } // namespace XSpace

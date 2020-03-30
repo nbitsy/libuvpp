@@ -32,7 +32,7 @@ public:
     virtual void Tick(const Timestamp *now);
 
 protected:
-    UVTimer(std::weak_ptr<UVLoop> loop, long long ticks = -1);
+    UVTimer(const std::weak_ptr<UVLoop> &loop, long long ticks = -1);
 
 public:
     long long Ticks;

@@ -18,7 +18,7 @@ static void __OnAsync(uv_async_t *async)
         self->OnAsync();
 }
 
-UVAsync::UVAsync(std::weak_ptr<UVLoop> loop) : UVHandle(loop)
+UVAsync::UVAsync(const std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
 {
     if (_loop.expired())
         return;

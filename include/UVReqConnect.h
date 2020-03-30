@@ -15,8 +15,8 @@ public:
     UV_CREATE_REQ_STRONG(UVReqConnect)
 
 public:
-    UVReqConnect(std::weak_ptr<UVHandle> &handle, NetAddress &address);
-    UVReqConnect(std::weak_ptr<UVHandle> &handle, const std::string &ip, int port);
+    UVReqConnect(const std::weak_ptr<UVHandle> &handle, const NetAddress &address);
+    UVReqConnect(const std::weak_ptr<UVHandle> &handle, const std::string &ip, int port);
     ~UVReqConnect();
 
     bool Start() OVERRIDE;

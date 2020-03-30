@@ -45,8 +45,10 @@ public:
     bool Write(void *data, int nsize);
     bool WriteSlice(Slice *slice);
 
+protected:
+    NetSliceStream(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
+
 private:
-    NetSliceStream(std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
     MemStream *GetSpliceBuffer(int nread);
     bool HasSpliceSlice() const;
     void ClearReadBrokenBuffer();

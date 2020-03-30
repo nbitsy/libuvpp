@@ -18,7 +18,7 @@ static void __OnPoll(uv_poll_t *handle, int status, int events)
     self->OnPoll(status, events);
 }
 
-UVPoll::UVPoll(std::weak_ptr<UVLoop> &loop, int fd) : UVHandle(loop)
+UVPoll::UVPoll(const std::weak_ptr<UVLoop> &loop, int fd) : UVHandle(loop)
 {
     _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_poll_t)); // XXX: 如果很频繁请改用对象缓存池
     if (!_loop.expired() && _handle != NULL)

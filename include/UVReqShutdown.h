@@ -16,7 +16,7 @@ public:
     UV_CREATE_REQ_STRONG(UVReqShutdown)
 
 public:
-    UVReqShutdown(std::weak_ptr<UVHandle> &handle);
+    UVReqShutdown(const std::weak_ptr<UVHandle> &handle);
     ~UVReqShutdown();
 
     bool Start() OVERRIDE;

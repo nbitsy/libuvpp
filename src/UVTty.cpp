@@ -5,7 +5,7 @@
 namespace XSpace
 {
 
-UVTty::UVTty(std::weak_ptr<UVLoop> loop, int fd, bool readable, int flags) : UVIODevice(loop, flags)
+UVTty::UVTty(const std::weak_ptr<UVLoop> &loop, int fd, bool readable, int flags) : UVIODevice(loop, flags)
 {
     _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_tty_t));
     if (_handle != NULL && !loop.expired())

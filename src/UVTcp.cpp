@@ -11,7 +11,7 @@ namespace XSpace
 class UVTcpConnectTimeoutTimer : public UVTimer
 {
 public:
-    UVTcpConnectTimeoutTimer(std::weak_ptr<UVLoop> &loop, std::weak_ptr<UVHandle> &tcp)
+    UVTcpConnectTimeoutTimer(const std::weak_ptr<UVLoop> &loop, std::weak_ptr<UVHandle> &tcp)
         : UVTimer(loop), _tcp(tcp)
     {
     }
@@ -44,7 +44,7 @@ private:
     std::weak_ptr<UVHandle> _tcp;
 };
 
-UVTcp::UVTcp(std::weak_ptr<UVLoop> &loop, int flags)
+UVTcp::UVTcp(const std::weak_ptr<UVLoop> &loop, int flags)
     : UVStream(loop, flags), _timeoutTimer(NULL), _connected(false), _timeout(0)
 {
     if (loop.expired())

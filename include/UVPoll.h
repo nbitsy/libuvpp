@@ -16,7 +16,7 @@ public:
     UV_CREATE_HANDLE(UVPoll)
 
 public:
-    UVPoll(std::weak_ptr<UVLoop> &loop, int fd);
+    UVPoll(const std::weak_ptr<UVLoop> &loop, int fd);
     ~UVPoll();
 
     bool Start(int events = UVET_ALL);

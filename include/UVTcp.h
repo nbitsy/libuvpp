@@ -50,7 +50,7 @@ public:
     void OnErrorAction(int status);
 
 protected:
-    UVTcp(std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
+    UVTcp(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
 
 private:
     bool Init();

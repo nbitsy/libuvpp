@@ -14,7 +14,7 @@ class UVReqWrite : public UVReq
 {
 public:
     template <typename T>
-    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy = false)
+    static std::shared_ptr<UVReqWrite> Create(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy = false)
     {
         if (is_subclass<T, UVReqWrite>::value)
         {
@@ -28,7 +28,7 @@ public:
         return NULL;
     }
     template <typename T>
-    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy = false)
+    static std::shared_ptr<UVReqWrite> Create(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy = false)
     {
         if (is_subclass<T, UVReqWrite>::value)
         {
@@ -42,7 +42,7 @@ public:
         return NULL;
     }
     template <typename T>
-    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy = false, bool gc = true)
+    static std::shared_ptr<UVReqWrite> Create(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy = false, bool gc = true)
     {
         if (is_subclass<T, UVReqWrite>::value)
         {
@@ -56,7 +56,7 @@ public:
         return NULL;
     }
     template <typename T>
-    static std::shared_ptr<UVReqWrite> Create(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy = false)
+    static std::shared_ptr<UVReqWrite> Create(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy = false)
     {
         if (is_subclass<T, UVReqWrite>::value)
         {
@@ -79,7 +79,7 @@ private:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy = false);
+    UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy = false);
 
     /**
      * UVHandle 输出目标流对象
@@ -89,7 +89,7 @@ private:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(std::weak_ptr<UVHandle> &iohandle, std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy = false);
+    UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy = false);
 
     /**
      * UVHandle 输出目标流对象
@@ -99,7 +99,7 @@ private:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy = false);
+    UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy = false);
     /**
      * UVHandle 输出目标流对象
      * addr UDP时的目标地址
@@ -108,7 +108,7 @@ private:
      * copy 是否把数据复制到Req对象
      * gc 完成任务后是否回收Req对象本身
     */
-    UVReqWrite(std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy = false);
+    UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy = false);
 
 public:
     ~UVReqWrite();
@@ -117,9 +117,9 @@ public:
     void OnReq(int status) OVERRIDE;
 
 private:
-    void Init(std::weak_ptr<UVHandle> &iohandle, void *data, int nsize, bool copy);
-    void Init(std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf, bool copy);
-    void InitReq(std::weak_ptr<UVHandle> &iohandle);
+    void Init(const std::weak_ptr<UVHandle> &iohandle, void *data, int nsize, bool copy);
+    void Init(const std::weak_ptr<UVHandle> &iohandle, void *bufs[], int nbuf, bool copy);
+    void InitReq(const std::weak_ptr<UVHandle> &iohandle);
     void InitAddress(const struct sockaddr *addr);
 
 private:

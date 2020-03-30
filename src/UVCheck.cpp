@@ -16,7 +16,7 @@ static void __OnCheck(uv_check_t *handle)
         self->OnCheck();
 }
 
-UVCheck::UVCheck(std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
+UVCheck::UVCheck(const std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
 {
     _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_check_t)); // XXX: 频率很低所有直接使用Allocator::malloc
     if (!_loop.expired() && _handle != NULL)

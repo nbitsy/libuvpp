@@ -29,7 +29,7 @@ static void __OnNewConnection(uv_stream_t *server, int status)
     uvstream->Accept(stream);
 }
 
-UVStream::UVStream(std::weak_ptr<UVLoop> &loop, int flags, EUVStreamType type)
+UVStream::UVStream(const std::weak_ptr<UVLoop> &loop, int flags, EUVStreamType type)
     : UVIODevice(loop, flags), _type(type)
 {
     DEBUG("Object @%p\n", this);

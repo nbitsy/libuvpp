@@ -27,7 +27,7 @@ void __OnConnected(uv_connect_t *req, int status)
         strong->reset();
 }
 
-UVReqConnect::UVReqConnect(std::weak_ptr<UVHandle> &handle, NetAddress &address)
+UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle> &handle, const NetAddress &address)
     : _handle(handle), _address(address)
 {
     _req = (uv_req_t *)Allocator::malloc(sizeof(uv_connect_t));
@@ -38,7 +38,7 @@ UVReqConnect::UVReqConnect(std::weak_ptr<UVHandle> &handle, NetAddress &address)
     DEBUG("Object @%p\n", this);
 }
 
-UVReqConnect::UVReqConnect(std::weak_ptr<UVHandle> &handle, const std::string &ip, int port)
+UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle> &handle, const std::string &ip, int port)
     : _handle(handle), _address(ip, port)
 {
     _req = (uv_req_t *)Allocator::malloc(sizeof(uv_connect_t));

@@ -5,7 +5,8 @@
 namespace XSpace
 {
 
-UVTimer::UVTimer(std::weak_ptr<UVLoop> loop, long long ticks) : UVHandle(loop), Ticks(ticks)
+UVTimer::UVTimer(const std::weak_ptr<UVLoop> &loop, long long ticks)
+    : UVHandle(loop), Ticks(ticks)
 {
     if (_loop.expired())
         return;

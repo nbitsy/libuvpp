@@ -17,7 +17,7 @@ class UVLoop;
 class UVHandle : public UVDataHelper, public std::enable_shared_from_this<UVHandle>
 {
 public:
-    UVHandle(std::weak_ptr<UVLoop> &loop);
+    UVHandle(const std::weak_ptr<UVLoop> &loop);
     virtual ~UVHandle();
 
     void SetData(void *data, bool force = false, bool strong = false);

@@ -18,7 +18,7 @@ static void __OnClosed(uv_handle_t *handle)
     h->OnClosed();
 }
 
-UVHandle::UVHandle(std::weak_ptr<UVLoop> &loop) : _loop(loop), _handle(NULL)
+UVHandle::UVHandle(const std::weak_ptr<UVLoop> &loop) : _loop(loop), _handle(NULL)
 {
     DEBUG("Object @%p\n", this);
 }

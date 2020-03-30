@@ -6,7 +6,7 @@
 namespace XSpace
 {
 
-UVUdp::UVUdp(std::weak_ptr<UVLoop> &loop, int flags) : UVIODevice(loop, flags)
+UVUdp::UVUdp(const std::weak_ptr<UVLoop> &loop, int flags) : UVIODevice(loop, flags)
 {
     if (_loop.expired())
         return;

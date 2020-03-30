@@ -19,7 +19,7 @@ void __OnShutdown(uv_shutdown_t *req, int status)
     uvreqshutdown->OnReq(status);
 }
 
-UVReqShutdown::UVReqShutdown(std::weak_ptr<UVHandle> &handle)
+UVReqShutdown::UVReqShutdown(const std::weak_ptr<UVHandle> &handle)
 {
     _req = (uv_req_t *)Allocator::malloc(sizeof(uv_shutdown_t));
     if (_req != NULL)
