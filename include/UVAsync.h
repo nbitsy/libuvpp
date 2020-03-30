@@ -29,8 +29,8 @@ public:
     // 放入同步对象的数据怎么处理
     virtual void Append(void *data) = 0;
 
-private:
-    explicit UVAsync(std::weak_ptr<UVLoop> &loop);
+protected:
+    explicit UVAsync(std::weak_ptr<UVLoop> loop);
 };
 
 } // namespace XSpace

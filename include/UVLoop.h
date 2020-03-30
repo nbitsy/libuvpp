@@ -12,35 +12,74 @@
 #include "UVDataHelper.h"
 #include "UVPoolHelper.h"
 
+#define UV_CREATE_LOOP(TYPE)                                                                    \
+    template <typename T = TYPE>                                                                \
+    static std::shared_ptr<TYPE> Create(const std::string &name, bool useDefault = false)       \
+    {                                                                                           \
+        return CreateWeak<T>(name, useDefault);                                                 \
+    }                                                                                           \
+    template <typename T = TYPE>                                                                \
+    static std::shared_ptr<TYPE> CreateWeak(const std::string &name, bool useDefault = false)   \
+    {                                                                                           \
+        if (is_subclass<TYPE, UVLoop>::value)                                                   \
+        {                                                                                       \
+            std::shared_ptr<TYPE> ptr(new TYPE(name));                                          \
+            if (ptr != NULL)                                                                    \
+                ptr->SetData(NULL, true, false);                                                \
+                                                                                                \
+            return ptr;                                                                         \
+        }                                                                                       \
+                                                                                                \
+        return NULL;                                                                            \
+    }                                                                                           \
+    template <typename T = TYPE>                                                                \
+    static std::shared_ptr<TYPE> CreateStrong(const std::string &name, bool useDefault = false) \
+    {                                                                                           \
+        if (is_subclass<TYPE, UVLoop>::value)                                                   \
+        {                                                                                       \
+            std::shared_ptr<TYPE> ptr(new TYPE(name));                                          \
+            if (ptr != NULL)                                                                    \
+                ptr->SetData(NULL, true, true);                                                 \
+                                                                                                \
+            return ptr;                                                                         \
+        }                                                                                       \
+                                                                                                \
+        return NULL;                                                                            \
+    }
+
 namespace XSpace
 {
 
 class UVLoop : public UVDataHelper, public std::enable_shared_from_this<UVLoop>
 {
 public:
-    template <typename T = UVLoop>
-    static std::shared_ptr<UVLoop> Create(const std::string &name, bool useDefault = false)
-    {
-        if (is_subclass<T, UVLoop>::value)
-        {
-            std::shared_ptr<UVLoop> ptr(new T(name));
-            if (ptr != NULL)
-                ptr->SetData(NULL, true);
+    UV_CREATE_LOOP(UVLoop)
 
-            return ptr;
-        }
-
-        return NULL;
-    }
-
+public:
     // XXX: 对于DefaultLoop来说，是第一个调用DefaultLoop传入的T
     template <typename T>
     static std::weak_ptr<UVLoop> DefaultLoop();
 
+    template <typename T>
+    std::weak_ptr<T> WeakFromThis()
+    {
+        if (is_subclass<T, UVLoop>::value)
+            return std::weak_ptr<T>(std::dynamic_pointer_cast<T>(this->shared_from_this()));
+        return std::weak_ptr<T>();
+    }
+
+    template <typename T>
+    std::weak_ptr<T> SharedFromThis()
+    {
+        if (is_subclass<T, UVLoop>::value)
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
+        return std::shared_ptr<T>();
+    }
+
 public:
     virtual ~UVLoop();
 
-    void SetData(void *data, bool force = false);
+    void SetData(void *data, bool force = false, bool strong = false);
     UVData *GetData() const;
     void ClearData();
 

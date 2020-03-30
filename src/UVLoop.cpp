@@ -43,9 +43,9 @@ UVLoop::~UVLoop()
     }
 }
 
-void UVLoop::SetData(void *data, bool force)
+void UVLoop::SetData(void *data, bool force, bool strong)
 {
-    UVDataHelper::SetData(this, _loop, data, force, false);
+    UVDataHelper::SetData(this, _loop, data, force, strong);
 }
 
 UVData *UVLoop::GetData() const

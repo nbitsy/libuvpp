@@ -155,7 +155,7 @@ void UVTcp::StartReconnectTimer()
     if (NULL == _timeoutTimer && _timeout > 0)
     {
         std::weak_ptr<UVHandle> self(shared_from_this());
-        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), self);
+        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer, UVLoop>(GetLoop(), self);
         if (_timeoutTimer != NULL)
             _timeoutTimer->Start(_timeout, _timeout);
     }

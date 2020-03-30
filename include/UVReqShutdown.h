@@ -3,6 +3,7 @@
 #define _UVREQSHUTDOWN_H_
 
 #include "UVReq.h"
+#include "UVHandle.h"
 
 namespace XSpace
 {

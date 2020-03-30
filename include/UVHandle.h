@@ -6,6 +6,7 @@
 
 #include "Config.h"
 #include "UVDataHelper.h"
+#include "TypeTraits.h"
 #include "uv.h"
 
 namespace XSpace
@@ -40,6 +41,22 @@ public:
      * 完成关闭后调用OnClosed
     */
     virtual void OnClosed() = 0;
+
+    template <typename T>
+    std::weak_ptr<T> WeakFromThis()
+    {
+        if (is_subclass<T, UVHandle>::value)
+            return std::weak_ptr<T>(std::dynamic_pointer_cast<T>(this->shared_from_this()));
+        return std::weak_ptr<T>();
+    }
+
+    template <typename T>
+    std::weak_ptr<T> SharedFromThis()
+    {
+        if (is_subclass<T, UVHandle>::value)
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
+        return std::shared_ptr<T>();
+    }
 
 protected:
     std::weak_ptr<UVLoop> _loop;

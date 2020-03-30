@@ -13,39 +13,39 @@ namespace XSpace
 {
 
 // XXX: 所有Handle和UVLoop都是弱引用的，外部需要强引用管理，而Req一般都是弱引用的，OnReq后需要回收
-#define UV_CREATE_HANDLE(TYPE)                                                         \
-    template <typename T = TYPE, typename... U>                                        \
-    inline static std::shared_ptr<TYPE> Create(std::weak_ptr<UVLoop> &loop, U... args) \
-    {                                                                                  \
-        return CreateWeak<T, U...>(loop, args...);                                     \
-    }                                                                                  \
-    template <typename T = TYPE, typename... U>                                        \
-    static std::shared_ptr<TYPE> CreateWeak(std::weak_ptr<UVLoop> &loop, U... args)    \
-    {                                                                                  \
-        if (is_subclass<T, TYPE>::value)                                               \
-        {                                                                              \
-            std::shared_ptr<TYPE> ptr(new T(loop, args...));                           \
-            if (ptr != NULL)                                                           \
-                ptr->SetData(NULL, true, false);                                       \
-                                                                                       \
-            return ptr;                                                                \
-        }                                                                              \
-                                                                                       \
-        return NULL;                                                                   \
-    }                                                                                  \
-    template <typename T = TYPE, typename... U>                                        \
-    static std::shared_ptr<TYPE> CreateStrong(std::weak_ptr<UVLoop> &loop, U... args)  \
-    {                                                                                  \
-        if (is_subclass<T, TYPE>::value)                                               \
-        {                                                                              \
-            std::shared_ptr<TYPE> ptr(new T(loop, args...));                           \
-            if (ptr != NULL)                                                           \
-                ptr->SetData(NULL, true, true);                                        \
-                                                                                       \
-            return ptr;                                                                \
-        }                                                                              \
-                                                                                       \
-        return NULL;                                                                   \
+#define UV_CREATE_HANDLE(TYPE)                                                   \
+    template <typename T = TYPE, typename L = UVLoop, typename... U>             \
+    inline static std::shared_ptr<TYPE> Create(std::weak_ptr<L> loop, U... args) \
+    {                                                                            \
+        return CreateWeak<T, L, U...>(loop, args...);                            \
+    }                                                                            \
+    template <typename T = TYPE, typename L = UVLoop, typename... U>             \
+    static std::shared_ptr<TYPE> CreateWeak(std::weak_ptr<L> loop, U... args)    \
+    {                                                                            \
+        if (is_subclass<T, TYPE>::value)                                         \
+        {                                                                        \
+            std::shared_ptr<TYPE> ptr(new T(loop, args...));                     \
+            if (ptr != NULL)                                                     \
+                ptr->SetData(NULL, true, false);                                 \
+                                                                                 \
+            return ptr;                                                          \
+        }                                                                        \
+                                                                                 \
+        return NULL;                                                             \
+    }                                                                            \
+    template <typename T = TYPE, typename L = UVLoop, typename... U>             \
+    static std::shared_ptr<TYPE> CreateStrong(std::weak_ptr<L> loop, U... args)  \
+    {                                                                            \
+        if (is_subclass<T, TYPE>::value)                                         \
+        {                                                                        \
+            std::shared_ptr<TYPE> ptr(new T(loop, args...));                     \
+            if (ptr != NULL)                                                     \
+                ptr->SetData(NULL, true, true);                                  \
+                                                                                 \
+            return ptr;                                                          \
+        }                                                                        \
+                                                                                 \
+        return NULL;                                                             \
     }
 
 #define UV_CREATE_REQ(TYPE, STRONG)                    \

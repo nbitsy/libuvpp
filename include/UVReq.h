@@ -28,6 +28,22 @@ public:
     virtual bool Start() = 0;
     virtual void OnReq(int status) = 0;
 
+    template <typename T>
+    std::weak_ptr<T> WeakFromThis()
+    {
+        if (is_subclass<T, UVReq>::value)
+            return std::weak_ptr<T>(std::dynamic_pointer_cast<T>(this->shared_from_this()));
+        return std::weak_ptr<T>();
+    }
+
+    template <typename T>
+    std::weak_ptr<T> SharedFromThis()
+    {
+        if (is_subclass<T, UVReq>::value)
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
+        return std::shared_ptr<T>();
+    }
+
 protected:
     uv_req_t *_req;
 };
