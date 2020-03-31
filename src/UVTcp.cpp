@@ -11,7 +11,7 @@ namespace XSpace
 class UVTcpConnectTimeoutTimer : public UVTimer
 {
 public:
-    UVTcpConnectTimeoutTimer(const std::weak_ptr<UVLoop> &loop, std::weak_ptr<UVHandle> &tcp)
+    UVTcpConnectTimeoutTimer(const std::weak_ptr<UVLoop> &loop, const std::weak_ptr<UVHandle> &tcp)
         : UVTimer(loop), _tcp(tcp)
     {
     }
@@ -21,6 +21,9 @@ public:
 
     void Tick(const Timestamp *now)
     {
+        if (_tcp.expired())
+            return;
+
         auto tcp = _tcp.lock();
         if (NULL == tcp)
         {
@@ -54,19 +57,14 @@ UVTcp::UVTcp(const std::weak_ptr<UVLoop> &loop, int flags)
     DEBUG("Object @%p\n", this);
 }
 
-void UVTcp::Clear()
-{
-    StopRead();
-    ClearData();
-    Allocator::Destroy((uv_tcp_t *)_handle);
-}
-
 bool UVTcp::Init()
 {
+    void* olddata = NULL;
     if (_handle != NULL)
     {
-        Clear();
-        _handle = NULL;
+        StopRead();
+        olddata = uv_handle_get_data(_handle);
+        Allocator::Destroy(_handle);
     }
 
     auto loop = _loop.lock();
@@ -80,7 +78,7 @@ bool UVTcp::Init()
     if (_handle != NULL)
     {
         uv_tcp_init_ex(loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, _flags);
-        uv_handle_set_data(_handle, NULL);
+        uv_handle_set_data(_handle, olddata);
     }
 
     return true;
@@ -116,8 +114,7 @@ bool UVTcp::StartConnect(const std::string &ip, int port, int timeout)
 {
     DEBUG("\n");
     _connector = true;
-    std::weak_ptr<UVHandle> self(shared_from_this());
-    std::shared_ptr<UVReqConnect> req = UVReqConnect::Create(self, ip, port);
+    std::shared_ptr<UVReqConnect> req = UVReqConnect::Create(shared_from_this(), ip, port);
     if (NULL == req)
         return false;
 
@@ -139,8 +136,7 @@ void UVTcp::Reconnect()
     if (_timeout > 0)
     {
         Init();
-        StartConnect(_local.Ip, _local.Port); // _timeout);
-        SetData(NULL, true);                  // Init把数据清了，这里再重置一下
+        StartConnect(_local.Ip, _local.Port);
     }
     else
     {
@@ -154,8 +150,7 @@ void UVTcp::StartReconnectTimer()
 {
     if (NULL == _timeoutTimer && _timeout > 0)
     {
-        std::weak_ptr<UVHandle> self(shared_from_this());
-        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer, UVLoop>(GetLoop(), self);
+        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer, UVLoop>(GetLoop(), shared_from_this());
         if (_timeoutTimer != NULL)
             _timeoutTimer->Start(_timeout, _timeout);
     }
@@ -174,30 +169,33 @@ void UVTcp::OnError(int status)
 {
 }
 
-void UVTcp::OnErrorAction(int status)
+bool UVTcp::OnErrorAction(int status)
 {
-    DEBUG("status :%d\n", status);
+    DEBUG("status :%d need reconnect: %d\n", status, _timeout>0);
     _connected = false;
 
     if (IsConnector() && _timeout > 0)
     {
         if (NULL == _timeoutTimer)
         {
-            std::weak_ptr<UVHandle> self(shared_from_this());
-            _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), self);
+            _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), shared_from_this());
             if (_timeoutTimer != NULL)
                 _timeoutTimer->Start(_timeout, _timeout);
         }
+
+        return false;
     }
     else
     {
         Close();
     }
+
+    return true;
 }
 
 std::shared_ptr<UVHandle> UVTcp::OnNewConnection()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    DEBUG("\n");
     return UVTcp::CreateStrong(GetLoop());
 }
 
@@ -228,8 +226,8 @@ void UVTcp::OnRead(void *data, int nread)
     DEBUG("RECV FROM %s nread: %d\n", RemoteAddress().ToString().c_str(), nread)
     if (nread < 0)
     {
-        OnError(-1);
-        OnErrorAction(-1);
+        if (OnErrorAction(-1))
+            OnError(-1);
     }
 }
 

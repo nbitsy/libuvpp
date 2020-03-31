@@ -839,6 +839,31 @@ inline TO nasty_cast(FROM f)
     return u.t;
 }
 
+#define SHARED_FROM_THIS_()                    \
+    {                                          \
+        auto _this = this->shared_from_this(); \
+        D *p = (D *)_this.get();               \
+        return std::shared_ptr<D>(_this, p);   \
+    }
+
+#define WEAK_FROM_THIS(UP)                 \
+    template <typename D, typename U = UP> \
+    std::weak_ptr<D> WeakFromThis()        \
+    {                                      \
+        if (is_subclass<D, U>::value)      \
+            SHARED_FROM_THIS_();           \
+        return std::weak_ptr<D>();         \
+    }
+
+#define SHARED_FROM_THIS(UP)               \
+    template <typename D, typename U = UP> \
+    std::shared_ptr<D> SharedFromThis()    \
+    {                                      \
+        if (is_subclass<D, U>::value)      \
+            SHARED_FROM_THIS_();           \
+        return std::shared_ptr<D>();       \
+    }
+
 } // namespace XSpace
 
 #endif // _TYPETRAITS_H_

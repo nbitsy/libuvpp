@@ -27,7 +27,6 @@ static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
     {
         uviodevice->OnError(nread); // XXX: OnError里去做一些关闭关的操作
         UVDataHelper::BufFree(buf);
-        uviodevice->Close();
         return;
     }
 
@@ -227,8 +226,7 @@ bool UVIODevice::Write(void *data, int nsize, std::weak_ptr<UVHandle> other, con
     if (NULL == _handle)
         return false;
 
-    std::weak_ptr<UVHandle> iohandle(shared_from_this());
-    std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(iohandle, other, data, nsize, true);
+    std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(shared_from_this(), other, data, nsize, true);
     if (!req.expired())
         return req.lock()->Start();
 
@@ -240,8 +238,7 @@ bool UVIODevice::Write(void *bufs[], int nbuf, std::weak_ptr<UVHandle> other, co
     if (NULL == _handle)
         return false;
 
-    std::weak_ptr<UVHandle> iodevice(shared_from_this());
-    std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(iodevice, other, bufs, nbuf, true);
+    std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(shared_from_this(), other, bufs, nbuf, true);
     if (!req.expired())
         return req.lock()->Start();
 

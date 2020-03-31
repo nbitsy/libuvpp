@@ -47,14 +47,13 @@ public:
     void OnShutdown() OVERRIDE;
 
     void OnConnectedAction();
-    void OnErrorAction(int status);
+    bool OnErrorAction(int status);
 
 protected:
     UVTcp(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
 
 private:
     bool Init();
-    void Clear();
     void StartReconnectTimer();
     void StopReconnectTimer();
 

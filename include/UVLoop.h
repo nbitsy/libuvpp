@@ -54,27 +54,13 @@ class UVLoop : public UVDataHelper, public std::enable_shared_from_this<UVLoop>
 {
 public:
     UV_CREATE_LOOP(UVLoop)
+    SHARED_FROM_THIS(UVLoop);
+    WEAK_FROM_THIS(UVLoop);
 
 public:
     // XXX: 对于DefaultLoop来说，是第一个调用DefaultLoop传入的T
     template <typename T>
     static std::weak_ptr<UVLoop> DefaultLoop();
-
-    template <typename T>
-    std::weak_ptr<T> WeakFromThis()
-    {
-        if (is_subclass<T, UVLoop>::value)
-            return std::weak_ptr<T>(std::dynamic_pointer_cast<T>(this->shared_from_this()));
-        return std::weak_ptr<T>();
-    }
-
-    template <typename T>
-    std::weak_ptr<T> SharedFromThis()
-    {
-        if (is_subclass<T, UVLoop>::value)
-            return std::dynamic_pointer_cast<T>(this->shared_from_this());
-        return std::shared_ptr<T>();
-    }
 
 public:
     virtual ~UVLoop();

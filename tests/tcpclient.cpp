@@ -106,7 +106,7 @@ void test3()
     std::shared_ptr<UVTcp> tcp = UVTcp::Create<>(l);
     tcp->SetNoDelay();
     tcp->SetBlocking(true);
-    tcp->StartConnect("127.0.0.1", 13200, 3000);
+    tcp->StartConnect("127.0.0.1", 13200);//, 3000);
     tcp->StartRead();
     loop->Start();
 }

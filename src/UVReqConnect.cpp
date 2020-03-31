@@ -99,8 +99,8 @@ void UVReqConnect::OnReq(int status)
         }
         else
         {
-            t->OnErrorAction(status);
-            t->OnError(status);
+            if (t->OnErrorAction(status))
+                t->OnError(status);
         }
     }
 }

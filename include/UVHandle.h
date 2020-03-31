@@ -17,6 +17,10 @@ class UVLoop;
 class UVHandle : public UVDataHelper, public std::enable_shared_from_this<UVHandle>
 {
 public:
+    WEAK_FROM_THIS(UVHandle);
+    SHARED_FROM_THIS(UVHandle);
+
+public:
     UVHandle(const std::weak_ptr<UVLoop> &loop);
     virtual ~UVHandle();
 
@@ -41,22 +45,6 @@ public:
      * 完成关闭后调用OnClosed
     */
     virtual void OnClosed() = 0;
-
-    template <typename T>
-    std::weak_ptr<T> WeakFromThis()
-    {
-        if (is_subclass<T, UVHandle>::value)
-            return std::weak_ptr<T>(std::dynamic_pointer_cast<T>(this->shared_from_this()));
-        return std::weak_ptr<T>();
-    }
-
-    template <typename T>
-    std::weak_ptr<T> SharedFromThis()
-    {
-        if (is_subclass<T, UVHandle>::value)
-            return std::dynamic_pointer_cast<T>(this->shared_from_this());
-        return std::shared_ptr<T>();
-    }
 
 protected:
     std::weak_ptr<UVLoop> _loop;

@@ -107,8 +107,7 @@ bool UVStream::Shutdown()
     if (NULL == _handle)
         return false;
 
-    std::weak_ptr<UVHandle> self(shared_from_this());
-    std::shared_ptr<UVReqShutdown> req = UVReqShutdown::Create<UVReqShutdown>(self);
+    std::shared_ptr<UVReqShutdown> req = UVReqShutdown::Create<UVReqShutdown>(shared_from_this());
     if (req != NULL)
         return req->Start();
 
