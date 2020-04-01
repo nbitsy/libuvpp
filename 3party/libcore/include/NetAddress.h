@@ -20,6 +20,13 @@ struct NetAddress
         return *this;
     }
 
+    NetAddress &operator=(const NetAddress &other)
+    {
+        Ip = other.Ip;
+        Port = other.Port;
+        return *this;
+    }
+
     inline std::string ToString() const { return Ip + ":" + std::to_string(Port); }
 
     std::string Ip;

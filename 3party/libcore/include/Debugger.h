@@ -79,10 +79,10 @@ namespace XSpace
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
-#define ERROR(...)                                                                                  \
-    {                                                                                               \
-        fprintf(stderr, "%s%s %s %s ", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                             \
+#define ERROR(...)                                                                                               \
+    {                                                                                                            \
+        fprintf(stderr, "%s%s %s:%d %s ", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, __LINE__, DEBUG_END); \
+        fprintf(stderr, ##__VA_ARGS__);                                                                          \
     }
 #else
 #define ERROR(...)

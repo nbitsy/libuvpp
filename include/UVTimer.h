@@ -22,7 +22,8 @@ public:
     // repeat 下一次的回调的间隔时间,ms
     // ticks 几个tick之后停止
     bool Start(uint64_t repeat = 5, uint64_t timeout = 0, long long ticks = -1);
-    void Stop();
+    bool Again();
+    void Stop(bool close = false);
 
     void SetRepeat(unsigned long long repeat);
     unsigned long long GetRepeat() const;

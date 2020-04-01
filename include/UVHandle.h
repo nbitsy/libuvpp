@@ -17,8 +17,7 @@ class UVLoop;
 class UVHandle : public UVDataHelper, public std::enable_shared_from_this<UVHandle>
 {
 public:
-    WEAK_FROM_THIS(UVHandle);
-    SHARED_FROM_THIS(UVHandle);
+    DRIVED_FROM_THIS(UVHandle);
 
 public:
     UVHandle(const std::weak_ptr<UVLoop> &loop);

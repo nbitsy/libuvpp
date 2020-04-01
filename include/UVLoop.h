@@ -54,8 +54,7 @@ class UVLoop : public UVDataHelper, public std::enable_shared_from_this<UVLoop>
 {
 public:
     UV_CREATE_LOOP(UVLoop)
-    SHARED_FROM_THIS(UVLoop);
-    WEAK_FROM_THIS(UVLoop);
+    DRIVED_FROM_THIS(UVLoop);
 
 public:
     // XXX: 对于DefaultLoop来说，是第一个调用DefaultLoop传入的T

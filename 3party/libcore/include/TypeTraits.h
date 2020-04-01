@@ -846,23 +846,27 @@ inline TO nasty_cast(FROM f)
         return std::shared_ptr<D>(_this, p);   \
     }
 
-#define WEAK_FROM_THIS(UP)                 \
-    template <typename D, typename U = UP> \
-    std::weak_ptr<D> WeakFromThis()        \
-    {                                      \
-        if (is_subclass<D, U>::value)      \
-            SHARED_FROM_THIS_();           \
-        return std::weak_ptr<D>();         \
+#define WEAK_FROM_THIS(BASE)                 \
+    template <typename D, typename U = BASE> \
+    std::weak_ptr<D> WeakFromThis()          \
+    {                                        \
+        if (is_subclass<D, U>::value)        \
+            SHARED_FROM_THIS_();             \
+        return std::weak_ptr<D>();           \
     }
 
-#define SHARED_FROM_THIS(UP)               \
-    template <typename D, typename U = UP> \
-    std::shared_ptr<D> SharedFromThis()    \
-    {                                      \
-        if (is_subclass<D, U>::value)      \
-            SHARED_FROM_THIS_();           \
-        return std::shared_ptr<D>();       \
+#define SHARED_FROM_THIS(BASE)               \
+    template <typename D, typename U = BASE> \
+    std::shared_ptr<D> SharedFromThis()      \
+    {                                        \
+        if (is_subclass<D, U>::value)        \
+            SHARED_FROM_THIS_();             \
+        return std::shared_ptr<D>();         \
     }
+
+#define DRIVED_FROM_THIS(BASE) \
+    WEAK_FROM_THIS(BASE);      \
+    SHARED_FROM_THIS(BASE);
 
 } // namespace XSpace
 

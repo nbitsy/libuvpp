@@ -64,13 +64,21 @@ bool UVTimer::Start(uint64_t repeat, uint64_t timeout, long long ticks)
     return !uv_timer_start(GetHandle<uv_timer_t>(), __OnTimer, timeout, repeat);
 }
 
-void UVTimer::Stop()
+bool UVTimer::Again()
+{
+    if (NULL == _handle || !_handle->flags)
+        return false;
+    return !uv_timer_again(GetHandle<uv_timer_t>());
+}
+
+void UVTimer::Stop(bool close)
 {
     if (NULL == _handle || !_handle->flags)
         return;
 
     uv_timer_stop(GetHandle<uv_timer_t>());
-    Close();
+    if (close)
+        Close();
 }
 
 void UVTimer::SetRepeat(unsigned long long repeat)

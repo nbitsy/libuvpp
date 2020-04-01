@@ -13,8 +13,7 @@ namespace XSpace
 class UVReq : public UVDataHelper, public std::enable_shared_from_this<UVReq>
 {
 public:
-    WEAK_FROM_THIS(UVReq);
-    SHARED_FROM_THIS(UVReq);
+    DRIVED_FROM_THIS(UVReq);
 
 public:
     explicit UVReq();

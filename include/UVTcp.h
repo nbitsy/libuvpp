@@ -41,6 +41,7 @@ public:
     inline bool IsConnected() const { return _connected; }
     inline bool IsConnector() const { return _connector; }
     inline bool IsServer() const { return !_connector; }
+    inline bool NeedReconnect() const { return !IsConnected() && _timeout > 0; }
 
     void OnRead(void *data, int nread) OVERRIDE;
     void OnClosed() OVERRIDE;

@@ -161,7 +161,7 @@ void UVTcp::StopReconnectTimer()
     if (_timeoutTimer != NULL)
     {
         _timeoutTimer->Stop();
-        _timeoutTimer = NULL;
+        _timeoutTimer.reset();
     }
 }
 
@@ -181,6 +181,10 @@ bool UVTcp::OnErrorAction(int status)
             _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), shared_from_this());
             if (_timeoutTimer != NULL)
                 _timeoutTimer->Start(_timeout, _timeout);
+        }
+        else
+        {
+            _timeoutTimer->Again();
         }
 
         return false;
@@ -210,10 +214,7 @@ void UVTcp::OnConnectedAction()
     _connected = true;
 
     if (_timeoutTimer != NULL)
-    {
         _timeoutTimer->Stop();
-        _timeoutTimer = NULL;
-    }
 
     InitAddress();
     StartRead();
@@ -233,7 +234,6 @@ void UVTcp::OnRead(void *data, int nread)
 
 void UVTcp::OnAccepted(std::weak_ptr<UVHandle> &server)
 {
-
     DEBUG("%s => %s\n", RemoteAddress().ToString().c_str(), LocalAddress().ToString().c_str());
 }
 
