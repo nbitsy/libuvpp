@@ -36,7 +36,7 @@ UVData::~UVData()
     if (_self != NULL)
     {
         if (_strong)
-            Allocator::Destroy(GetStrongPtr<UVDataHelper>());
+            Allocator::Destroy(GetSharedPtr<UVDataHelper>());
         else
             Allocator::Destroy(GetWeakPtr<UVDataHelper>());
         _self = NULL;

@@ -41,7 +41,7 @@ static void __OnWrite(uv_write_t *req, int status)
     self->OnReq(status);
 
     // 如果Req里注册的是强引用，则释放引用，一般来说Req使用完后需要回收
-    auto strong = uvdata->GetStrongPtr<UVReqWrite>();
+    auto strong = uvdata->GetSharedPtr<UVReqWrite>();
     if (strong != NULL)
         strong->reset();
 }

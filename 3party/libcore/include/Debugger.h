@@ -13,14 +13,21 @@ namespace XSpace
 {
 
 #ifdef _DEBUG
+
+#ifndef DEBUG_LEVEL
+//#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
+#define DEBUG_LEVEL DEBUG_LEVEL_LOG
+#endif
+
 #define ___FUNCTION___ __PRETTY_FUNCTION__
 //#define ___FUNCTION___ __FUNCTION__
 #define ___TIME___ DateTime().toString().c_str()
 
+// 30 white 31 red 32 green 33 yellow 34 blue 35 purple 
 #define DEBUG_GREENnBACK "\033[1;32;40m"  // debug
 #define DEBUG_WHITEnBACK ""               // log
-#define DEBUG_BLUEnBACK "\033[1;34;40m"   // info
-#define DEBUG_YALLOWnBACK "\033[1;33;40m" // warn
+#define DEBUG_PURPLEnBACK "\033[1;35;40m" // info
+#define DEBUG_YELLOWnBACK "\033[1;33;40m" // warn
 #define DEBUG_REDnBACK "\033[1;31;40m"    // err
 #define DEBUG_WHITEnRED "\033[1;30;41m"
 #define DEBUG_YALLOWnRED "\033[1;33;41m"
@@ -33,10 +40,6 @@ namespace XSpace
 #define DEBUG_LEVEL_INFO 2
 #define DEBUG_LEVEL_WARN 3
 #define DEBUG_LEVEL_ERR 4
-
-#ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
-#endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_DEBUG
 #define DEBUG(...)                                                                                           \
@@ -59,10 +62,10 @@ namespace XSpace
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
-#define INFO(...)                                                                                           \
-    {                                                                                                       \
-        fprintf(stderr, "%s%s %s:%d %s", DEBUG_BLUEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stdout, ##__VA_ARGS__);                                                                     \
+#define INFO(...)                                                                                             \
+    {                                                                                                         \
+        fprintf(stderr, "%s%s %s:%d %s", DEBUG_PURPLEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
+        fprintf(stdout, ##__VA_ARGS__);                                                                       \
     }
 #else
 #define INFO(...)
@@ -71,7 +74,7 @@ namespace XSpace
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
 #define WARN(...)                                                                                              \
     {                                                                                                          \
-        fprintf(stderr, "%s%s %s:%d %s ", DEBUG_YALLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
+        fprintf(stderr, "%s%s %s:%d %s ", DEBUG_YELLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
         fprintf(stderr, ##__VA_ARGS__);                                                                        \
     }
 #else

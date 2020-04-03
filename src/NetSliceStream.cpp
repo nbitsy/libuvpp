@@ -19,12 +19,12 @@ NetSliceStream::~NetSliceStream()
 
 std::shared_ptr<UVHandle> NetSliceStream::OnNewConnection()
 {
-    return NetSliceStream::CreateStrong(GetLoop());
+    return NetSliceStream::CreateShared(GetLoop());
 }
 
-void NetSliceStream::PushSlice(void *data, int nsize)
+void NetSliceStream::PushSlice(Slice* slice)
 {
-    DEBUG("LEN: %d => %s\n", nsize, (char *)data);
+    DEBUG("LEN: %d => %s\n", slice->BodyLength(), (char *)slice->Body());
 }
 
 void NetSliceStream::ClearReadBrokenBuffer()
@@ -162,7 +162,7 @@ void NetSliceStream::OnRead(void *data, int nread)
                     break;
 
                 Slice *realslice = DealFlags(slice);
-                PushSlice(realslice->Body(), realslice->BodyLength());
+                PushSlice(realslice);
                 pms->ReadFlipSilence(slice->Length);
             }
 

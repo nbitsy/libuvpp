@@ -55,9 +55,13 @@ public:
         other._queue.swap(_queue);
     }
 
-    inline iterator_type begin() { return _queue.begin(); }
-    inline iterator_type end() { return _queue.end(); }
-    inline size_t size() const { return _queue.size(); }
+    template <typename F>
+    void ForEach(const F& f)
+    {
+        std::lock_guard<mutex_type> l(_lck);
+        for (auto i = _queue.begin(); i != _queue.end(); ++i)
+            f(*i);
+    }
 
 private:
     container_type _queue;

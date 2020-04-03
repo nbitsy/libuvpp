@@ -3,7 +3,7 @@
 #define _LUATINKER_H_
 
 /**
- * LuaTinker基于lua_tinker的一个C++实现，而至于底层用的是Lua还是LuaJIT并不关心
+ * LuaTinker基于lua_tinker的一个简易C++接口，而至于底层用的是Lua还是LuaJIT并不关心
  * 但是，对于游戏服务器开发来说，还是建议使用LuaJIT。就目前来说LuaJIT只支持到Lua5.1，
  * 而lua_tinker也是对Lua5.1的支持，如果需要支持更高Lua版本，需要修改lua_tinker。
 */

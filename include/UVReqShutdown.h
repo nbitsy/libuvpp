@@ -13,7 +13,7 @@ class UVStream;
 class UVReqShutdown : public UVReq
 {
 public:
-    UV_CREATE_REQ_STRONG(UVReqShutdown)
+    UV_CREATE_REQ_SHARED(UVReqShutdown)
 
 public:
     UVReqShutdown(const std::weak_ptr<UVHandle> &handle);

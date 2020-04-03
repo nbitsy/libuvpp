@@ -33,7 +33,7 @@
         return NULL;                                                                            \
     }                                                                                           \
     template <typename T = TYPE>                                                                \
-    static std::shared_ptr<TYPE> CreateStrong(const std::string &name, bool useDefault = false) \
+    static std::shared_ptr<TYPE> CreateShared(const std::string &name, bool useDefault = false) \
     {                                                                                           \
         if (is_subclass<TYPE, UVLoop>::value)                                                   \
         {                                                                                       \

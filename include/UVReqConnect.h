@@ -12,7 +12,7 @@ namespace XSpace
 class UVReqConnect : public UVReq
 {
 public:
-    UV_CREATE_REQ_STRONG(UVReqConnect)
+    UV_CREATE_REQ_SHARED(UVReqConnect)
 
 public:
     UVReqConnect(const std::weak_ptr<UVHandle> &handle, const NetAddress &address);

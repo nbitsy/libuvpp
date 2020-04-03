@@ -22,7 +22,7 @@ void __OnConnected(uv_connect_t *req, int status)
     uvreqconnect->OnReq(status);
 
     // 如果Req里注册的是强引用，则释放引用，一般来说Req使用完后需要回收
-    auto strong = uvdata->GetStrongPtr<UVReqConnect>();
+    auto strong = uvdata->GetSharedPtr<UVReqConnect>();
     if (strong != NULL)
         strong->reset();
 }

@@ -12,6 +12,7 @@
 namespace XSpace
 {
 
+// TODO: new 换成 make_shared
 // XXX: 所有Handle和UVLoop都是弱引用的，外部需要强引用管理，而Req一般都是弱引用的，OnReq后需要回收
 // XXX: 所有继承自UVHandle的类需要提供以loop为第一参数的构造函数
 #define UV_CREATE_HANDLE(TYPE)                                                   \
@@ -35,7 +36,7 @@ namespace XSpace
         return NULL;                                                             \
     }                                                                            \
     template <typename T = TYPE, typename L = UVLoop, typename... U>             \
-    static std::shared_ptr<TYPE> CreateStrong(std::weak_ptr<L> loop, U... args)  \
+    static std::shared_ptr<TYPE> CreateShared(std::weak_ptr<L> loop, U... args)  \
     {                                                                            \
         if (is_subclass<T, TYPE>::value)                                         \
         {                                                                        \
@@ -49,7 +50,7 @@ namespace XSpace
         return NULL;                                                             \
     }
 
-#define UV_CREATE_REQ(TYPE, STRONG)                    \
+#define UV_CREATE_REQ(TYPE, SHARED)                    \
     template <typename T = TYPE, typename... U>        \
     static std::shared_ptr<TYPE> Create(U... args)     \
     {                                                  \
@@ -57,7 +58,7 @@ namespace XSpace
         {                                              \
             std::shared_ptr<TYPE> ptr(new T(args...)); \
             if (ptr != NULL)                           \
-                ptr->SetData(NULL, true, STRONG);      \
+                ptr->SetData(NULL, true, SHARED);      \
                                                        \
             return ptr;                                \
         }                                              \
@@ -66,7 +67,7 @@ namespace XSpace
     }
 
 #define UV_CREATE_REQ_WEAK(TYPE) UV_CREATE_REQ(TYPE, false)
-#define UV_CREATE_REQ_STRONG(TYPE) UV_CREATE_REQ(TYPE, true)
+#define UV_CREATE_REQ_SHARED(TYPE) UV_CREATE_REQ(TYPE, true)
 
 enum UVDataType
 {
@@ -93,7 +94,7 @@ struct UVData
     }
 
     template <typename T>
-    inline std::shared_ptr<T> *GetStrongPtr()
+    inline std::shared_ptr<T> *GetSharedPtr()
     {
         if (!_strong)
             return NULL;
@@ -106,7 +107,7 @@ struct UVData
         T *t = NULL;
         if (_strong)
         {
-            auto uvtimer = GetStrongPtr<T>();
+            auto uvtimer = GetSharedPtr<T>();
             t = uvtimer->get();
         }
         else

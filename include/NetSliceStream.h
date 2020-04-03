@@ -40,8 +40,10 @@ public:
     void OnRead(void *data, int nread) OVERRIDE;
 
     // 收到一个完整的Slice
-    virtual void PushSlice(void *data, int nsize);
+    virtual void PushSlice(Slice* slice);
+    // 消息头部的标志位处理
     virtual Slice *DealFlags(_NOMODIFY Slice *slice);
+    // 把data组装进一个Slice发送出去
     bool Write(void *data, int nsize);
     bool WriteSlice(Slice *slice);
 
