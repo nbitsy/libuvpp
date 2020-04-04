@@ -61,6 +61,7 @@ bool UVTimer::Start(uint64_t repeat, uint64_t timeout, long long ticks)
     if (ticks >= 0)
         Ticks = ticks;
 
+    SetData(&_timestamp, true);
     return !uv_timer_start(GetHandle<uv_timer_t>(), __OnTimer, timeout, repeat);
 }
 

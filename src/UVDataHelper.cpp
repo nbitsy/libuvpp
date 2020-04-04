@@ -9,10 +9,12 @@ namespace XSpace
 UVData::UVData(bool strong, void *self, void *data)
     : _strong(strong), _self(self), _data(data)
 {
+    DEBUG("Object @%p _self: %p, _data: %p\n", this, _self, _data);
 }
 
 UVData::~UVData()
 {
+    DEBUG("Object @%p _self: %p, _data: %p\n", this, _self, _data);
 #if _DEBUG
     if (_self != NULL)
     {

@@ -63,9 +63,15 @@ public:
             f(*i);
     }
 
+    size_t Size() const
+    {
+        std::lock_guard<mutex_type> l(_lck);
+        return _queue.size();
+    }
+
 private:
     container_type _queue;
-    mutex_type _lck;
+    mutable mutex_type _lck;
 };
 
 } // namespace XSpace
