@@ -2,10 +2,14 @@
 #ifndef _DEBUGGER_H_
 #define _DEBUGGER_H_
 
+#include "Thread.h"
+
 #ifdef _DEBUG
 #include "DateTime.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <thread>
+using XSpace::FormatThreadId;
 using XSpace::DateTime;
 #endif
 
@@ -22,8 +26,9 @@ namespace XSpace
 #define ___FUNCTION___ __PRETTY_FUNCTION__
 //#define ___FUNCTION___ __FUNCTION__
 #define ___TIME___ DateTime().toString().c_str()
+#define ___TID___ FormatThreadId(std::this_thread::get_id())
 
-// 30 white 31 red 32 green 33 yellow 34 blue 35 purple 
+// 30 white 31 red 32 green 33 yellow 34 blue 35 purple
 #define DEBUG_GREENnBACK "\033[1;32;40m"  // debug
 #define DEBUG_WHITEnBACK ""               // log
 #define DEBUG_PURPLEnBACK "\033[1;35;40m" // info
@@ -42,50 +47,50 @@ namespace XSpace
 #define DEBUG_LEVEL_ERR 4
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_DEBUG
-#define DEBUG(...)                                                                                           \
-    {                                                                                                        \
-        fprintf(stderr, "%s%s %s:%d%s ", DEBUG_GREENnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                                      \
+#define DEBUG(...)                                                                                                           \
+    {                                                                                                                        \
+        fprintf(stderr, "%s%s %s:%d%s [%p] ", DEBUG_GREENnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, ##__VA_ARGS__);                                                                                      \
     }
 #else
 #define DEBUG(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_LOG
-#define LOG(...)                                                                                \
-    {                                                                                           \
-        fprintf(stderr, "%s%s %s:%d ", DEBUG_WHITEnBACK, ___TIME___, ___FUNCTION___, __LINE__); \
-        fprintf(stdout, ##__VA_ARGS__);                                                         \
+#define LOG(...)                                                                                               \
+    {                                                                                                          \
+        fprintf(stderr, "%s%s %s:%d [%p]", DEBUG_WHITEnBACK, ___TIME___, ___FUNCTION___, __LINE__, ___TID___); \
+        fprintf(stdout, ##__VA_ARGS__);                                                                        \
     }
 #else
 #define LOG(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
-#define INFO(...)                                                                                             \
-    {                                                                                                         \
-        fprintf(stderr, "%s%s %s:%d %s", DEBUG_PURPLEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stdout, ##__VA_ARGS__);                                                                       \
+#define INFO(...)                                                                                                             \
+    {                                                                                                                         \
+        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_PURPLEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stdout, ##__VA_ARGS__);                                                                                       \
     }
 #else
 #define INFO(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
-#define WARN(...)                                                                                              \
-    {                                                                                                          \
-        fprintf(stderr, "%s%s %s:%d %s ", DEBUG_YELLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                                        \
+#define WARN(...)                                                                                                             \
+    {                                                                                                                         \
+        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_YELLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, ##__VA_ARGS__);                                                                                       \
     }
 #else
 #define WARN(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
-#define ERROR(...)                                                                                               \
-    {                                                                                                            \
-        fprintf(stderr, "%s%s %s:%d %s ", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, __LINE__, DEBUG_END); \
-        fprintf(stderr, ##__VA_ARGS__);                                                                          \
+#define ERROR(...)                                                                                                              \
+    {                                                                                                                           \
+        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, ##__VA_ARGS__);                                                                                         \
     }
 #else
 #define ERROR(...)

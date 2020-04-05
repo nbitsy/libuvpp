@@ -44,7 +44,7 @@ public:
     // 消息头部的标志位处理
     virtual Slice *DealFlags(_NOMODIFY Slice *slice);
     // 把data组装进一个Slice发送出去
-    bool Write(void *data, int nsize);
+    bool Write(void *data, int nsize) OVERWRITE;
     bool WriteSlice(Slice *slice);
 
 protected:

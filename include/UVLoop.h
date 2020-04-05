@@ -85,6 +85,7 @@ public:
     T *GetRawLoop() { return reinterpret_cast<T *>(_loop); }
 
     inline std::thread::id ThreadId() const { return _threadId; }
+    inline void* FormatedThreadId() const { return FormatThreadId(_threadId); }
     inline bool IsRunning() const { return _running; }
 
 private:

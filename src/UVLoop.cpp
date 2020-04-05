@@ -66,6 +66,8 @@ bool UVLoop::Run(uv_run_mode type)
     if (_loop != NULL)
     {
         _running = true;
+        INFO("Thread from %p to %p\n", FormatedThreadId(), FormatThreadId(std::this_thread::get_id()));
+        _threadId = std::this_thread::get_id();
         uv_run(_loop, type);
         OnStopped();
         _running = false;

@@ -21,7 +21,7 @@ public:
     SyncDeque() {}
     ~SyncDeque() {}
 
-    inline void PushBack(T &v)
+    inline void PushBack(const T &v)
     {
         std::lock_guard<mutex_type> l(_lck);
         _queue.push_back(v);
@@ -35,7 +35,7 @@ public:
         return v;
     }
 
-    void PushFront(T &v)
+    void PushFront(const T &v)
     {
         std::lock_guard<mutex_type> l(_lck);
         _queue.push_front(v);

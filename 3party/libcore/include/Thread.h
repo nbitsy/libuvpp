@@ -10,6 +10,8 @@
 namespace XSpace
 {
 
+inline void* FormatThreadId(const std::thread::id& id) { return (void*)(*(unsigned long long*)&id); }
+
 class Thread
 {
 public:

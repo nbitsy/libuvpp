@@ -9,12 +9,12 @@ namespace XSpace
 NetSliceStream::NetSliceStream(const std::weak_ptr<UVLoop> &loop, int flags)
     : UVTcp(loop, flags), _readBroken(false), _readBrokenBuffer(0), _writeSlice(0), _writeSliceLength(0)
 {
-    DEBUG("\n");
+    DEBUG("Object @%p\n", this);
 }
 
 NetSliceStream::~NetSliceStream()
 {
-    DEBUG("\n");
+    DEBUG("Object @%p\n", this);
 }
 
 std::shared_ptr<UVHandle> NetSliceStream::OnNewConnection()
