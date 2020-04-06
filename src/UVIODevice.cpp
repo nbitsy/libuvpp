@@ -9,6 +9,7 @@ namespace XSpace
 
 static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
+    INFO("@%p len: %lu buf->len: %lu\n", buf, nread, buf->len);
     UVData *uvdata = (UVData *)stream->data;
     if (NULL == uvdata || NULL == uvdata->_self)
     {
@@ -226,6 +227,7 @@ bool UVIODevice::Write(void *data, int nsize, std::weak_ptr<UVHandle> other, con
     if (NULL == _handle)
         return false;
 
+    //std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(this->WeakFromThis<UVHandle>(), other, data, nsize, true);
     std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(shared_from_this(), other, data, nsize, true);
     if (!req.expired())
         return req.lock()->Start();
@@ -238,6 +240,7 @@ bool UVIODevice::Write(void *bufs[], int nbuf, std::weak_ptr<UVHandle> other, co
     if (NULL == _handle)
         return false;
 
+    //std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(this->WeakFromThis<UVHandle>(), other, bufs, nbuf, true);
     std::weak_ptr<UVReqWrite> req = UVReqWrite::Create<UVReqWrite>(shared_from_this(), other, bufs, nbuf, true);
     if (!req.expired())
         return req.lock()->Start();

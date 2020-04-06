@@ -33,7 +33,7 @@ public:
     int GetAf() const;
 
     // TCP/PIPE
-    virtual void OnRead(void *data, int nread) {}
+    virtual void OnRead(void *data, int nread) {} // XXX: libuv里一次性最多只能读取64*1024个字节 1.34.3
     // UDP
     virtual void OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags) {}
     virtual void OnError(int status) {}

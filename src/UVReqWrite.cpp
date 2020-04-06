@@ -150,23 +150,23 @@ void UVReqWrite::Init(const std::weak_ptr<UVHandle> &iohandle, void *bufs[], int
 }
 
 UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *data, int nsize, bool copy)
-    : UVReq(), _bCopye(copy), _iohandle(iohandle), _other(other), _bBuffers(false)
+    : UVReq(), _bCopye(copy), _iohandle(iohandle), _other(other), _bBuffers(false), _addr(NULL)
 {
-    DEBUG("Object @%p\n", this);
+    INFO("Object @%p\n", this);
     Init(iohandle, data, nsize, copy);
 }
 
 UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const std::weak_ptr<UVHandle> &other, void *bufs[], int nbuf, bool copy)
-    : UVReq(), _bCopye(false), _iohandle(iohandle), _other(other), _bBuffers(true)
+    : UVReq(), _bCopye(false), _iohandle(iohandle), _other(other), _bBuffers(true), _addr(NULL)
 {
-    DEBUG("Object @%p\n", this);
+    INFO("Object @%p\n", this);
     Init(iohandle, bufs, nbuf, copy);
 }
 
 UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *data, int nsize, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(false), _addr(NULL)
 {
-    DEBUG("Object @%p\n", this);
+    INFO("Object @%p\n", this);
     Init(iohandle, data, nsize, copy);
     InitAddress(addr);
 }
@@ -174,7 +174,7 @@ UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct soc
 UVReqWrite::UVReqWrite(const std::weak_ptr<UVHandle> &iohandle, const struct sockaddr *addr, void *bufs[], int nbuf, bool copy)
     : UVReq(), _bCopye(false), _iohandle(iohandle), _bBuffers(true), _addr(NULL)
 {
-    DEBUG("Object @%p\n", this);
+    INFO("Object @%p\n", this);
     Init(iohandle, bufs, nbuf, copy);
     InitAddress(addr);
 }
@@ -195,12 +195,12 @@ void UVReqWrite::InitAddress(const struct sockaddr *addr)
 
 UVReqWrite::~UVReqWrite()
 {
-    DEBUG("Object @%p\n", this);
+    INFO("Object @%p\n", this);
     if (!_bBuffers)
     {
         if (_bCopye && d._data != NULL)
         {
-            Allocator::free(d._data); // TODO:
+            Allocator::free(d._data);
             d._data = NULL;
             d._nsize = 0;
         }
@@ -210,9 +210,9 @@ UVReqWrite::~UVReqWrite()
         if (_bCopye && d2._bufs && d2._nbuf > 0)
         {
             for (int i = 0; i < d2._nbuf; ++i)
-                Allocator::free(d2._bufs[i]); // TODO:
+                Allocator::free(d2._bufs[i]);
 
-            Allocator::free(d2._bufs); // TODO:
+            Allocator::free(d2._bufs);
         }
 
         d2._bufs = NULL;
@@ -221,9 +221,12 @@ UVReqWrite::~UVReqWrite()
 
     if (_addr != NULL)
     {
-        Allocator::free(_addr); // TODO:
+        Allocator::free(_addr);
         _addr = NULL;
     }
+
+    _iohandle.reset();
+    _other.reset();
 }
 
 bool UVReqWrite::Start()

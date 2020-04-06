@@ -27,7 +27,7 @@ void UVAsyncWrite::OnAsync()
         return;
 
     SyncDeque<UVAsyncWriteData *> tmp;
-    tmp.Swap(_queue);
+    _queue.Swap(tmp);
 
     auto &iodevice = _iodevice;
     auto &sendSlice = _sendSlice;

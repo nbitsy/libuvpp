@@ -19,8 +19,8 @@ namespace XSpace
 #ifdef _DEBUG
 
 #ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
-//#define DEBUG_LEVEL DEBUG_LEVEL_LOG
+//#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
+#define DEBUG_LEVEL DEBUG_LEVEL_LOG
 #endif
 
 #define ___FUNCTION___ __PRETTY_FUNCTION__

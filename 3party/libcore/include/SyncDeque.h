@@ -21,7 +21,7 @@ public:
     SyncDeque() {}
     ~SyncDeque() {}
 
-    inline void PushBack(const T &v)
+    void PushBack(const T &v)
     {
         std::lock_guard<mutex_type> l(_lck);
         _queue.push_back(v);
@@ -52,7 +52,7 @@ public:
     inline void Swap(SyncDeque& other)
     {
         std::lock_guard<mutex_type> l(_lck);
-        other._queue.swap(_queue);
+        _queue.swap(other._queue);
     }
 
     template <typename F>
@@ -67,6 +67,12 @@ public:
     {
         std::lock_guard<mutex_type> l(_lck);
         return _queue.size();
+    }
+
+    inline bool Empty() const
+    {
+        std::lock_guard<mutex_type> l(_lck);
+        return _queue.empty();
     }
 
 private:

@@ -218,10 +218,12 @@ bool NetSliceStream::Write(void *data, int nsize)
     if (!UVTcp::Write((void *)_writeSlice, total))
     {
         Allocator::free(_writeSlice);
+        _writeSlice = NULL;
         return false;
     }
 
     Allocator::free(_writeSlice);
+    _writeSlice = NULL;
     return true;
 }
 

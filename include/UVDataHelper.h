@@ -108,14 +108,14 @@ struct UVData
         T *t = NULL;
         if (_strong)
         {
-            auto uvtimer = GetSharedPtr<T>();
-            t = uvtimer->get();
+            auto self = GetSharedPtr<T>();
+            t = self->get();
         }
         else
         {
-            auto uvtimer = GetWeakPtr<T>();
-            if (!uvtimer->expired())
-                t = uvtimer->lock().get();
+            auto self = GetWeakPtr<T>();
+            if (!self->expired())
+                t = self->lock().get();
         }
         return t;
     }

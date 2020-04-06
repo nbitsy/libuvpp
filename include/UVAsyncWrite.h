@@ -14,7 +14,7 @@ class UVIODevice;
 
 struct UVAsyncWriteData
 {
-    UVAsyncWriteData(void* data, int length, bool copy = true) : Data(NULL), Length(length)
+    UVAsyncWriteData(void *data, int length, bool copy = true) : Data(NULL), Length(length)
     {
         DEBUG("Object @%p\n", this);
         if (copy)
@@ -22,6 +22,8 @@ struct UVAsyncWriteData
             Data = Allocator::malloc(length);
             if (Data != NULL)
                 std::memcpy(Data, data, length);
+            else
+                ERROR("Malloc!!!\n");
         }
         else
         {
@@ -63,7 +65,7 @@ protected:
 private:
     // 一个异步写对象对应一个Handle
     std::weak_ptr<UVIODevice> _iodevice; // 对宿主的弱引用，宿主对我是强引用
-    SyncDeque<UVAsyncWriteData*> _queue;
+    SyncDeque<UVAsyncWriteData *> _queue;
     bool _sendSlice; // 发送的数据包是否加上Slice的包头
 };
 
