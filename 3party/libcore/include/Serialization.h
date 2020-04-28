@@ -11,6 +11,7 @@ namespace XSpace
 class ISerialization
 {
 public:
+    ISerialization() {}
     virtual ~ISerialization() {}
     virtual void Serialize(OStream &stream) const = 0;
     virtual void Unserialize(IStream &stream) = 0;
@@ -18,6 +19,7 @@ public:
 
 class Serializable : public ISerialization
 {
+public:
     Serializable() {}
     ~Serializable() {}
     virtual void Serialize(OStream &) const OVERRIDE {}

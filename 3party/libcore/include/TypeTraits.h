@@ -810,6 +810,7 @@ template <typename T, typename U>
 struct is_drived_from
 {
     static true_t is_drived_from_tester(U *u);
+    static true_t is_drived_from_tester(const U *u);
     static false_t is_drived_from_tester(...);
 
     enum

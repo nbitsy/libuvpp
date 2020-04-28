@@ -2,9 +2,10 @@
 #ifndef _TOKENIZER_H_
 #define _TOKENIZER_H_
 
-#include "Spliter.h"
 #include <string>
 #include <vector>
+
+#include "Spliter.h"
 
 namespace XSpace
 {

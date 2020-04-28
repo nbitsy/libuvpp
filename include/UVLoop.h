@@ -12,6 +12,8 @@
 #include "UVDataHelper.h"
 #include "UVPoolHelper.h"
 
+// Create之后不负责回收，而Constructor需要负责Destroy
+
 #define UV_CREATE_LOOP(TYPE)                                                                    \
     template <typename T = TYPE>                                                                \
     static std::shared_ptr<TYPE> Create(const std::string &name, bool useDefault = false)       \

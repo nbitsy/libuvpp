@@ -45,7 +45,7 @@ struct Slice
 
     inline int SliceLength() const { return Length; }
     inline int HeadLength() const { return sizeof(Slice); }
-    inline void *Body() { return &_all + 1; }
+    inline void *Body() { return &End[0]; }
     inline int BodyLength() const { return Length >= sizeof(Slice) ? Length - sizeof(Slice) : 0; }
 
     inline void SetFwd(bool v) { SLICE_FLAG_SET(FWD, v); }
@@ -65,12 +65,24 @@ struct Slice
             int Length : 24; // 低
             int Flags : 8;   // 高
 #else
-            int Flags : 4;   // 高
-            int Length : 28; // 低
+            int Flags : 8;   // 高
+            int Length : 24; // 低
 #endif
         };
-        int _all;
     };
+    // 以下几个描述字段可以在不解包的情况下进行一些操作
+
+    // 消息ID，客户有这个才知道怎么解释
+    unsigned int MsgID;
+    // 转发去的节点类型，如果当前节点类型为FwdType，则启用FwdTarget条件，如果FwdType为0则为广播
+    unsigned char FwdType;
+    // 如果类型匹配后，当前节点标识与FwdTarget相等时启用Target条件，如果FwdTarget为0则为广播
+    unsigned int FwdTarget;
+    // 如果Target为0则为广播
+    unsigned int Target;
+
+    // 之后为包体
+    char End[0];
 };
 
 } // namespace XSpace

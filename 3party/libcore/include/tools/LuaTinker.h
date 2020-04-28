@@ -15,7 +15,7 @@ extern "C"
 #include "lualib.h"
 }
 
-#include "tools/lua_tinker.h"
+#include "Tools/lua_tinker.h"
 #include <string>
 
 using namespace lua_tinker;
@@ -56,38 +56,18 @@ public:
         return false;
     }
 
-    inline bool DoFile(const std::string &filename)
-    {
-        return DoFile(filename.c_str());
-    }
-    inline bool DoString(const std::string &str)
-    {
-        return DoString(str.c_str());
-    }
-    inline bool DoBuffer(const std::string &buf)
-    {
-        return DoBuffer(buf.c_str(), buf.length());
-    }
-
-    inline void push_lightdata(void *p) { lua_pushlightuserdata(_L, p); }
+    inline bool DoFile(const std::string &filename) { return DoFile(filename.c_str()); }
+    inline bool DoString(const std::string &str) { return DoString(str.c_str()); }
+    inline bool DoBuffer(const std::string &buf) { return DoBuffer(buf.c_str(), buf.length()); }
+    inline void PushLightData(void *p) { lua_pushlightuserdata(_L, p); }
 
     template <typename T, typename... U>
-    inline T Call(const char *name, U... args)
-    {
-        return lua_tinker::call<T>(_L, name, args...);
-    }
+    inline T Call(const char *name, U... args) { return lua_tinker::call<T>(_L, name, args...); }
+    template <typename T>
+    inline void SetGlobal(const char *name, T object) { lua_tinker::setglobal(_L, name, object); }
 
     template <typename T>
-    inline void Set(const char *name, T object)
-    {
-        lua_tinker::setglobal(_L, name, object);
-    }
-
-    template <typename T>
-    inline T Get(const char *name)
-    {
-        return lua_tinker::getglobal<T>(_L, name);
-    }
+    inline T GetGlobal(const char *name) const { return lua_tinker::getglobal<T>(_L, name); }
 
     // global or static functions
     template <typename F>
@@ -140,8 +120,6 @@ public:
         return *this;
     }
 
-    // int callWithParams(const char *name, void *params, size_t len);
-
     inline LuaState *GetState() { return _L; }
 
 protected:
@@ -153,7 +131,6 @@ protected:
 #define CLASS_DEF(clazz, member) class_def<clazz>(#member, &clazz::member)
 #define CLASS_VAR(clazz, var) class_mem<clazz>(#var, &clazz::member)
 #define CLASS_KMEM(clazz, member) class_def<clazz>(#clazz "_" #member, &clazz::member)
-
 
 } // namespace XSpace
 

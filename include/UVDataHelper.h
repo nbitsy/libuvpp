@@ -12,10 +12,11 @@
 namespace XSpace
 {
 
-// TODO: new 换成 make_shared
 // TODO: 如果在创建的时候有更多的定制性需求，需要考虑把SetData独立出来
 // XXX: 所有Handle和UVLoop都是弱引用的，外部需要强引用管理，而Req一般都是弱引用的，OnReq后需要回收
 // XXX: 所有继承自UVHandle的类需要提供以loop为第一参数的构造函数
+// XXX: 所有创建的对象都是通过new出来的，回收的时候通过shared_ptr的deleter进行回收，关于内存的管理
+//      目前的解决方案是重载new和delete，最终会调用到Allocator来进行内存的分配和回收
 #define UV_CREATE_HANDLE(TYPE)                                                   \
     template <typename T = TYPE, typename L = UVLoop, typename... U>             \
     inline static std::shared_ptr<TYPE> Create(std::weak_ptr<L> loop, U... args) \

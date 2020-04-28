@@ -19,16 +19,16 @@ public:
     {
     }
 
-    void Tick(const Timestamp *now)
+    bool Ticking(const Timestamp *now)
     {
         if (_tcp.expired())
-            return;
+            return false;
 
         auto tcp = _tcp.lock();
         if (NULL == tcp)
         {
             Stop();
-            return;
+            return false;
         }
 
         UVTcp *t = (UVTcp *)tcp.get();
@@ -41,6 +41,8 @@ public:
             Stop();
             t->Close();
         }
+
+        return true;
     }
 
 private:

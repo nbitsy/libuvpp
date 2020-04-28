@@ -270,7 +270,7 @@ bool UVReqWrite::Start()
     }
 
     if (NULL == uvbuf)
-        return false; // TODO: 回收自己
+        return false;
 
     int type = uvhandle->type;
     if (type == UV_TCP || type == UV_TTY)
@@ -295,7 +295,7 @@ bool UVReqWrite::Start()
             return true;
     }
 
-    return false; // TODO: 回收自己
+    return false;
 }
 
 void UVReqWrite::OnReq(int status)

@@ -43,7 +43,7 @@ void __OnTimer(uv_timer_t *timer)
     if (timestamp != NULL)
         timestamp->Update();
 
-    t->Tick(timestamp);
+    t->Ticking(timestamp);
 
     if (t->Ticks == 0)
         t->Stop();
@@ -51,18 +51,16 @@ void __OnTimer(uv_timer_t *timer)
         --t->Ticks;
 }
 
-// timeout: 第一次开始时的延迟时间
-// repeat: 下一次的回调的间隔时间,ms
-bool UVTimer::Start(uint64_t repeat, uint64_t timeout, long long ticks)
+bool UVTimer::Start(uint64_t interval , uint64_t timeout, long long repeat)
 {
     if (NULL == _handle || !_handle->flags)
         return false;
 
-    if (ticks >= 0)
-        Ticks = ticks;
+    if (repeat >= 0)
+        Ticks = repeat;
 
     SetData(&_timestamp, true);
-    return !uv_timer_start(GetHandle<uv_timer_t>(), __OnTimer, timeout, repeat);
+    return !uv_timer_start(GetHandle<uv_timer_t>(), __OnTimer, timeout, interval);
 }
 
 bool UVTimer::Again()
@@ -103,7 +101,7 @@ void UVTimer::OnClosed()
     DEBUG("\n");
 }
 
-void UVTimer::Tick(const Timestamp *now)
+bool UVTimer::Ticking(const Timestamp *now)
 {
     static int i = 0;
 
@@ -123,6 +121,8 @@ void UVTimer::Tick(const Timestamp *now)
     {
         DEBUG("\n");
     }
+
+    return true;
 }
 
 } // namespace XSpace

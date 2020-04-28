@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <thread>
-using XSpace::FormatThreadId;
 using XSpace::DateTime;
+using XSpace::FormatThreadId;
 #endif
 
 namespace XSpace
@@ -19,8 +19,8 @@ namespace XSpace
 #ifdef _DEBUG
 
 #ifndef DEBUG_LEVEL
-//#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
-#define DEBUG_LEVEL DEBUG_LEVEL_LOG
+#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
+//#define DEBUG_LEVEL DEBUG_LEVEL_LOG
 #endif
 
 #define ___FUNCTION___ __PRETTY_FUNCTION__
@@ -52,15 +52,22 @@ namespace XSpace
         fprintf(stderr, "%s%s %s:%d%s [%p] ", DEBUG_GREENnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                      \
     }
+#define DEBUG_PURE(...) fprintf(stderr, ##__VA_ARGS__)
 #else
 #define DEBUG(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_LOG
-#define LOG(...)                                                                                               \
-    {                                                                                                          \
-        fprintf(stderr, "%s%s %s:%d [%p]", DEBUG_WHITEnBACK, ___TIME___, ___FUNCTION___, __LINE__, ___TID___); \
-        fprintf(stdout, ##__VA_ARGS__);                                                                        \
+#define LOG(...)                                                                                                             \
+    {                                                                                                                        \
+        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_WHITEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, ##__VA_ARGS__);                                                                                      \
+    }
+#define LOG_PURE(...)                            \
+    {                                            \
+        fprintf(stderr, "%s", DEBUG_WHITEnBACK); \
+        fprintf(stderr, ##__VA_ARGS__);          \
+        fprintf(stderr, "%s", DEBUG_END);        \
     }
 #else
 #define LOG(...)
@@ -70,7 +77,13 @@ namespace XSpace
 #define INFO(...)                                                                                                             \
     {                                                                                                                         \
         fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_PURPLEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
-        fprintf(stdout, ##__VA_ARGS__);                                                                                       \
+        fprintf(stderr, ##__VA_ARGS__);                                                                                       \
+    }
+#define INFO_PURE(...)                            \
+    {                                             \
+        fprintf(stderr, "%s", DEBUG_PURPLEnBACK); \
+        fprintf(stderr, ##__VA_ARGS__);           \
+        fprintf(stderr, "%s", DEBUG_END);         \
     }
 #else
 #define INFO(...)
@@ -82,6 +95,12 @@ namespace XSpace
         fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_YELLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                       \
     }
+#define WARN_PURE(...)                            \
+    {                                             \
+        fprintf(stderr, "%s", DEBUG_YELLOWnBACK); \
+        fprintf(stderr, ##__VA_ARGS__);           \
+        fprintf(stderr, "%s", DEBUG_END);         \
+    }
 #else
 #define WARN(...)
 #endif
@@ -91,6 +110,12 @@ namespace XSpace
     {                                                                                                                           \
         fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                         \
+    }
+#define ERROR_PURE(...)                        \
+    {                                          \
+        fprintf(stderr, "%s", DEBUG_REDnBACK); \
+        fprintf(stderr, ##__VA_ARGS__);        \
+        fprintf(stderr, "%s", DEBUG_END);      \
     }
 #else
 #define ERROR(...)
@@ -102,6 +127,12 @@ namespace XSpace
 #define INFO(...)
 #define WARN(...)
 #define ERROR(...)
+
+#define DEBUG_PURE(...)
+#define LOG_PURE(...)
+#define INFO_PURE(...)
+#define WARN_PURE(...)
+#define ERROR_PURE(...)
 #endif
 
 } // namespace XSpace

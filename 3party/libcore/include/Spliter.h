@@ -2,17 +2,17 @@
 #ifndef SPLITER_H_
 #define SPLITER_H_
 
-#include <strings.h>
 #include <string.h>
 #include <string>
+#include <strings.h>
 
-namespace XSpace 
+namespace XSpace
 {
 
 //#define USING_CSPLIT 1
 
 template <typename C>
-void split(C& ret, const std::string& src, const char sp)
+void split(C &ret, const std::string &src, const char sp)
 {
     std::string::size_type len = src.length();
     if (!len)
@@ -35,7 +35,7 @@ void split(C& ret, const std::string& src, const char sp)
     {
         if ((end = src.find(sp, start)) != std::string::npos)
         {
-            ret.push_back(src.substr(start, end-start));
+            ret.push_back(src.substr(start, end - start));
             ++end;
             if (end >= len)
             {
@@ -59,7 +59,7 @@ void split(C& ret, const std::string& src, const char sp)
 }
 
 template <typename C>
-void split(C& ret, const char* src, const char sp)
+void split(C &ret, const char *src, const char sp)
 {
     if (!src)
         return;
@@ -67,9 +67,9 @@ void split(C& ret, const char* src, const char sp)
     size_t len = ::strlen(src);
     if (!len)
         return;
-    
-    char* start = (char*)src;
-    char* end = (char*)src;
+
+    char *start = (char *)src;
+    char *end = (char *)src;
 
     bool empty = false;
     std::string s;
@@ -77,16 +77,18 @@ void split(C& ret, const char* src, const char sp)
     {
         if (s.length())
             s.clear();
-        while (*end && *end++ != sp && *end) {}
-        if (*end || *(end-1) == sp)
+        while (*end && *end++ != sp && *end)
         {
-            s.append(start, end-start-1);
-            if (*(end-1) == sp && !(*end))
+        }
+        if (*end || *(end - 1) == sp)
+        {
+            s.append(start, end - start - 1);
+            if (*(end - 1) == sp && !(*end))
                 empty = true;
         }
-        else 
+        else
         {
-            s.append(start, end-start);
+            s.append(start, end - start);
         }
 
         ret.push_back(s);
@@ -101,7 +103,7 @@ void split(C& ret, const char* src, const char sp)
 }
 
 template <typename C>
-void split(C& ret, const std::string& src, const std::string& sp)
+void split(C &ret, const std::string &src, const std::string &sp)
 {
     std::string::size_type len = src.length();
     if (!len)
@@ -124,7 +126,7 @@ void split(C& ret, const std::string& src, const std::string& sp)
     {
         if ((end = src.find(sp, start)) != std::string::npos)
         {
-            ret.push_back(src.substr(start, end-start));
+            ret.push_back(src.substr(start, end - start));
             end += splen;
             if (end >= len)
             {
@@ -149,4 +151,3 @@ void split(C& ret, const std::string& src, const std::string& sp)
 #endif // SPLITER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

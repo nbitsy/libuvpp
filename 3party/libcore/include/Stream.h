@@ -6,10 +6,10 @@
 #include <exception>
 #include <iostream>
 
-#include <vector>
 #include <list>
 #include <map>
 #include <set>
+#include <vector>
 
 namespace XSpace
 {
@@ -397,6 +397,12 @@ public:
     {
     }
 
+    inline const_pointer ReadPos() const { return &_data[_rpos]; }
+    inline pointer ReadPos() { return &_data[_rpos]; }
+
+    inline const_pointer WritePos() const { return &_data[_wpos]; }
+    inline pointer WritePos() { return &_data[_wpos]; }
+
     inline OutStream &Put(const void *buf, size_type size, unsigned char lennull = 0)
     {
         return Append(buf, size, lennull);
@@ -605,6 +611,10 @@ template <typename Container = DefaultContainer>
 class Stream : public InStream<Container>, public OutStream<Container>
 {
 public:
+    using InStream<Container>::ReadSize;
+    using OutStream<Container>::WriteSize;
+
+public:
     explicit Stream(size_t size = 0)
         : StreamBase<Container>(size), InStream<Container>(size), OutStream<Container>(size)
     {
@@ -716,10 +726,19 @@ private:
 
 class OStream : public OutStream<>
 {
+public:
+    using OutStream<>::operator<<;
+
+    OStream() : OutStream<>(K_TRUNK_SIZE) {}
 };
+
 class IStream : public InStream<>
 {
+public:
+    using InStream<>::operator>>;
+    IStream() : InStream<>(K_TRUNK_SIZE) {}
 };
+
 class IOStream : public Stream<>
 {
 };

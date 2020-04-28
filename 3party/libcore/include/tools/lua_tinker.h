@@ -11,6 +11,7 @@
 #if !defined(_LUA_TINKER_H_)
 #define _LUA_TINKER_H_
 
+#include <atomic>
 #include <cassert>
 #include <new>
 #include <string.h>
@@ -24,6 +25,7 @@ extern "C"
 
 namespace lua_tinker
 {
+
 // init LuaTinker
 void init(lua_State *L);
 
@@ -614,6 +616,7 @@ struct functor<void>
 // member variable
 struct var_base
 {
+    virtual ~var_base() {}
     virtual void get(lua_State *L) = 0;
     virtual void set(lua_State *L) = 0;
 };
@@ -1446,8 +1449,8 @@ struct table_obj
     {
         if (validate())
         {
-            lua_pushinteger(m_L, luaL_len(m_L, m_index)); //only use in table here
-            return pop<int>(m_L);
+            lua_pushinteger(_L, luaL_len(_L, _index)); //only use in table here
+            return pop<int>(_L);
         }
         else
         {
@@ -1460,9 +1463,9 @@ struct table_obj
     {
         if (validate())
         {
-            lua_pushinteger(m_L, index);
-            push(m_L, object);
-            lua_settable(m_L, m_index);
+            lua_pushinteger(_L, index);
+            push(_L, object);
+            lua_settable(_L, _index);
         }
     }
 
@@ -1471,21 +1474,20 @@ struct table_obj
     {
         if (validate())
         {
-            lua_pushstring(m_L, name);
-            push(m_L, object);
-            lua_settable(m_L, m_index);
+            lua_pushstring(_L, name);
+            push(_L, object);
+            lua_settable(_L, _index);
         }
     }
 
-    //add by szd [2010/04/06]
     template <typename T>
     void rawset(int index, T object)
     {
         if (validate())
         {
-            lua_pushinteger(m_L, index);
-            push(m_L, object);
-            lua_rawseti(m_L, m_index, index);
+            lua_pushinteger(_L, index);
+            push(_L, object);
+            lua_rawseti(_L, _index, index);
         }
     }
 
@@ -1494,9 +1496,9 @@ struct table_obj
     {
         if (validate())
         {
-            lua_pushstring(m_L, name);
-            push(m_L, object);
-            lua_rawset(m_L, m_index);
+            lua_pushstring(_L, name);
+            push(_L, object);
+            lua_rawset(_L, _index);
         }
     }
 
@@ -1506,15 +1508,15 @@ struct table_obj
         assert(index <= size() && "lua_tinker::table_obj::get index should <= size()");
         if (validate())
         {
-            lua_pushinteger(m_L, index);
-            lua_gettable(m_L, m_index);
+            lua_pushinteger(_L, index);
+            lua_gettable(_L, _index);
         }
         else
         {
-            lua_pushnil(m_L);
+            lua_pushnil(_L);
         }
 
-        return pop<T>(m_L);
+        return pop<T>(_L);
     }
 
     template <typename T>
@@ -1522,108 +1524,80 @@ struct table_obj
     {
         if (validate())
         {
-            lua_pushstring(m_L, name);
-            lua_gettable(m_L, m_index);
+            lua_pushstring(_L, name);
+            lua_gettable(_L, _index);
         }
         else
         {
-            lua_pushnil(m_L);
+            lua_pushnil(_L);
         }
 
-        return pop<T>(m_L);
+        return pop<T>(_L);
     }
 
-    template <typename T>
-    T rawget(int index)
-    {
-        assert(index <= size() && "lua_tinker::table_obj::get index should <= size()");
-        if (validate())
-        {
-            lua_rawgeti(m_L, m_index, index);
-        }
-        else
-        {
-            lua_pushnil(m_L);
-        }
-
-        return pop<T>(m_L);
-    }
-
-    template <typename T>
-    T rawget(const char *name)
-    {
-        if (validate())
-        {
-            lua_pushstring(m_L, name);
-            lua_rawget(m_L, m_index);
-        }
-        else
-        {
-            lua_pushnil(m_L);
-        }
-
-        return pop<T>(m_L);
-    }
-
-    int getIndex() const { return m_index; }
+    int getIndex() const { return _index; }
 
 private:
-    lua_State *m_L;
-    int m_index;
-    const void *m_pointer;
-    int m_ref;
+    lua_State *_L;
+    int _index;
+    const void *_pointer;
+    std::atomic_int32_t _ref;
 };
 
 // Table Object Holder
 struct table
 {
+    table();
     table(lua_State *L, int index);
     table(lua_State *L, const char *name);
-    //  table(lua_State* L);
-    //  table(const table& input);
+    table(lua_State *L);
+    table(const table &input);
 
     ~table();
 
-    template <typename T>
-    void set(int index, T object) const { m_obj->set(index, object); }
+    bool is_null() const { return _obj == NULL; }
+
+    bool validate()
+    {
+        if (_obj)
+            return _obj->validate();
+        return false;
+    }
 
     template <typename T>
-    void set(const char *name, T object) const { m_obj->set(name, object); }
+    void set(int index, T object) const { _obj->set(index, object); }
 
     template <typename T>
-    void rawset(int index, T object) const { m_obj->rawset(index, object); }
+    void set(const char *name, T object) const { _obj->set(name, object); }
 
     template <typename T>
-    void rawset(const char *name, T object) const { m_obj->rawset(name, object); }
+    void rawset(int index, T object) const { _obj->rawset(index, object); }
 
     template <typename T>
-    T get(int index) const { return m_obj->get<T>(index); }
+    void rawset(const char *name, T object) const { _obj->rawset(name, object); }
 
     template <typename T>
-    T get(const char *name) const { return m_obj->get<T>(name); }
+    T get(int index) const { return _obj->get<T>(index); }
 
     template <typename T>
-    T rawget(int index) const { return m_obj->rawget<T>(index); }
-
-    template <typename T>
-    T rawget(const char *name) const { return m_obj->rawget<T>(name); }
+    T get(const char *name) const { return _obj->get<T>(name); }
 
     //////////////////////////////////////////////////////////////////////////
     //NOTE size just return int key size, other type key not
     int size() const
     {
-        return m_obj->size();
+        return _obj->size();
     }
 
     bool empty() const
     {
-        return m_obj->size() == 0;
+        return _obj->size() == 0;
     }
 
-    int getIndex() const { return m_obj->getIndex(); }
+    int getIndex() const { return _obj->getIndex(); }
 
 private:
-    table_obj *m_obj;
+    table_obj *_obj;
 };
 
 } // namespace lua_tinker
