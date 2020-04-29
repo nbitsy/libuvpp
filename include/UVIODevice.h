@@ -28,8 +28,9 @@ public:
     bool TryWrite(void *data, int nsize, const struct sockaddr *addr);
     bool TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr);
 
-    const NetAddress LocalAddress() const;
-    const NetAddress RemoteAddress(const struct sockaddr *remote = NULL) const;
+    inline const NetAddress &LocalAddress() const { return _local; }
+    inline const NetAddress &RemoteAddress() const { return _remote; }
+
     int GetAf() const;
 
     // TCP/PIPE
@@ -39,6 +40,7 @@ public:
     virtual void OnError(int status) {}
 
 private:
+    void GetAddress();
     void GetAddress(int type, NetAddress &address, const struct sockaddr *addr = NULL) const;
 
 protected:
@@ -56,6 +58,9 @@ protected:
         struct sockaddr_in _addrPeer;
         struct sockaddr_in6 _addr6Peer;
     };
+
+    NetAddress _local;
+    NetAddress _remote;
 };
 
 } // namespace XSpace

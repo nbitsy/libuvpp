@@ -63,7 +63,6 @@ private:
     bool _connected;
     bool _connector;
     int _timeout;
-    NetAddress _local;
 };
 
 } // namespace XSpace

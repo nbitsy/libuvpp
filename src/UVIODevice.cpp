@@ -107,8 +107,10 @@ void UVIODevice::InitAddress()
 {
     DEBUG("\n");
     struct sockaddr_in *addr = NULL;
+
     int len = sizeof(_addr);
     int af = GetAf();
+
     if (af == AF_INET6)
     {
         addr = (struct sockaddr_in *)&_addr6;
@@ -122,7 +124,7 @@ void UVIODevice::InitAddress()
     else if (_handle->type == UV_UDP)
         uv_udp_getsockname(GetHandle<uv_udp_t>(), (struct sockaddr *)addr, &len);
 
-    len = sizeof(_addr);
+    len = sizeof(_addrPeer);
     if (af == AF_INET6)
     {
         addr = (struct sockaddr_in *)&_addr6Peer;
@@ -135,6 +137,14 @@ void UVIODevice::InitAddress()
         uv_tcp_getpeername(GetHandle<uv_tcp_t>(), (struct sockaddr *)addr, &len);
     else if (_handle->type == UV_UDP)
         uv_udp_getpeername(GetHandle<uv_udp_t>(), (struct sockaddr *)addr, &len);
+    
+    GetAddress();
+}
+
+void UVIODevice::GetAddress()
+{
+    GetAddress(0, _local);
+    GetAddress(1, _remote);
 }
 
 void UVIODevice::GetAddress(int type, NetAddress &address, const struct sockaddr *raddr) const
@@ -171,20 +181,6 @@ void UVIODevice::GetAddress(int type, NetAddress &address, const struct sockaddr
 
     address.Ip = ip;
     address.Port = ntohs(addr->sin_port);
-}
-
-const NetAddress UVIODevice::LocalAddress() const
-{
-    NetAddress address;
-    GetAddress(0, address);
-    return address;
-}
-
-const NetAddress UVIODevice::RemoteAddress(const struct sockaddr *remote) const
-{
-    NetAddress address;
-    GetAddress(1, address, remote);
-    return address;
 }
 
 bool UVIODevice::StartRead()

@@ -72,7 +72,8 @@ bool UVStream::Accept(std::weak_ptr<UVHandle> &client)
         stream->StartRead();
 
     OnAccept(client);
-    InitAddress();
+    stream->InitAddress();
+
     std::weak_ptr<UVHandle> ss(shared_from_this());
     stream->OnAccepted(ss);
     return true;
