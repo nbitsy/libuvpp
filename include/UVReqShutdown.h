@@ -2,8 +2,8 @@
 #ifndef _UVREQSHUTDOWN_H_
 #define _UVREQSHUTDOWN_H_
 
-#include "UVReq.h"
 #include "UVHandle.h"
+#include "UVReq.h"
 
 namespace XSpace
 {
@@ -16,7 +16,7 @@ public:
     UV_CREATE_REQ_SHARED(UVReqShutdown)
 
 public:
-    UVReqShutdown(const std::weak_ptr<UVHandle> &handle);
+    UVReqShutdown(const std::weak_ptr<UVHandle>& handle);
     ~UVReqShutdown();
 
     bool Start() OVERRIDE;

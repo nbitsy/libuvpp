@@ -14,11 +14,13 @@ public:
     UV_CREATE_HANDLE(UVUdp)
 
 public:
+    UVUdp(const std::weak_ptr<UVLoop>& loop, int flags = AF_UNSPEC);
     ~UVUdp();
-    bool Bind(const std::string &ip, int port, unsigned int flags = 0);
-    bool Connect(const std::string &ip, int port);
 
-    inline bool Write(void *data, int nsize, const struct sockaddr *addr)
+    bool Bind(const std::string& ip, int port, unsigned int flags = 0);
+    bool Connect(const std::string& ip, int port);
+
+    inline bool Write(void* data, int nsize, const struct sockaddr* addr)
     {
         std::weak_ptr<UVHandle> other;
         return UVIODevice::Write(data, nsize, other, addr);
@@ -26,17 +28,17 @@ public:
     /**
      * bufs里的每一个数据里的前sizeof(int)个字节为包的长度
     */
-    inline bool Write(void *bufs[], int nbuf, const struct sockaddr *addr)
+    inline bool Write(void* bufs[], int nbuf, const struct sockaddr* addr)
     {
         std::weak_ptr<UVHandle> other;
         return UVIODevice::Write(bufs, nbuf, other, addr);
     }
 
-    inline bool TryWrite(void *data, int nsize, const struct sockaddr *addr)
+    inline bool TryWrite(void* data, int nsize, const struct sockaddr* addr)
     {
         return UVIODevice::TryWrite(data, nsize, addr);
     }
-    inline bool TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr)
+    inline bool TryWrite(void* bufs[], int nbuf, const struct sockaddr* addr)
     {
         return UVIODevice::TryWrite(bufs, nbuf, addr);
     }
@@ -47,11 +49,8 @@ public:
     size_t SendQueueSize() const;
     size_t SendQueueCount() const;
 
-    void OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags) OVERRIDE;
+    void OnRead(void* data, int nread, const struct sockaddr* addr, unsigned int flags) OVERRIDE;
     void OnClosed() OVERRIDE;
-
-protected:
-    UVUdp(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
 };
 
 } // namespace XSpace

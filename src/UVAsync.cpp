@@ -7,26 +7,26 @@
 namespace XSpace
 {
 
-static void __OnAsync(uv_async_t *async)
+static void __OnAsync(uv_async_t* async)
 {
-    UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)async);
+    UVData* uvdata = (UVData*)uv_handle_get_data((uv_handle_t*)async);
     if (NULL == uvdata || NULL == uvdata->_self)
         return;
 
-    UVAsync *self = uvdata->GetPtr<UVAsync>();
+    UVAsync* self = uvdata->GetPtr<UVAsync>();
     if (self != NULL)
         self->OnAsync();
 }
 
-UVAsync::UVAsync(const std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
+UVAsync::UVAsync(const std::weak_ptr<UVLoop>& loop) : UVHandle(loop)
 {
     if (_loop.expired())
         return;
 
-    _handle = (uv_handle_t *)Allocator::Construct<uv_async_t>();
+    _handle = (uv_handle_t*)Allocator::Construct<uv_async_t>();
     if (_handle != NULL)
     {
-        uv_async_init(loop.lock()->GetRawLoop<uv_loop_t>(), (uv_async_t *)_handle, __OnAsync);
+        uv_async_init(loop.lock()->GetRawLoop<uv_loop_t>(), (uv_async_t*)_handle, __OnAsync);
         uv_handle_set_data(_handle, NULL);
     }
     DEBUG("Object @%p\n", this);
@@ -37,7 +37,7 @@ UVAsync::~UVAsync()
     DEBUG("Object @%p\n", this);
 }
 
-bool UVAsync::Send(void *data)
+bool UVAsync::Send(void* data)
 {
     if (_loop.expired() || _loop.lock()->GetRawLoop<uv_loop_t>() == NULL || NULL == _handle)
         return false;

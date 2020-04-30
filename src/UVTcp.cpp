@@ -11,7 +11,10 @@ namespace XSpace
 class UVTcpConnectTimeoutTimer : public UVTimer
 {
 public:
-    UVTcpConnectTimeoutTimer(const std::weak_ptr<UVLoop> &loop, const std::weak_ptr<UVHandle> &tcp)
+    UV_CREATE_HANDLE(UVTcpConnectTimeoutTimer)
+
+public:
+    UVTcpConnectTimeoutTimer(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVHandle>& tcp)
         : UVTimer(loop), _tcp(tcp)
     {
     }
@@ -19,7 +22,7 @@ public:
     {
     }
 
-    bool Ticking(const Timestamp *now)
+    bool Ticking(const Timestamp* now)
     {
         if (_tcp.expired())
             return false;
@@ -31,7 +34,7 @@ public:
             return false;
         }
 
-        UVTcp *t = (UVTcp *)tcp.get();
+        UVTcp* t = (UVTcp*)tcp.get();
         if (!t->IsConnected())
         {
             t->Reconnect();
@@ -49,7 +52,7 @@ private:
     std::weak_ptr<UVHandle> _tcp;
 };
 
-UVTcp::UVTcp(const std::weak_ptr<UVLoop> &loop, int flags)
+UVTcp::UVTcp(const std::weak_ptr<UVLoop>& loop, int flags)
     : UVStream(loop, flags), _timeoutTimer(NULL), _connected(false), _timeout(0)
 {
     if (loop.expired())
@@ -73,13 +76,13 @@ bool UVTcp::Init()
     if (NULL == loop)
         return false;
 
-    _handle = (uv_handle_t *)Allocator::Construct<uv_tcp_t>();
+    _handle = (uv_handle_t*)Allocator::Construct<uv_tcp_t>();
     if (NULL == _handle)
         return false;
 
     if (_handle != NULL)
     {
-        uv_tcp_init_ex(loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t *)_handle, _flags);
+        uv_tcp_init_ex(loop->GetRawLoop<uv_loop_t>(), (uv_tcp_t*)_handle, _flags);
         uv_handle_set_data(_handle, olddata);
     }
 
@@ -101,18 +104,18 @@ void UVTcp::KeepAlive(bool v, unsigned int delay)
     uv_tcp_keepalive(GetHandle<uv_tcp_t>(), v, delay);
 }
 
-bool UVTcp::Bind(const std::string &ip, int port, unsigned int flags)
+bool UVTcp::Bind(const std::string& ip, int port, unsigned int flags)
 {
     _connector = false;
     return UVIODevice::Bind(GetHandle<uv_handle_t>(), ip, port, flags);
 }
 
-void UVTcp::OnAccept(std::weak_ptr<UVHandle> &client)
+void UVTcp::OnAccept(std::weak_ptr<UVHandle>& client)
 {
     DEBUG("\n");
 }
 
-bool UVTcp::StartConnect(const std::string &ip, int port, int timeout)
+bool UVTcp::StartConnect(const std::string& ip, int port, int timeout)
 {
     DEBUG("\n");
     _connector = true;
@@ -152,7 +155,7 @@ void UVTcp::StartReconnectTimer()
 {
     if (NULL == _timeoutTimer && _timeout > 0)
     {
-        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer, UVLoop>(GetLoop(), shared_from_this());
+        _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), shared_from_this());
         if (_timeoutTimer != NULL)
             _timeoutTimer->Start(_timeout, _timeout);
     }
@@ -169,18 +172,19 @@ void UVTcp::StopReconnectTimer()
 
 void UVTcp::OnError(int status)
 {
+    OnErrorAction(status);
 }
 
 bool UVTcp::OnErrorAction(int status)
 {
-    DEBUG("status :%d need reconnect: %d\n", status, _timeout>0);
+    DEBUG("status :%d need reconnect: %d\n", status, _timeout > 0);
     _connected = false;
 
     if (IsConnector() && _timeout > 0)
     {
         if (NULL == _timeoutTimer)
         {
-            _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer>(GetLoop(), shared_from_this());
+            _timeoutTimer = UVTcpConnectTimeoutTimer::Create<UVTcpConnectTimeoutTimer, UVLoop>(GetLoop(), shared_from_this());
             if (_timeoutTimer != NULL)
                 _timeoutTimer->Start(_timeout, _timeout);
         }
@@ -224,7 +228,7 @@ void UVTcp::OnConnectedAction()
     DEBUG("%s Connected To %s\n", LocalAddress().ToString().c_str(), RemoteAddress().ToString().c_str());
 }
 
-void UVTcp::OnRead(void *data, int nread)
+void UVTcp::OnRead(void* data, int nread)
 {
     DEBUG("RECV FROM %s nread: %d\n", RemoteAddress().ToString().c_str(), nread)
     if (nread < 0)
@@ -234,7 +238,7 @@ void UVTcp::OnRead(void *data, int nread)
     }
 }
 
-void UVTcp::OnAccepted(std::weak_ptr<UVHandle> &server)
+void UVTcp::OnAccepted(std::weak_ptr<UVHandle>& server)
 {
     DEBUG("%s => %s\n", RemoteAddress().ToString().c_str(), LocalAddress().ToString().c_str());
 }

@@ -15,10 +15,10 @@ public:
     UV_CREATE_HANDLE(UVTty)
 
 public:
-    explicit UVTty(const std::weak_ptr<UVLoop> &loop, int fd, bool readable = true, int flag = 0);
+    explicit UVTty(const std::weak_ptr<UVLoop>& loop, int fd, bool readable = true, int flag = 0);
     ~UVTty();
 
-    void OnRead(void *data, int nread) OVERRIDE;
+    void OnRead(void* data, int nread) OVERRIDE;
     void OnClosed() OVERRIDE;
     void OnShutdown();
 };

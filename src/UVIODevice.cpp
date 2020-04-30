@@ -7,10 +7,10 @@
 namespace XSpace
 {
 
-static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+static void __OnRead(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf)
 {
     INFO("@%p len: %lu buf->len: %lu\n", buf, nread, buf->len);
-    UVData *uvdata = (UVData *)stream->data;
+    UVData* uvdata = (UVData*)stream->data;
     if (NULL == uvdata || NULL == uvdata->_self)
     {
         UVDataHelper::BufFree(buf);
@@ -35,9 +35,9 @@ static void __OnRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
     UVDataHelper::BufFree(buf);
 }
 
-static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, const struct sockaddr *addr, unsigned flags)
+static void __OnReadUDP(uv_udp_t* stream, ssize_t nread, const uv_buf_t* buf, const struct sockaddr* addr, unsigned flags)
 {
-    UVData *uvdata = (UVData *)stream->data;
+    UVData* uvdata = (UVData*)stream->data;
     if (NULL == uvdata)
     {
         UVDataHelper::BufFree(buf);
@@ -64,21 +64,21 @@ static void __OnReadUDP(uv_udp_t *stream, ssize_t nread, const uv_buf_t *buf, co
     UVDataHelper::BufFree(buf);
 }
 
-bool UVIODevice::Bind(uv_handle_t *handle, const std::string &ip, int port, unsigned int flags)
+bool UVIODevice::Bind(uv_handle_t* handle, const std::string& ip, int port, unsigned int flags)
 {
     if (NULL == handle)
         return false;
 
-    struct sockaddr *addr = NULL;
+    struct sockaddr* addr = NULL;
     if (_flags == AF_INET6)
     {
         uv_ip6_addr(ip.c_str(), port, &_addr6);
-        addr = (struct sockaddr *)&_addr6;
+        addr = (struct sockaddr*)&_addr6;
     }
     else
     {
         uv_ip4_addr(ip.c_str(), port, &_addr);
-        addr = (struct sockaddr *)&_addr;
+        addr = (struct sockaddr*)&_addr;
     }
 
     if (NULL == addr)
@@ -86,12 +86,12 @@ bool UVIODevice::Bind(uv_handle_t *handle, const std::string &ip, int port, unsi
 
     if (handle->type == UV_TCP)
     {
-        if (!uv_tcp_bind((uv_tcp_t *)handle, addr, flags))
+        if (!uv_tcp_bind((uv_tcp_t*)handle, addr, flags))
             return true;
     }
     else if (handle->type == UV_UDP)
     {
-        if (!uv_udp_bind((uv_udp_t *)handle, addr, flags))
+        if (!uv_udp_bind((uv_udp_t*)handle, addr, flags))
             return true;
     }
 
@@ -106,38 +106,38 @@ int UVIODevice::GetAf() const
 void UVIODevice::InitAddress()
 {
     DEBUG("\n");
-    struct sockaddr_in *addr = NULL;
+    struct sockaddr_in* addr = NULL;
 
     int len = sizeof(_addr);
     int af = GetAf();
 
     if (af == AF_INET6)
     {
-        addr = (struct sockaddr_in *)&_addr6;
+        addr = (struct sockaddr_in*)&_addr6;
         len = sizeof(_addr6);
     }
     else
-        addr = (struct sockaddr_in *)&_addr;
+        addr = (struct sockaddr_in*)&_addr;
 
     if (_handle->type == UV_TCP)
-        uv_tcp_getsockname(GetHandle<uv_tcp_t>(), (struct sockaddr *)addr, &len);
+        uv_tcp_getsockname(GetHandle<uv_tcp_t>(), (struct sockaddr*)addr, &len);
     else if (_handle->type == UV_UDP)
-        uv_udp_getsockname(GetHandle<uv_udp_t>(), (struct sockaddr *)addr, &len);
+        uv_udp_getsockname(GetHandle<uv_udp_t>(), (struct sockaddr*)addr, &len);
 
     len = sizeof(_addrPeer);
     if (af == AF_INET6)
     {
-        addr = (struct sockaddr_in *)&_addr6Peer;
+        addr = (struct sockaddr_in*)&_addr6Peer;
         len = sizeof(_addr6);
     }
     else
-        addr = (struct sockaddr_in *)&_addrPeer;
+        addr = (struct sockaddr_in*)&_addrPeer;
 
     if (_handle->type == UV_TCP)
-        uv_tcp_getpeername(GetHandle<uv_tcp_t>(), (struct sockaddr *)addr, &len);
+        uv_tcp_getpeername(GetHandle<uv_tcp_t>(), (struct sockaddr*)addr, &len);
     else if (_handle->type == UV_UDP)
-        uv_udp_getpeername(GetHandle<uv_udp_t>(), (struct sockaddr *)addr, &len);
-    
+        uv_udp_getpeername(GetHandle<uv_udp_t>(), (struct sockaddr*)addr, &len);
+
     GetAddress();
 }
 
@@ -147,16 +147,16 @@ void UVIODevice::GetAddress()
     GetAddress(1, _remote);
 }
 
-void UVIODevice::GetAddress(int type, NetAddress &address, const struct sockaddr *raddr) const
+void UVIODevice::GetAddress(int type, NetAddress& address, const struct sockaddr* raddr) const
 {
     char ip[128] = {
         0,
     };
 
-    const struct sockaddr_in *addr = NULL;
+    const struct sockaddr_in* addr = NULL;
     if (raddr != NULL)
     {
-        addr = (const struct sockaddr_in *)raddr;
+        addr = (const struct sockaddr_in*)raddr;
     }
     else
     {
@@ -164,20 +164,20 @@ void UVIODevice::GetAddress(int type, NetAddress &address, const struct sockaddr
         {
             addr = &_addr;
             if (addr->sin_family == AF_INET6)
-                addr = (const struct sockaddr_in *)&_addr6;
+                addr = (const struct sockaddr_in*)&_addr6;
         }
         else
         {
             addr = &_addrPeer;
             if (addr->sin_family == AF_INET6)
-                addr = (const struct sockaddr_in *)&_addr6Peer;
+                addr = (const struct sockaddr_in*)&_addr6Peer;
         }
     }
 
     if (addr->sin_family == AF_INET)
         uv_ip4_name(addr, ip, sizeof(ip));
     else if (_addr.sin_family == AF_INET6)
-        uv_ip6_name((const struct sockaddr_in6 *)addr, ip, sizeof(ip));
+        uv_ip6_name((const struct sockaddr_in6*)addr, ip, sizeof(ip));
 
     address.Ip = ip;
     address.Port = ntohs(addr->sin_port);
@@ -218,7 +218,7 @@ bool UVIODevice::StopRead()
     return false;
 }
 
-bool UVIODevice::Write(void *data, int nsize, std::weak_ptr<UVHandle> other, const struct sockaddr *addr)
+bool UVIODevice::Write(void* data, int nsize, std::weak_ptr<UVHandle> other, const struct sockaddr* addr)
 {
     if (NULL == _handle)
         return false;
@@ -231,7 +231,7 @@ bool UVIODevice::Write(void *data, int nsize, std::weak_ptr<UVHandle> other, con
     return false;
 }
 
-bool UVIODevice::Write(void *bufs[], int nbuf, std::weak_ptr<UVHandle> other, const struct sockaddr *addr)
+bool UVIODevice::Write(void* bufs[], int nbuf, std::weak_ptr<UVHandle> other, const struct sockaddr* addr)
 {
     if (NULL == _handle)
         return false;
@@ -244,12 +244,12 @@ bool UVIODevice::Write(void *bufs[], int nbuf, std::weak_ptr<UVHandle> other, co
     return false;
 }
 
-bool UVIODevice::TryWrite(void *data, int nsize, const struct sockaddr *addr)
+bool UVIODevice::TryWrite(void* data, int nsize, const struct sockaddr* addr)
 {
     if (NULL == _handle)
         return false;
 
-    uv_buf_t buf = uv_buf_init((char *)data, nsize);
+    uv_buf_t buf = uv_buf_init((char*)data, nsize);
     if (NULL == addr)
         return uv_try_write(GetHandle<uv_stream_t>(), &buf, 1) == 0;
     else if (_handle->type == UV_UDP)
@@ -258,7 +258,7 @@ bool UVIODevice::TryWrite(void *data, int nsize, const struct sockaddr *addr)
     return false;
 }
 
-bool UVIODevice::TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr)
+bool UVIODevice::TryWrite(void* bufs[], int nbuf, const struct sockaddr* addr)
 {
     if (NULL == _handle)
         return false;
@@ -266,15 +266,15 @@ bool UVIODevice::TryWrite(void *bufs[], int nbuf, const struct sockaddr *addr)
     if (nbuf <= 0 || NULL == bufs)
         return false;
 
-    uv_buf_t *uvbufs = (uv_buf_t *)Allocator::malloc(nbuf * sizeof(uv_buf_t));
+    uv_buf_t* uvbufs = (uv_buf_t*)Allocator::malloc(nbuf * sizeof(uv_buf_t));
     if (NULL == uvbufs)
         return false;
 
     for (int i = 0; i < nbuf; ++i)
     {
-        void *data = bufs[i];
-        int size = *(int *)data;
-        uvbufs[i] = uv_buf_init((char *)data + sizeof(size), size);
+        void* data = bufs[i];
+        int size = *(int*)data;
+        uvbufs[i] = uv_buf_init((char*)data + sizeof(size), size);
     }
 
     if (NULL == addr)

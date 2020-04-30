@@ -5,17 +5,17 @@
 namespace XSpace
 {
 
-void __OnConnected(uv_connect_t *req, int status)
+void __OnConnected(uv_connect_t* req, int status)
 {
     DEBUG("\n");
     if (NULL == req)
         return;
 
-    UVData *uvdata = (UVData *)uv_req_get_data((uv_req_t *)req);
+    UVData* uvdata = (UVData*)uv_req_get_data((uv_req_t*)req);
     if (NULL == uvdata)
         return;
 
-    UVReqConnect *uvreqconnect = uvdata->GetPtr<UVReqConnect>();
+    UVReqConnect* uvreqconnect = uvdata->GetPtr<UVReqConnect>();
     if (NULL == uvdata->_self)
         return;
 
@@ -27,10 +27,10 @@ void __OnConnected(uv_connect_t *req, int status)
         strong->reset();
 }
 
-UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle> &handle, const NetAddress &address)
+UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle>& handle, const NetAddress& address)
     : _handle(handle), _address(address)
 {
-    _req = (uv_req_t *)Allocator::malloc(sizeof(uv_connect_t));
+    _req = (uv_req_t*)Allocator::malloc(sizeof(uv_connect_t));
     if (_req != NULL)
     {
         uv_req_set_data(_req, NULL);
@@ -38,10 +38,10 @@ UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle> &handle, const NetAddre
     DEBUG("Object @%p\n", this);
 }
 
-UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle> &handle, const std::string &ip, int port)
+UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle>& handle, const std::string& ip, int port)
     : _handle(handle), _address(ip, port)
 {
-    _req = (uv_req_t *)Allocator::malloc(sizeof(uv_connect_t));
+    _req = (uv_req_t*)Allocator::malloc(sizeof(uv_connect_t));
     if (_req != NULL)
     {
         uv_req_set_data(_req, NULL);
@@ -60,9 +60,9 @@ bool UVReqConnect::Start()
         return false;
 
     auto handle = _handle.lock();
-    UVTcp *tcp = (UVTcp *)handle.get();
+    UVTcp* tcp = (UVTcp*)handle.get();
     int af = tcp->GetAf();
-    struct sockaddr *addr = NULL;
+    struct sockaddr* addr = NULL;
     union {
         struct sockaddr_in _addr;
         struct sockaddr_in6 _addr6;
@@ -71,12 +71,12 @@ bool UVReqConnect::Start()
     if (af == AF_INET6)
     {
         uv_ip6_addr(_address.Ip.c_str(), _address.Port, &_addr6);
-        addr = (struct sockaddr *)&_addr6;
+        addr = (struct sockaddr*)&_addr6;
     }
     else
     {
         uv_ip4_addr(_address.Ip.c_str(), _address.Port, &_addr);
-        addr = (struct sockaddr *)&_addr;
+        addr = (struct sockaddr*)&_addr;
     }
 
     if (NULL == addr)
@@ -91,7 +91,7 @@ void UVReqConnect::OnReq(int status)
     if (!_handle.expired())
     {
         auto handle = _handle.lock();
-        UVTcp *t = (UVTcp *)handle.get();
+        UVTcp* t = (UVTcp*)handle.get();
         if (status == 0)
         {
             t->OnConnectedAction();

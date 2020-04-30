@@ -6,7 +6,7 @@
 namespace XSpace
 {
 
-NetSliceStream::NetSliceStream(const std::weak_ptr<UVLoop> &loop, int flags)
+NetSliceStream::NetSliceStream(const std::weak_ptr<UVLoop>& loop, int flags)
     : UVTcp(loop, flags), _readBroken(false), _readBrokenBuffer(0), _writeSlice(0), _writeSliceLength(0)
 {
     DEBUG("Object @%p\n", this);
@@ -24,7 +24,7 @@ std::shared_ptr<UVHandle> NetSliceStream::OnNewConnection()
 
 void NetSliceStream::PushSlice(Slice* slice)
 {
-    DEBUG("LEN: %d => %s\n", slice->BodyLength(), (char *)slice->Body());
+    DEBUG("LEN: %d => %s\n", slice->BodyLength(), (char*)slice->Body());
 }
 
 void NetSliceStream::ClearReadBrokenBuffer()
@@ -49,7 +49,7 @@ void NetSliceStream::ClearReadBroken()
     _readBroken = false;
 }
 
-MemStream *NetSliceStream::GetSpliceBuffer(int nread)
+MemStream* NetSliceStream::GetSpliceBuffer(int nread)
 {
     // 之前有不完整的包，空间够用
     if (_readBrokenBufferStream != NULL && _readBrokenBufferStream->WriteSize() >= nread)
@@ -74,7 +74,7 @@ MemStream *NetSliceStream::GetSpliceBuffer(int nread)
     // 之前有不完整的包，空间不够用，重新分配足够的空间
     if (_readBrokenBuffer != NULL)
     {
-        void *readBrokenBuf = Allocator::malloc(size);
+        void* readBrokenBuf = Allocator::malloc(size);
         if (NULL == readBrokenBuf)
         {
             ClearReadBroken();
@@ -82,7 +82,7 @@ MemStream *NetSliceStream::GetSpliceBuffer(int nread)
         }
 
         memcpy(readBrokenBuf, _readBrokenBufferStream->C_ReadPos(), alreadyRead);
-        MemStream *readBufStream = Allocator::Construct<MemStream>((unsigned char *)readBrokenBuf, size, alreadyRead);
+        MemStream* readBufStream = Allocator::Construct<MemStream>((unsigned char*)readBrokenBuf, size, alreadyRead);
         if (NULL == readBufStream)
         {
             Allocator::free(readBrokenBuf);
@@ -106,7 +106,7 @@ MemStream *NetSliceStream::GetSpliceBuffer(int nread)
             return NULL;
         }
 
-        _readBrokenBufferStream = Allocator::Construct<MemStream>((unsigned char *)_readBrokenBuffer, size);
+        _readBrokenBufferStream = Allocator::Construct<MemStream>((unsigned char*)_readBrokenBuffer, size);
         if (NULL == _readBrokenBufferStream)
         {
             ClearReadBroken();
@@ -123,7 +123,7 @@ bool NetSliceStream::HasSpliceSlice() const
 {
     if (_readBrokenBuffer != NULL)
     {
-        Slice *slice = (Slice *)_readBrokenBufferStream->C_ReadPos();
+        Slice* slice = (Slice*)_readBrokenBufferStream->C_ReadPos();
         if (slice->Length > 0 && slice->Length <= _readBrokenBufferStream->ReadSize())
             return true;
     }
@@ -132,18 +132,18 @@ bool NetSliceStream::HasSpliceSlice() const
 }
 
 // 这个slice参数所指向的内容也不允许修改
-Slice *NetSliceStream::DealFlags(_NOMODIFY Slice *slice)
+Slice* NetSliceStream::DealFlags(_NOMODIFY Slice* slice)
 {
     DEBUG("LEN(flags:%x): %d => %s\n", slice->Flags, slice->Length, slice->Body());
     // TODO: 需要对应解压和加密选项的处理
     return slice;
 }
 
-void NetSliceStream::OnRead(void *data, int nread)
+void NetSliceStream::OnRead(void* data, int nread)
 {
     DEBUG("RECV: %d\n", nread);
-    MemStream ms((unsigned char *)data, nread, nread);
-    MemStream *pms = &ms;
+    MemStream ms((unsigned char*)data, nread, nread);
+    MemStream* pms = &ms;
     while (pms != NULL && pms->ReadSize())
     {
         // 一个新包开始
@@ -152,7 +152,7 @@ void NetSliceStream::OnRead(void *data, int nread)
             // 解出收到的数据包里所有的完整包
             while (pms->ReadSize())
             {
-                Slice *slice = (Slice *)pms->C_ReadPos();
+                Slice* slice = (Slice*)pms->C_ReadPos();
                 // 有包头不完整的包
                 if (pms->ReadSize() < slice->HeadLength())
                     break;
@@ -161,7 +161,7 @@ void NetSliceStream::OnRead(void *data, int nread)
                 if (slice->Length > pms->ReadSize())
                     break;
 
-                Slice *realslice = DealFlags(slice);
+                Slice* realslice = DealFlags(slice);
                 PushSlice(realslice);
                 pms->ReadFlipSilence(slice->Length);
             }
@@ -197,7 +197,7 @@ void NetSliceStream::OnRead(void *data, int nread)
     }
 }
 
-bool NetSliceStream::Write(void *data, int nsize)
+bool NetSliceStream::Write(void* data, int nsize)
 {
     int size = WRITE_BUFFER_SIZE_MAX;
     int total = nsize + sizeof(*_writeSlice);
@@ -207,7 +207,7 @@ bool NetSliceStream::Write(void *data, int nsize)
     if (size > WRITE_BUFFER_SIZE_MAX)
         return false;
 
-    _writeSlice = (Slice *)Allocator::malloc(size);
+    _writeSlice = (Slice*)Allocator::malloc(size);
     if (NULL == _writeSlice)
         return false;
 
@@ -215,7 +215,7 @@ bool NetSliceStream::Write(void *data, int nsize)
     memcpy(_writeSlice->Body(), data, nsize);
     // TODO: flags
 
-    if (!UVTcp::Write((void *)_writeSlice, total))
+    if (!UVTcp::Write((void*)_writeSlice, total))
     {
         Allocator::free(_writeSlice);
         _writeSlice = NULL;
@@ -227,9 +227,9 @@ bool NetSliceStream::Write(void *data, int nsize)
     return true;
 }
 
-bool NetSliceStream::WriteSlice(Slice *slice)
+bool NetSliceStream::WriteSlice(Slice* slice)
 {
-    return Write((void *)slice, slice->Length);
+    return Write((void*)slice, slice->Length);
 }
 
 #if 0

@@ -6,22 +6,22 @@
 namespace XSpace
 {
 
-void __OnShutdown(uv_shutdown_t *req, int status)
+void __OnShutdown(uv_shutdown_t* req, int status)
 {
-    UVData *uvdata = (UVData *)uv_req_get_data((uv_req_t *)req);
+    UVData* uvdata = (UVData*)uv_req_get_data((uv_req_t*)req);
     if (NULL == uvdata)
         return;
 
-    UVReqShutdown *uvreqshutdown = uvdata->GetPtr<UVReqShutdown>();
+    UVReqShutdown* uvreqshutdown = uvdata->GetPtr<UVReqShutdown>();
     if (NULL == uvreqshutdown)
         return;
 
     uvreqshutdown->OnReq(status);
 }
 
-UVReqShutdown::UVReqShutdown(const std::weak_ptr<UVHandle> &handle)
+UVReqShutdown::UVReqShutdown(const std::weak_ptr<UVHandle>& handle)
 {
-    _req = (uv_req_t *)Allocator::malloc(sizeof(uv_shutdown_t));
+    _req = (uv_req_t*)Allocator::malloc(sizeof(uv_shutdown_t));
     if (_req != NULL)
     {
         uv_req_set_data(_req, NULL);

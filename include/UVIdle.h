@@ -16,6 +16,7 @@ public:
     UV_CREATE_HANDLE(UVIdle)
 
 public:
+    UVIdle(const std::weak_ptr<UVLoop>& loop);
     virtual ~UVIdle();
 
     bool Start();
@@ -23,9 +24,6 @@ public:
 
     void OnClosed() OVERRIDE;
     virtual void OnIdle();
-
-protected:
-    UVIdle(const std::weak_ptr<UVLoop> &loop);
 };
 
 } // namespace XSpace

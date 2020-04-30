@@ -5,20 +5,20 @@
 namespace XSpace
 {
 
-static void __OnClosed(uv_handle_t *handle)
+static void __OnClosed(uv_handle_t* handle)
 {
     DEBUG("Free @%p\n", handle);
-    UVData *uvdata = (UVData *)handle->data;
+    UVData* uvdata = (UVData*)handle->data;
     if (NULL == uvdata)
         std::cout << "@" << handle << " 's owner has released already." << std::endl;
 
-    UVHandle *h = uvdata->GetPtr<UVHandle>();
+    UVHandle* h = uvdata->GetPtr<UVHandle>();
     if (NULL == h)
         return;
     h->OnClosed();
 }
 
-UVHandle::UVHandle(const std::weak_ptr<UVLoop> &loop) : _loop(loop), _handle(NULL)
+UVHandle::UVHandle(const std::weak_ptr<UVLoop>& loop) : _loop(loop), _handle(NULL)
 {
     DEBUG("Object @%p\n", this);
 }
@@ -35,12 +35,12 @@ UVHandle::~UVHandle()
     DEBUG("Object @%p\n", this);
 }
 
-void UVHandle::SetData(void *data, bool force, bool strong)
+void UVHandle::SetData(void* data, bool force, bool strong)
 {
     UVDataHelper::SetData(this, _handle, data, force, strong);
 }
 
-const UVData *UVHandle::GetData() const
+const UVData* UVHandle::GetData() const
 {
     return UVDataHelper::GetData(_handle);
 }

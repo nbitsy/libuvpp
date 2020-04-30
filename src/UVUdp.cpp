@@ -6,15 +6,15 @@
 namespace XSpace
 {
 
-UVUdp::UVUdp(const std::weak_ptr<UVLoop> &loop, int flags) : UVIODevice(loop, flags)
+UVUdp::UVUdp(const std::weak_ptr<UVLoop>& loop, int flags) : UVIODevice(loop, flags)
 {
     if (_loop.expired())
         return;
 
-    _handle = (uv_handle_t *)Allocator::Construct<uv_udp_t>();
+    _handle = (uv_handle_t*)Allocator::Construct<uv_udp_t>();
     if (_handle != NULL)
     {
-        uv_udp_init_ex(_loop.lock()->GetRawLoop<uv_loop_t>(), (uv_udp_t *)_handle, flags);
+        uv_udp_init_ex(_loop.lock()->GetRawLoop<uv_loop_t>(), (uv_udp_t*)_handle, flags);
         uv_handle_set_data(_handle, NULL);
     }
     DEBUG("Object @%p\n", this);
@@ -25,20 +25,20 @@ UVUdp::~UVUdp()
     DEBUG("Object @%p\n", this);
 }
 
-bool UVUdp::Bind(const std::string &ip, int port, unsigned int flags)
+bool UVUdp::Bind(const std::string& ip, int port, unsigned int flags)
 {
     if (NULL == _handle)
         return false;
     return UVIODevice::Bind(GetHandle<uv_handle_t>(), ip, port, flags);
 }
 
-bool UVUdp::Connect(const std::string &ip, int port)
+bool UVUdp::Connect(const std::string& ip, int port)
 {
     if (NULL == _handle)
         return false;
 
     int af = GetAf();
-    struct sockaddr *addr = NULL;
+    struct sockaddr* addr = NULL;
     union {
         struct sockaddr_in _addr;
         struct sockaddr_in6 _addr6;
@@ -47,12 +47,12 @@ bool UVUdp::Connect(const std::string &ip, int port)
     if (af == AF_INET6)
     {
         uv_ip6_addr(ip.c_str(), port, &_addr6);
-        addr = (struct sockaddr *)&_addr6;
+        addr = (struct sockaddr*)&_addr6;
     }
     else
     {
         uv_ip4_addr(ip.c_str(), port, &_addr);
-        addr = (struct sockaddr *)&_addr;
+        addr = (struct sockaddr*)&_addr;
     }
 
     if (NULL == addr)
@@ -101,9 +101,9 @@ size_t UVUdp::SendQueueCount() const
 }
 
 // test
-void UVUdp::OnRead(void *data, int nread, const struct sockaddr *addr, unsigned int flags)
+void UVUdp::OnRead(void* data, int nread, const struct sockaddr* addr, unsigned int flags)
 {
-    ((char *)data)[nread - 1] = '\0';
+    ((char*)data)[nread - 1] = '\0';
     DEBUG("RECV: %s LEN: %d\n", data, nread);
 }
 

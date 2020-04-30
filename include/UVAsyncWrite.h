@@ -14,7 +14,7 @@ class UVIODevice;
 
 struct UVAsyncWriteData
 {
-    UVAsyncWriteData(void *data, int length, bool copy = true) : Data(NULL), Length(length)
+    UVAsyncWriteData(void* data, int length, bool copy = true) : Data(NULL), Length(length)
     {
         DEBUG("Object @%p\n", this);
         if (copy)
@@ -41,7 +41,7 @@ struct UVAsyncWriteData
             Allocator::free(Data);
     }
 
-    void *Data;
+    void* Data;
     int Length;
     bool Copyed;
 };
@@ -52,20 +52,18 @@ public:
     UV_CREATE_HANDLE(UVAsyncWrite)
 
 public:
+    UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice, bool sendSlice = false);
     ~UVAsyncWrite();
 
     void OnAsync() OVERRIDE;
-    void Append(void *data) OVERRIDE;
+    void Append(void* data) OVERRIDE;
 
-    void Send(void *data, int nwrite, bool copy = true);
-
-protected:
-    UVAsyncWrite(const std::weak_ptr<UVLoop> &loop, const std::weak_ptr<UVIODevice> &iodevice, bool sendSlice = false);
+    void Send(void* data, int nwrite, bool copy = true);
 
 private:
     // 一个异步写对象对应一个Handle
     std::weak_ptr<UVIODevice> _iodevice; // 对宿主的弱引用，宿主对我是强引用
-    SyncDeque<UVAsyncWriteData *> _queue;
+    SyncDeque<UVAsyncWriteData*> _queue;
     bool _sendSlice; // 发送的数据包是否加上Slice的包头
 };
 

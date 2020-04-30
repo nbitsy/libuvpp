@@ -16,12 +16,12 @@
 
 #define UV_CREATE_LOOP(TYPE)                                                                    \
     template <typename T = TYPE>                                                                \
-    static std::shared_ptr<TYPE> Create(const std::string &name, bool useDefault = false)       \
+    static std::shared_ptr<TYPE> Create(const std::string& name, bool useDefault = false)       \
     {                                                                                           \
         return CreateWeak<T>(name, useDefault);                                                 \
     }                                                                                           \
     template <typename T = TYPE>                                                                \
-    static std::shared_ptr<TYPE> CreateWeak(const std::string &name, bool useDefault = false)   \
+    static std::shared_ptr<TYPE> CreateWeak(const std::string& name, bool useDefault = false)   \
     {                                                                                           \
         if (is_subclass<TYPE, UVLoop>::value)                                                   \
         {                                                                                       \
@@ -35,7 +35,7 @@
         return NULL;                                                                            \
     }                                                                                           \
     template <typename T = TYPE>                                                                \
-    static std::shared_ptr<TYPE> CreateShared(const std::string &name, bool useDefault = false) \
+    static std::shared_ptr<TYPE> CreateShared(const std::string& name, bool useDefault = false) \
     {                                                                                           \
         if (is_subclass<TYPE, UVLoop>::value)                                                   \
         {                                                                                       \
@@ -66,8 +66,8 @@ public:
 public:
     virtual ~UVLoop();
 
-    void SetData(void *data, bool force = false, bool strong = false);
-    UVData *GetData() const;
+    void SetData(void* data, bool force = false, bool strong = false);
+    UVData* GetData() const;
     void ClearData();
 
     bool Start();
@@ -79,12 +79,12 @@ public:
 
     int RawFd() const;
     bool IsAlive() const;
-    inline const std::string &Name() const { return _name; }
+    inline const std::string& Name() const { return _name; }
 
     std::weak_ptr<UVLoop> GetLoop() { return shared_from_this(); }
 
     template <typename T>
-    T *GetRawLoop() { return reinterpret_cast<T *>(_loop); }
+    T* GetRawLoop() { return reinterpret_cast<T*>(_loop); }
 
     inline std::thread::id ThreadId() const { return _threadId; }
     inline void* FormatedThreadId() const { return FormatThreadId(_threadId); }
@@ -94,10 +94,10 @@ private:
     bool Run(uv_run_mode type);
 
 protected:
-    explicit UVLoop(const std::string &name);
+    explicit UVLoop(const std::string& name);
 
 protected:
-    uv_loop_t *_loop;
+    uv_loop_t* _loop;
     std::string _name;
     std::thread::id _threadId;
     bool _running;

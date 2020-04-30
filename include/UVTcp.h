@@ -18,20 +18,21 @@ public:
     UV_CREATE_HANDLE(UVTcp)
 
 public:
+    UVTcp(const std::weak_ptr<UVLoop>& loop, int flags = AF_UNSPEC);
     ~UVTcp();
 
-    bool Bind(const std::string &ip, int port, unsigned int flags = 0) OVERWRITE;
+    bool Bind(const std::string& ip, int port, unsigned int flags = 0) OVERWRITE;
 
     inline void SetNoDelay() { SetDelay(false); }
     void SetDelay(bool delay);
     void KeepAlive(bool v, unsigned int delay);
 
     // timeout : 断线重连间隔或连接超时
-    bool StartConnect(const std::string &ip, int port, int timeout = 0);
+    bool StartConnect(const std::string& ip, int port, int timeout = 0);
 
     std::shared_ptr<UVHandle> OnNewConnection() OVERRIDE;
-    void OnAccepted(std::weak_ptr<UVHandle> &server) OVERRIDE;
-    void OnAccept(std::weak_ptr<UVHandle> &client) OVERRIDE;
+    void OnAccepted(std::weak_ptr<UVHandle>& server) OVERRIDE;
+    void OnAccept(std::weak_ptr<UVHandle>& client) OVERRIDE;
 
     virtual void OnConnected();
     void OnError(int status) OVERRIDE;
@@ -43,15 +44,12 @@ public:
     inline bool IsServer() const { return !_connector; }
     inline bool NeedReconnect() const { return !IsConnected() && _timeout > 0; }
 
-    void OnRead(void *data, int nread) OVERRIDE;
+    void OnRead(void* data, int nread) OVERRIDE;
     void OnClosed() OVERRIDE;
     void OnShutdown() OVERRIDE;
 
     void OnConnectedAction();
     bool OnErrorAction(int status);
-
-protected:
-    UVTcp(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
 
 private:
     bool Init();

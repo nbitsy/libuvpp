@@ -15,8 +15,8 @@ public:
     UV_CREATE_REQ_SHARED(UVReqConnect)
 
 public:
-    UVReqConnect(const std::weak_ptr<UVHandle> &handle, const NetAddress &address);
-    UVReqConnect(const std::weak_ptr<UVHandle> &handle, const std::string &ip, int port);
+    UVReqConnect(const std::weak_ptr<UVHandle>& handle, const NetAddress& address);
+    UVReqConnect(const std::weak_ptr<UVHandle>& handle, const std::string& ip, int port);
     ~UVReqConnect();
 
     bool Start() OVERRIDE;

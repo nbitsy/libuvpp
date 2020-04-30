@@ -5,9 +5,9 @@
 namespace XSpace
 {
 
-static void __OnCheck(uv_check_t *handle)
+static void __OnCheck(uv_check_t* handle)
 {
-    UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)handle);
+    UVData* uvdata = (UVData*)uv_handle_get_data((uv_handle_t*)handle);
     if (NULL == uvdata)
         return;
 
@@ -16,20 +16,20 @@ static void __OnCheck(uv_check_t *handle)
         self->OnCheck();
 }
 
-UVCheck::UVCheck(const std::weak_ptr<UVLoop> &loop) : UVHandle(loop)
+UVCheck::UVCheck(const std::weak_ptr<UVLoop>& loop) : UVHandle(loop)
 {
-    _handle = (uv_handle_t *)Allocator::malloc(sizeof(uv_check_t)); // XXX: 频率很低所有直接使用Allocator::malloc
+    _handle = (uv_handle_t*)Allocator::malloc(sizeof(uv_check_t)); // XXX: 频率很低所有直接使用Allocator::malloc
     if (!_loop.expired() && _handle != NULL)
     {
-        uv_check_init(loop.lock()->GetRawLoop<uv_loop_t>(), (uv_check_t *)_handle);
+        uv_check_init(loop.lock()->GetRawLoop<uv_loop_t>(), (uv_check_t*)_handle);
         uv_handle_set_data(_handle, NULL);
     }
-    DEBUG("Object @%p => ", (void *)this);
+    DEBUG("Object @%p => ", (void*)this);
 }
 
 UVCheck::~UVCheck()
 {
-    DEBUG("Object @%p => ", (void *)this);
+    DEBUG("Object @%p => ", (void*)this);
 }
 
 bool UVCheck::Start()
@@ -37,7 +37,7 @@ bool UVCheck::Start()
     if (_loop.expired() || NULL == _handle)
         return false;
 
-    return !uv_check_start((uv_check_t *)_handle, __OnCheck);
+    return !uv_check_start((uv_check_t*)_handle, __OnCheck);
 }
 
 bool UVCheck::Stop()
@@ -45,7 +45,7 @@ bool UVCheck::Stop()
     if (_loop.expired() || NULL == _handle)
         return false;
 
-    return !uv_check_stop((uv_check_t *)_handle);
+    return !uv_check_stop((uv_check_t*)_handle);
 }
 
 void UVCheck::OnClosed()

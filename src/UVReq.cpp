@@ -13,12 +13,12 @@ UVReq::~UVReq()
 {
 }
 
-void UVReq::SetData(void *data, bool force, bool strong)
+void UVReq::SetData(void* data, bool force, bool strong)
 {
     UVDataHelper::SetData(this, _req, data, force, strong);
 }
 
-UVData *UVReq::GetData() const
+UVData* UVReq::GetData() const
 {
     return UVDataHelper::GetData(_req);
 }

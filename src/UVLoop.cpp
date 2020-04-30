@@ -15,12 +15,12 @@ std::weak_ptr<UVLoop> UVLoop::DefaultLoop()
     return gDefaultLoop;
 }
 
-UVLoop::UVLoop(const std::string &name)
+UVLoop::UVLoop(const std::string& name)
     : UVDataHelper(), _name(name), _loop(NULL), _running(false)
 {
     uv_replace_allocator(Allocator::malloc, Allocator::realloc, Allocator::calloc, Allocator::free);
 
-    _loop = (uv_loop_t *)Allocator::malloc(sizeof(*_loop));
+    _loop = (uv_loop_t*)Allocator::malloc(sizeof(*_loop));
     if (_loop != NULL)
     {
         uv_loop_init(_loop);
@@ -43,12 +43,12 @@ UVLoop::~UVLoop()
     }
 }
 
-void UVLoop::SetData(void *data, bool force, bool strong)
+void UVLoop::SetData(void* data, bool force, bool strong)
 {
     UVDataHelper::SetData(this, _loop, data, force, strong);
 }
 
-UVData *UVLoop::GetData() const
+UVData* UVLoop::GetData() const
 {
     return UVDataHelper::GetData(_loop);
 }

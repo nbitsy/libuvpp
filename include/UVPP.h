@@ -26,7 +26,7 @@
 namespace XSpace
 {
 
-inline const char *Version()
+inline const char* Version()
 {
     return uv_version_string();
 }

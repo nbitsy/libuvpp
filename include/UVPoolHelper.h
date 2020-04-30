@@ -14,24 +14,24 @@ public:
     UVPoolHelper() {}
     ~UVPoolHelper() {}
 
-    inline void *Malloc(size_t size)
+    inline void* Malloc(size_t size)
     {
         return Allocator::malloc(size);
     }
 
-    inline void Free(void *p)
+    inline void Free(void* p)
     {
         Allocator::free(p);
     }
 
     template <typename T, typename... U>
-    static T *Construct(U... args)
+    static T* Construct(U... args)
     {
         return Allocator::Construct<T>(args...);
     }
 
     template <typename T>
-    static void Destroy(T *p)
+    static void Destroy(T* p)
     {
         Allocator::Destroy<T>(p);
     }

@@ -34,24 +34,22 @@ public:
     UV_CREATE_HANDLE(NetSliceStream)
 
 public:
+    NetSliceStream(const std::weak_ptr<UVLoop>& loop, int flags = AF_UNSPEC);
     ~NetSliceStream();
 
     std::shared_ptr<UVHandle> OnNewConnection() OVERRIDE;
-    void OnRead(void *data, int nread) OVERRIDE;
+    void OnRead(void* data, int nread) OVERRIDE;
 
     // 收到一个完整的Slice
     virtual void PushSlice(Slice* slice);
     // 消息头部的标志位处理
-    virtual Slice *DealFlags(_NOMODIFY Slice *slice);
+    virtual Slice* DealFlags(_NOMODIFY Slice* slice);
     // 把data组装进一个Slice发送出去
-    bool Write(void *data, int nsize) OVERWRITE;
-    bool WriteSlice(Slice *slice);
-
-protected:
-    NetSliceStream(const std::weak_ptr<UVLoop> &loop, int flags = AF_UNSPEC);
+    bool Write(void* data, int nsize) OVERWRITE;
+    bool WriteSlice(Slice* slice);
 
 private:
-    MemStream *GetSpliceBuffer(int nread);
+    MemStream* GetSpliceBuffer(int nread);
     bool HasSpliceSlice() const;
     void ClearReadBrokenBuffer();
     void ClearReadBroken();
@@ -60,11 +58,11 @@ private:
     // 包不完整
     bool _readBroken;
     // 拼包时缓存，完整后释放，因为拼包的机会不多，不要占着资源
-    void *_readBrokenBuffer;
+    void* _readBrokenBuffer;
     // 用于控制拼包缓存
-    MemStream *_readBrokenBufferStream;
+    MemStream* _readBrokenBufferStream;
     // 用于发送消息的缓存
-    Slice *_writeSlice;
+    Slice* _writeSlice;
     // 发送缓存大小
     int _writeSliceLength;
 };

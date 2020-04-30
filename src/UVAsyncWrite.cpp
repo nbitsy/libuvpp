@@ -1,14 +1,14 @@
 
 
 #include "UVAsyncWrite.h"
+#include "NetSliceStream.h"
 #include "UVIODevice.h"
 #include "UVLoop.h"
-#include "NetSliceStream.h"
 
 namespace XSpace
 {
 
-UVAsyncWrite::UVAsyncWrite(const std::weak_ptr<UVLoop> &loop, const std::weak_ptr<UVIODevice> &iodevice, bool sendSlice)
+UVAsyncWrite::UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice, bool sendSlice)
     : UVAsync(loop), _iodevice(iodevice), _sendSlice(sendSlice)
 {
     DEBUG("Object @%p\n", this);
@@ -26,12 +26,12 @@ void UVAsyncWrite::OnAsync()
     if (_iodevice.expired())
         return;
 
-    SyncDeque<UVAsyncWriteData *> tmp;
+    SyncDeque<UVAsyncWriteData*> tmp;
     _queue.Swap(tmp);
 
-    auto &iodevice = _iodevice;
-    auto &sendSlice = _sendSlice;
-    tmp.ForEach([&iodevice, &sendSlice](UVAsyncWriteData *data) {
+    auto& iodevice = _iodevice;
+    auto& sendSlice = _sendSlice;
+    tmp.ForEach([&iodevice, &sendSlice](UVAsyncWriteData* data) {
         if (!iodevice.expired())
         {
             auto device = iodevice.lock().get();
@@ -45,20 +45,20 @@ void UVAsyncWrite::OnAsync()
     });
 }
 
-void UVAsyncWrite::Append(void *data)
+void UVAsyncWrite::Append(void* data)
 {
     if (NULL == data)
         return;
 
-    _queue.PushBack((UVAsyncWriteData *)data);
+    _queue.PushBack((UVAsyncWriteData*)data);
 }
 
-void UVAsyncWrite::Send(void *data, int nwrite, bool copy)
+void UVAsyncWrite::Send(void* data, int nwrite, bool copy)
 {
-    UVAsyncWriteData *uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy);
+    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy);
     if (NULL == uvasyncwritedata)
         return;
-    
+
     UVAsync::Send(uvasyncwritedata);
 }
 

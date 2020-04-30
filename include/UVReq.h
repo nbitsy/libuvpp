@@ -20,19 +20,19 @@ public:
     virtual ~UVReq();
 
     // strong 强引用加入loop调起后自动回收
-    void SetData(void *data, bool force = false, bool strong = true);
-    UVData *GetData() const;
+    void SetData(void* data, bool force = false, bool strong = true);
+    UVData* GetData() const;
 
     void ClearData();
 
     template <typename T>
-    inline T *GetReq() { return (T *)_req; }
+    inline T* GetReq() { return (T*)_req; }
 
     virtual bool Start() = 0;
     virtual void OnReq(int status) = 0;
 
 protected:
-    uv_req_t *_req;
+    uv_req_t* _req;
 };
 
 } // namespace XSpace

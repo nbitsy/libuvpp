@@ -16,6 +16,7 @@ public:
     UV_CREATE_HANDLE(UVCheck)
 
 public:
+    UVCheck(const std::weak_ptr<UVLoop>& loop);
     virtual ~UVCheck();
 
     bool Start();
@@ -23,9 +24,6 @@ public:
 
     void OnClosed() OVERRIDE;
     virtual void OnCheck();
-
-protected:
-    UVCheck(const std::weak_ptr<UVLoop> &loop);
 };
 
 } // namespace XSpace

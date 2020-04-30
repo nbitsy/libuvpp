@@ -54,7 +54,7 @@ public:
     TimeVal Raw() const;
     TimeVal Ticks() const;
     void Swap(Timestamp &other);
-    void Update(TimeDiff delay = 0);
+    void Update(TimeDiff delay = 0); // delay*1000*1000 = second
     UtcTimeVal ToUtcTime() const;
     std::time_t EpochTime() const;
 

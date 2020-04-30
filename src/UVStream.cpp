@@ -8,13 +8,13 @@
 namespace XSpace
 {
 
-static void __OnNewConnection(uv_stream_t *server, int status)
+static void __OnNewConnection(uv_stream_t* server, int status)
 {
-    UVData *uvdata = (UVData *)uv_handle_get_data((uv_handle_t *)server);
+    UVData* uvdata = (UVData*)uv_handle_get_data((uv_handle_t*)server);
     if (NULL == uvdata)
         return;
 
-    UVStream *uvstream = uvdata->GetPtr<UVStream>();
+    UVStream* uvstream = uvdata->GetPtr<UVStream>();
     if (NULL == uvstream)
         return;
 
@@ -29,7 +29,7 @@ static void __OnNewConnection(uv_stream_t *server, int status)
     uvstream->Accept(stream);
 }
 
-UVStream::UVStream(const std::weak_ptr<UVLoop> &loop, int flags, EUVStreamType type)
+UVStream::UVStream(const std::weak_ptr<UVLoop>& loop, int flags, EUVStreamType type)
     : UVIODevice(loop, flags), _type(type)
 {
     DEBUG("Object @%p\n", this);
@@ -55,7 +55,7 @@ bool UVStream::Listen(int backlog)
     return true;
 }
 
-bool UVStream::Accept(std::weak_ptr<UVHandle> &client)
+bool UVStream::Accept(std::weak_ptr<UVHandle>& client)
 {
     if (NULL == _handle || client.expired())
         return false;
@@ -67,7 +67,7 @@ bool UVStream::Accept(std::weak_ptr<UVHandle> &client)
     if (uv_accept(GetHandle<uv_stream_t>(), c->GetHandle<uv_stream_t>()))
         return false;
 
-    UVStream *stream = (UVStream *)c.get();
+    UVStream* stream = (UVStream*)c.get();
     if (_type & EUVS_READ)
         stream->StartRead();
 

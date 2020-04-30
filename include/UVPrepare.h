@@ -16,7 +16,7 @@ public:
     UV_CREATE_HANDLE(UVPrepare)
 
 public:
-    UVPrepare(const std::weak_ptr<UVLoop> &loop);
+    UVPrepare(const std::weak_ptr<UVLoop>& loop);
     virtual ~UVPrepare();
 
     bool Start();

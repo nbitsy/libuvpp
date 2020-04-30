@@ -17,7 +17,9 @@ public:
     UV_CREATE_HANDLE(UVTimer)
 
 public:
+    UVTimer(const std::weak_ptr<UVLoop>& loop, long long ticks = -1);
     virtual ~UVTimer();
+
     // interval 下一次的回调的间隔时间,ms
     // timeout 第一次开始时的延迟时间
     // repeat 几个tick之后停止
@@ -30,10 +32,7 @@ public:
 
     void OnClosed() OVERRIDE;
 
-    virtual bool Ticking(const Timestamp *now);
-
-protected:
-    UVTimer(const std::weak_ptr<UVLoop> &loop, long long ticks = -1);
+    virtual bool Ticking(const Timestamp* now);
 
 public:
     long long Ticks;

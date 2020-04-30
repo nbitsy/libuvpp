@@ -5,8 +5,8 @@
 #include <memory>
 
 #include "Config.h"
-#include "UVDataHelper.h"
 #include "TypeTraits.h"
+#include "UVDataHelper.h"
 #include "uv.h"
 
 namespace XSpace
@@ -20,16 +20,16 @@ public:
     DRIVED_FROM_THIS(UVHandle);
 
 public:
-    UVHandle(const std::weak_ptr<UVLoop> &loop);
+    UVHandle(const std::weak_ptr<UVLoop>& loop);
     virtual ~UVHandle();
 
-    void SetData(void *data, bool force = false, bool strong = false);
-    const UVData *GetData() const;
+    void SetData(void* data, bool force = false, bool strong = false);
+    const UVData* GetData() const;
     void ClearData();
 
-    std::weak_ptr<UVLoop> &GetLoop() { return _loop; }
+    const std::weak_ptr<UVLoop>& GetLoop() const { return _loop; }
     template <typename T>
-    inline T *GetHandle() const { return reinterpret_cast<T *>(_handle); }
+    inline T* GetHandle() const { return reinterpret_cast<T*>(_handle); }
 
     bool IsActive() const;
     bool IsClosing() const;
@@ -47,7 +47,7 @@ public:
 
 protected:
     std::weak_ptr<UVLoop> _loop;
-    uv_handle_t *_handle;
+    uv_handle_t* _handle;
 };
 
 } // namespace XSpace
