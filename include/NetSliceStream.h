@@ -25,9 +25,9 @@ public:
     static const int WRITE_BUFFER_SIZE_MAX = 1024;
 #else
     static const int READ_BUFFER_SIZE = 64 * 1024;
-    static const int READ_BUFFER_SIZE_MAX = 256 * 1024;
+    static const int READ_BUFFER_SIZE_MAX = 128 * 1024;
     static const int WIRTE_BUFFER_SIZE = 64 * 1024;
-    static const int WRITE_BUFFER_SIZE_MAX = 256 * 1024;
+    static const int WRITE_BUFFER_SIZE_MAX = 128 * 1024;
 #endif
 
 public:
@@ -45,8 +45,12 @@ public:
     // 消息头部的标志位处理
     virtual Slice* DealFlags(_NOMODIFY Slice* slice);
     // 把data组装进一个Slice发送出去
-    bool Write(void* data, int nsize) OVERWRITE;
+    bool Write(void* data, int nsize,
+               unsigned int MsgID = 0, unsigned char FwdType = 0,
+               unsigned int FwdTarget = 0, unsigned int Target = 0) OVERWRITE;
     bool WriteSlice(Slice* slice);
+    Slice* MakeSlice(int nsize, _OUT int& total);
+    void ReleaseSlice(Slice* slice);
 
 private:
     MemStream* GetSpliceBuffer(int nread);

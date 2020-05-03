@@ -197,49 +197,58 @@ void NetSliceStream::OnRead(void* data, int nread)
     }
 }
 
-bool NetSliceStream::Write(void* data, int nsize)
+Slice* NetSliceStream::MakeSlice(int nsize, _OUT int& total)
 {
-    int size = WRITE_BUFFER_SIZE_MAX;
-    int total = nsize + sizeof(*_writeSlice);
+    Slice* writeSlice = NULL;
+    int size = READ_BUFFER_SIZE;
+    total = nsize + sizeof(*writeSlice);
+
     while (size < total)
         size <<= 1;
 
     if (size > WRITE_BUFFER_SIZE_MAX)
-        return false;
+        return NULL;
 
-    _writeSlice = (Slice*)Allocator::malloc(size);
+    writeSlice = (Slice*)Allocator::malloc(size);
+    if (NULL == _writeSlice)
+        return NULL;
+
+    return writeSlice;
+}
+
+void NetSliceStream::ReleaseSlice(Slice* slice)
+{
+    Allocator::free(slice);
+}
+
+bool NetSliceStream::Write(void* data, int nsize,
+                           unsigned int MsgID, unsigned char FwdType,
+                           unsigned int FwdTarget, unsigned int Target)
+{
+    int total = 0;
+    _writeSlice = MakeSlice(nsize, total);
     if (NULL == _writeSlice)
         return false;
 
     _writeSlice->Length = nsize + sizeof(*_writeSlice);
     memcpy(_writeSlice->Body(), data, nsize);
-    // TODO: flags
+    // XXX: flags???
 
-    if (!UVTcp::Write((void*)_writeSlice, total))
-    {
-        Allocator::free(_writeSlice);
-        _writeSlice = NULL;
-        return false;
-    }
+    _writeSlice->MsgID = MsgID;
+    _writeSlice->FwdType = FwdType;
+    _writeSlice->FwdTarget = FwdTarget;
+    _writeSlice->Target = Target;
 
-    Allocator::free(_writeSlice);
+    bool ret = UVTcp::Write((void*)_writeSlice, total);
+    ReleaseSlice(_writeSlice);
     _writeSlice = NULL;
-    return true;
+    return ret;
 }
 
 bool NetSliceStream::WriteSlice(Slice* slice)
 {
     return Write((void*)slice, slice->Length);
 }
-
-#if 0
-void NetSliceStream::Release()
-{
-    DEBUG("\n");
-    ClearReadBroken();
-    UVTcp::Release();
-}
-#endif
 
 } // namespace XSpace
 
