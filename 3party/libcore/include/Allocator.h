@@ -15,6 +15,14 @@ typedef TCAllocator Allocator;
 #else
 typedef StdAllocator Allocator;
 #endif
+
+template <typename T>
+struct Deleter
+{
+    inline void operator()(T* i) { Allocator::Destroy(i); }
+    inline void operator()(const T* i) { Allocator::Destroy(i); }
+};
+
 } // namespace XSpace
 
 #endif // _ALLOCATOR_H_

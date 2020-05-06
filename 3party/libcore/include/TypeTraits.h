@@ -13,7 +13,7 @@ struct remove_pointer
     typedef T type;
 };
 template <typename T>
-struct remove_pointer<T *>
+struct remove_pointer<T*>
 {
     typedef T type;
 };
@@ -35,7 +35,7 @@ struct remove_pointer_const
     typedef T type;
 };
 template <typename T>
-struct remove_pointer_const<const T *>
+struct remove_pointer_const<const T*>
 {
     typedef T type;
 };
@@ -57,12 +57,12 @@ struct remove_reference
     typedef T type;
 };
 template <typename T>
-struct remove_reference<T &>
+struct remove_reference<T&>
 {
     typedef T type;
 };
 template <typename T>
-struct remove_reference<const T &>
+struct remove_reference<const T&>
 {
     typedef T type;
 };
@@ -688,7 +688,7 @@ struct is_str
     };
 };
 template <>
-struct is_str<char *>
+struct is_str<char*>
 {
     enum
     {
@@ -696,7 +696,7 @@ struct is_str<char *>
     };
 };
 template <>
-struct is_str<const char *>
+struct is_str<const char*>
 {
     enum
     {
@@ -733,7 +733,7 @@ template <typename T>
 struct is_const_pointer
 {
     template <typename U>
-    static true_t is_const_pointer_tester(void (*)(const U *));
+    static true_t is_const_pointer_tester(void (*)(const U*));
     static false_t is_const_pointer_tester(...);
 
     enum
@@ -746,7 +746,7 @@ template <typename T>
 struct is_pointer
 {
     template <typename U>
-    static true_t is_pointer_tester(U *);
+    static true_t is_pointer_tester(U*);
     static false_t is_pointer_tester(...);
 
     enum
@@ -761,8 +761,8 @@ struct is_const
     enum
     {
         value = (is_pointer<T>::value &&
-                 is_const_pointer<typename remove_pointer<T>::type *>::value) ||
-                is_const_pointer<T *>::value
+                 is_const_pointer<typename remove_pointer<T>::type*>::value) ||
+                is_const_pointer<T*>::value
     };
 };
 
@@ -809,13 +809,13 @@ struct is_same_type
 template <typename T, typename U>
 struct is_drived_from
 {
-    static true_t is_drived_from_tester(U *u);
-    static true_t is_drived_from_tester(const U *u);
+    static true_t is_drived_from_tester(U* u);
+    static true_t is_drived_from_tester(const U* u);
     static false_t is_drived_from_tester(...);
 
     enum
     {
-        value = (sizeof(true_t) == sizeof(is_drived_from_tester((T *)0)))
+        value = (sizeof(true_t) == sizeof(is_drived_from_tester((T*)0)))
     };
 };
 
@@ -843,7 +843,7 @@ inline TO nasty_cast(FROM f)
 #define SHARED_FROM_THIS_()                    \
     {                                          \
         auto _this = this->shared_from_this(); \
-        D *p = (D *)_this.get();               \
+        D* p = (D*)_this.get();                \
         return std::shared_ptr<D>(_this, p);   \
     }
 

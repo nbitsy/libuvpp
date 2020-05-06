@@ -25,7 +25,7 @@
     {                                                                                           \
         if (is_subclass<TYPE, UVLoop>::value)                                                   \
         {                                                                                       \
-            std::shared_ptr<TYPE> ptr(new TYPE(name));                                          \
+            std::shared_ptr<TYPE> ptr(Allocator::Construct<TYPE>(name), Deleter<TYPE>());       \
             if (ptr != NULL)                                                                    \
                 ptr->SetData(NULL, true, false);                                                \
                                                                                                 \
@@ -39,7 +39,7 @@
     {                                                                                           \
         if (is_subclass<TYPE, UVLoop>::value)                                                   \
         {                                                                                       \
-            std::shared_ptr<TYPE> ptr(new TYPE(name));                                          \
+            std::shared_ptr<TYPE> ptr(Allocator::Construct<TYPE>(name), Deleter<TYPE>());       \
             if (ptr != NULL)                                                                    \
                 ptr->SetData(NULL, true, true);                                                 \
                                                                                                 \

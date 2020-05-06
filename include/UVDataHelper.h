@@ -12,45 +12,25 @@
 namespace XSpace
 {
 
-template <typename T>
-struct Deleter
-{
-    inline void operator()(T* i) { Allocator::Destroy(i); }
-};
-
 // TODO: 如果在创建的时候有更多的定制性需求，需要考虑把SetData独立出来
 // XXX: 所有Handle和UVLoop都是弱引用的，外部需要强引用管理，而Req一般都是弱引用的，OnReq后需要回收
 // XXX: 所有继承自UVHandle的类需要提供以loop为第一参数的构造函数
-// XXX: 所有创建的对象都是通过new出来的，回收的时候通过shared_ptr的deleter进行回收，关于内存的管理
-//      目前的解决方案是重载new和delete，最终会调用到Allocator来进行内存的分配和回收
-#define UV_CREATE_HANDLE(TYPE)                                                                  \
+#define UV_CREATE_HANDLE_CREATE(TYPE)                                                   \
+    template <typename T = TYPE, typename L = UVLoop, typename... U>                    \
+    inline static std::shared_ptr<TYPE> Create(const std::weak_ptr<L>& loop, U... args) \
+    {                                                                                   \
+        return CreateWeak<T, L, U...>(loop, args...);                                   \
+    }
+
+#define UV_CREATE_HANDLE_(TYPE, SHARED, WEAK)                                                   \
     template <typename T = TYPE, typename L = UVLoop, typename... U>                            \
-    inline static std::shared_ptr<TYPE> Create(const std::weak_ptr<L>& loop, U... args)         \
-    {                                                                                           \
-        return CreateWeak<T, L, U...>(loop, args...);                                           \
-    }                                                                                           \
-    template <typename T = TYPE, typename L = UVLoop, typename... U>                            \
-    static std::shared_ptr<TYPE> CreateWeak(const std::weak_ptr<L>& loop, U... args)            \
-    {                                                                                           \
-        if (is_subclass<T, TYPE>::value)                                                        \
-        {                                                                                       \
-            std::shared_ptr<TYPE> ptr(Allocator::Construct<T>(loop, args...), Deleter<TYPE>()); \
-            if (ptr != NULL)                                                                    \
-                ptr->SetData(NULL, true, false);                                                \
-                                                                                                \
-            return ptr;                                                                         \
-        }                                                                                       \
-                                                                                                \
-        return NULL;                                                                            \
-    }                                                                                           \
-    template <typename T = TYPE, typename L = UVLoop, typename... U>                            \
-    static std::shared_ptr<TYPE> CreateShared(const std::weak_ptr<L>& loop, U... args)          \
+    static std::shared_ptr<TYPE> Create##WEAK(const std::weak_ptr<L>& loop, U... args)          \
     {                                                                                           \
         if (is_subclass<T, TYPE>::value)                                                        \
         {                                                                                       \
             std::shared_ptr<TYPE> ptr(Allocator::Construct<T>(loop, args...), Deleter<TYPE>()); \
             if (ptr != NULL)                                                                    \
-                ptr->SetData(NULL, true, true);                                                 \
+                ptr->SetData(NULL, true, SHARED);                                               \
                                                                                                 \
             return ptr;                                                                         \
         }                                                                                       \
@@ -73,6 +53,14 @@ struct Deleter
                                                                                           \
         return NULL;                                                                      \
     }
+
+#define UV_CREATE_HANDLE_WEAK(TYPE)   UV_CREATE_HANDLE_(TYPE, false, Weak)
+#define UV_CREATE_HANDLE_SHARED(TYPE) UV_CREATE_HANDLE_(TYPE, true, Shared)
+
+#define UV_CREATE_HANDLE(TYPE)    \
+    UV_CREATE_HANDLE_CREATE(TYPE) \
+    UV_CREATE_HANDLE_WEAK(TYPE)   \
+    UV_CREATE_HANDLE_SHARED(TYPE)
 
 #define UV_CREATE_REQ_WEAK(TYPE)   UV_CREATE_REQ(TYPE, false)
 #define UV_CREATE_REQ_SHARED(TYPE) UV_CREATE_REQ(TYPE, true)
@@ -110,7 +98,7 @@ struct UVData
     }
 
     template <typename T>
-    inline T* GetPtr()
+    T* GetPtr()
     {
         T* t = NULL;
         if (_strong)

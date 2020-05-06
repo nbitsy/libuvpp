@@ -45,7 +45,7 @@ struct Slice
 
     inline int SliceLength() const { return Length; }
     inline int HeadLength() const { return sizeof(Slice); }
-    inline void *Body() { return &End[0]; }
+    inline void* Body() { return &End[0]; }
     inline int BodyLength() const { return Length >= sizeof(Slice) ? Length - sizeof(Slice) : 0; }
 
     inline void SetFwd(bool v) { SLICE_FLAG_SET(FWD, v); }
