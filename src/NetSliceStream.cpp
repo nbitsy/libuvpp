@@ -29,7 +29,6 @@ void NetSliceStream::PushSlice(Slice* slice)
 
 void NetSliceStream::ClearReadBrokenBuffer()
 {
-    DEBUG("\n");
     if (_readBrokenBuffer != NULL)
     {
         Allocator::free(_readBrokenBuffer);
@@ -210,7 +209,7 @@ Slice* NetSliceStream::MakeSlice(int nsize, _OUT int& total)
         return NULL;
 
     writeSlice = (Slice*)Allocator::malloc(size);
-    if (NULL == _writeSlice)
+    if (NULL == writeSlice)
         return NULL;
 
     return writeSlice;

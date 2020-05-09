@@ -75,7 +75,7 @@ struct Slice
     // 消息ID，客户有这个才知道怎么解释
     unsigned int MsgID;
     // 转发去的节点类型，如果当前节点类型为FwdType，则启用FwdTarget条件，如果FwdType为0则为广播
-    unsigned char FwdType;
+    unsigned int FwdType;
     // 如果类型匹配后，当前节点标识与FwdTarget相等时启用Target条件，如果FwdTarget为0则为广播
     unsigned int FwdTarget;
     // 如果Target为0则为广播
