@@ -64,6 +64,7 @@ public:
     static std::weak_ptr<UVLoop> DefaultLoop();
 
 public:
+    explicit UVLoop(const std::string& name);
     virtual ~UVLoop();
 
     void SetData(void* data, bool force = false, bool strong = false);
@@ -92,9 +93,6 @@ public:
 
 private:
     bool Run(uv_run_mode type);
-
-protected:
-    explicit UVLoop(const std::string& name);
 
 protected:
     uv_loop_t* _loop;

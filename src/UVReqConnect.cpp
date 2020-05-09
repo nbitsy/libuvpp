@@ -36,6 +36,7 @@ UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle>& handle, const NetAddre
         uv_req_set_data(_req, NULL);
     }
     DEBUG("Object @%p\n", this);
+    INFO("Reconnecting to %s\n", _address.ToString().c_str());
 }
 
 UVReqConnect::UVReqConnect(const std::weak_ptr<UVHandle>& handle, const std::string& ip, int port)
@@ -87,7 +88,7 @@ bool UVReqConnect::Start()
 
 void UVReqConnect::OnReq(int status)
 {
-    DEBUG("status: %d\n", status);
+    DEBUG("Connecting to %s status: %d\n", _address.ToString().c_str(), status);
     if (!_handle.expired())
     {
         auto handle = _handle.lock();

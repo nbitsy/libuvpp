@@ -59,7 +59,11 @@ protected:
         struct sockaddr_in6 _addr6Peer;
     };
 
+    // 建立通信之前目标地址信息
+    NetAddress _remoteServer;
+    // 建立通信后本地地址信息
     NetAddress _local;
+    // 建立通信后远程地址信息
     NetAddress _remote;
 };
 

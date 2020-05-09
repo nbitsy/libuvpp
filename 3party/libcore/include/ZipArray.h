@@ -86,14 +86,14 @@ public:
 public:
     explicit ZipArray(ZipArrayIdx_t idxmax = ZIP_ARRAY_SIZE_MIN, unsigned char type = ZIPARRAY_ARRAY_1_8);
     template <typename U>
-    ZipArray(ZipArray<U> &other)
+    ZipArray(ZipArray<U>& other)
         : _count(other._count), _size(other._size), _idxmax(other._idxmax),
           _idxwidth(other._idxwidth), _datatype(other._datatype), _value(NULL), _data(NULL)
     {
         CopyFrom(other);
     }
     template <typename U>
-    ZipArray(const ZipArray<U> &other)
+    ZipArray(const ZipArray<U>& other)
         : _count(other._count), _size(other._size), _idxmax(other._idxmax),
           _idxwidth(other._idxwidth), _datatype(other._datatype), _value(NULL), _data(NULL)
     {
@@ -104,12 +104,12 @@ public:
     void Clear();
 
     // 返回引用是一个危险的动作，所以需要明确的调用
-    T &GetRef(ZipArrayIdx_t idx) const;
+    T& GetRef(ZipArrayIdx_t idx) const;
     inline T Get(ZipArrayIdx_t idx) const { return GetRef(idx); }
     inline T operator[](ZipArrayIdx_t idx) const { return GetRef(idx); }
 
     // 返回原始值
-    T Set(ZipArrayIdx_t idx, const T &value);
+    T Set(ZipArrayIdx_t idx, const T& value);
     // 清空并返回当前值
     T Clear(ZipArrayIdx_t idx);
 
@@ -124,54 +124,57 @@ public:
     const std::string ToString() const;
 
     template <typename U>
-    void CopyFrom(const ZipArray<U> &other);
+    void CopyFrom(const ZipArray<U>& other);
 
     template <typename U>
-    ZipArray<T> &operator=(const ZipArray<U> &other);
+    ZipArray<T>& operator=(const ZipArray<U>& other);
 
     template <typename U>
-    ZipArray<T> operator+(const ZipArray<U> &other);
+    ZipArray<T> operator+(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> operator-(const ZipArray<U> &other);
+    ZipArray<T> operator-(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> operator*(const ZipArray<U> &other);
+    ZipArray<T> operator*(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> operator/(const ZipArray<U> &other);
+    ZipArray<T> operator/(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> operator%(const ZipArray<U> &other);
+    ZipArray<T> operator%(const ZipArray<U>& other);
 
     template <typename U>
-    ZipArray<T> &operator+=(const ZipArray<U> &other);
+    ZipArray<T>& operator+=(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> &operator-=(const ZipArray<U> &other);
+    ZipArray<T>& operator-=(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> &operator*=(const ZipArray<U> &other);
+    ZipArray<T>& operator*=(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> &operator/=(const ZipArray<U> &other);
+    ZipArray<T>& operator/=(const ZipArray<U>& other);
     template <typename U>
-    ZipArray<T> &operator%=(const ZipArray<U> &other);
+    ZipArray<T>& operator%=(const ZipArray<U>& other);
 
     template <typename U>
-    ZipArray<T> &operator+=(const U &v);
+    ZipArray<T>& operator+=(const U& v);
     template <typename U>
-    ZipArray<T> &operator-=(const U &v);
+    ZipArray<T>& operator-=(const U& v);
     template <typename U>
-    ZipArray<T> &operator*=(const U &v);
+    ZipArray<T>& operator*=(const U& v);
     template <typename U>
-    ZipArray<T> &operator/=(const U &v);
+    ZipArray<T>& operator/=(const U& v);
     template <typename U>
-    ZipArray<T> &operator%=(const U &v);
+    ZipArray<T>& operator%=(const U& v);
 
-    virtual void Serialize(OStream &stream) const OVERRIDE;
-    virtual void Unserialize(IStream &stream) OVERRIDE;
+    virtual void Serialize(OStream& stream) const OVERRIDE;
+    virtual void Unserialize(IStream& stream) OVERRIDE;
+
+    template <typename F>
+    void ForEach(const F& f) const;
 
 private:
-    bool HasData(ZipArrayIdx_t idx, T **ppvalue, void *map, void *data, unsigned char datatype, unsigned char idxwidth);
-    bool HasData(ZipArrayIdx_t idx, T **pvalue, ZipArrayIdx_t *realidx) const;
+    bool HasData(ZipArrayIdx_t idx, T** ppvalue, void* map, void* data, unsigned char datatype, unsigned char idxwidth);
+    bool HasData(ZipArrayIdx_t idx, T** pvalue, ZipArrayIdx_t* realidx) const;
     void Init(ZipArrayIdx_t idxmax, unsigned char type = ZIPARRAY_ARRAY_1_8);
     void InitFull(ZipArrayIdx_t idxmax);
     void InitHashMap(ZipArrayIdx_t idxmax);
-    void CopyDataFromOld(void *src, void *olddata, unsigned char datatype, ZipArrayIdx_t idxmax, unsigned char idxwidth);
+    void CopyDataFromOld(void* src, void* olddata, unsigned char datatype, ZipArrayIdx_t idxmax, unsigned char idxwidth);
     void ConvertTo_1_4();
     void ConvertTo_1_2();
     void ConvertToFull();
@@ -189,9 +192,9 @@ private:
     // 当前数据空间类型
     unsigned char _datatype; // 0 - 1/8 1 - 1/4 2 - full 3 - 1/2 4 - hashmap
     // 数据，数据存放空间包括位图数据，位图数据之后是正常数据
-    void *_value;
+    void* _value;
     // 真实数据起始地址
-    void *_data;
+    void* _data;
 };
 
 template <typename T>
@@ -228,7 +231,7 @@ void ZipArray<T>::Clear()
 
     if (ZIPARRAY_MAP == _datatype && _value != NULL)
     {
-        Allocator::Destroy((ZipArrayMap_t *)_value);
+        Allocator::Destroy((ZipArrayMap_t*)_value);
         _value = NULL;
         _data = NULL;
         _datatype = ZIPARRAY_ARRAY_NONE;
@@ -250,8 +253,8 @@ template <typename T>
 void ZipArray<T>::InitFull(ZipArrayIdx_t idxmax)
 {
     DEBUG("\n");
-    void *oldvalue = _value;
-    void *olddata = _data;
+    void* oldvalue = _value;
+    void* olddata = _data;
     int oldidxmax = _idxmax;
     int oldidxwidth = _idxwidth;
     int olddatatype = _datatype;
@@ -278,8 +281,8 @@ template <typename T>
 void ZipArray<T>::InitHashMap(ZipArrayIdx_t idxmax)
 {
     DEBUG("\n");
-    void *oldvalue = _value;
-    void *olddata = _data;
+    void* oldvalue = _value;
+    void* olddata = _data;
     int oldidxmax = _idxmax;
     int oldidxwidth = _idxwidth;
     int olddatatype = _datatype;
@@ -340,8 +343,8 @@ void ZipArray<T>::Init(ZipArrayIdx_t idxmax, unsigned char targettype)
     if (idxmax < ZIP_ARRAY_SIZE_MIN)
         idxmax = ZIP_ARRAY_SIZE_MIN;
 
-    void *oldvalue = _value;
-    void *olddata = _data;
+    void* oldvalue = _value;
+    void* olddata = _data;
     ZipArrayIdx_t oldidxmax = _idxmax;
     ZipArrayIdx_t oldidxwidth = _idxwidth;
     unsigned char olddatatype = _datatype;
@@ -371,7 +374,7 @@ void ZipArray<T>::Init(ZipArrayIdx_t idxmax, unsigned char targettype)
         return;
     }
 
-    _data = ((unsigned char *)_value) + mapsize;
+    _data = ((unsigned char*)_value) + mapsize;
     std::memset(_value, 0x00, total);
     DEBUG("total size: %d\n", total);
 
@@ -384,12 +387,12 @@ void ZipArray<T>::Init(ZipArrayIdx_t idxmax, unsigned char targettype)
 }
 
 template <typename T>
-void ZipArray<T>::CopyDataFromOld(void *src, void *data, unsigned char datatype, ZipArrayIdx_t idxmax, unsigned char idxwidth)
+void ZipArray<T>::CopyDataFromOld(void* src, void* data, unsigned char datatype, ZipArrayIdx_t idxmax, unsigned char idxwidth)
 {
     DEBUG("\n");
     for (ZipArrayIdx_t i = 0; i < idxmax; ++i)
     {
-        T *v = NULL;
+        T* v = NULL;
         if (HasData(i, &v, src, data, datatype, idxwidth))
             Set(i, *v);
     }
@@ -400,12 +403,12 @@ void ZipArray<T>::CopyDataFromOld(void *src, void *data, unsigned char datatype,
  * map 存储位图的起始地址
  * idxwidth 存放实际空间索引值的位数
 */
-inline static ZipArrayIdx_t GetRealIdx(ZipArrayIdx_t idx, void *map, unsigned char idxwidth)
+inline static ZipArrayIdx_t GetRealIdx(ZipArrayIdx_t idx, void* map, unsigned char idxwidth)
 {
     int bitpos = idx * idxwidth; // 目标范围索引在位图中位起始位
     int offset = bitpos >> 3;    // 在位图中的字节起始位置
     int start = bitpos % 8;      // 索引在当前字节中的起始位
-    unsigned char mapvalue = ((unsigned char *)map)[offset];
+    unsigned char mapvalue = ((unsigned char*)map)[offset];
 
     int realidx = -1;
     int retain = 8 - start;
@@ -419,7 +422,7 @@ inline static ZipArrayIdx_t GetRealIdx(ZipArrayIdx_t idx, void *map, unsigned ch
         // 一部分
         int left = idxwidth - retain;
         int realidx1 = (mapvalue >> start) & 0xff;
-        unsigned char mapvalue2 = ((unsigned char *)map)[offset + 1];
+        unsigned char mapvalue2 = ((unsigned char*)map)[offset + 1];
         int realidx2 = (((mapvalue2 << (8 - left)) & 0xff) >> (8 - left - retain)) & 0xff;
         realidx = (realidx1 | realidx2) & 0xff;
     }
@@ -429,13 +432,13 @@ inline static ZipArrayIdx_t GetRealIdx(ZipArrayIdx_t idx, void *map, unsigned ch
 }
 
 // must be empty
-inline void SetRealIdx(ZipArrayIdx_t idx, ZipArrayIdx_t realidx, void *map, unsigned char idxwidth)
+inline void SetRealIdx(ZipArrayIdx_t idx, ZipArrayIdx_t realidx, void* map, unsigned char idxwidth)
 {
     //DEBUG("idx: %d, realidx: %d\n", idx, realidx);
     int bitpos = idx * idxwidth;
     int offset = bitpos >> 3;
     int start = bitpos % 8;
-    unsigned char &mapvalue = ((unsigned char *)map)[offset];
+    unsigned char& mapvalue = ((unsigned char*)map)[offset];
     int retain = 8 - start; // 当前字节存储的索引值位数
 
     ZipArrayIdx_t idxvalue = realidx;
@@ -448,30 +451,30 @@ inline void SetRealIdx(ZipArrayIdx_t idx, ZipArrayIdx_t realidx, void *map, unsi
     {
         unsigned char part1 = idxvalue << start;
         mapvalue |= part1;
-        unsigned char &mapvalue2 = ((unsigned char *)map)[offset + 1];
+        unsigned char& mapvalue2 = ((unsigned char*)map)[offset + 1];
         unsigned char part2 = (idxvalue >> retain) & 0xff;
         mapvalue2 |= part2;
     }
 }
 
 template <typename T>
-T &ZipArray<T>::GetRef(ZipArrayIdx_t idx) const
+T& ZipArray<T>::GetRef(ZipArrayIdx_t idx) const
 {
     if (idx >= _idxmax - 1)
-        return (T &)null;
+        return (T&)null;
 
     DEBUG("idx: %d\n", idx);
     if (ZIPARRAY_FULLARRAY == _datatype)
-        return ((T *)_data)[idx];
+        return ((T*)_data)[idx];
 
     if (ZIPARRAY_MAP == _datatype)
-        return (*((ZipArrayMap_t *)_data))[idx];
+        return (*((ZipArrayMap_t*)_data))[idx];
 
     ZipArrayIdx_t realidx = GetRealIdx(idx, _value, _idxwidth);
     if (realidx != 0)
-        return ((T *)_data)[realidx - 1];
+        return ((T*)_data)[realidx - 1];
 
-    return (T &)null;
+    return (T&)null;
 }
 
 template <typename T>
@@ -501,7 +504,7 @@ void ZipArray<T>::ConvertTo_1_2()
 template <typename T>
 T ZipArray<T>::Clear(ZipArrayIdx_t idx)
 {
-    T *v = NULL;
+    T* v = NULL;
     if (HasData(idx, &v, NULL))
         return *v;
 
@@ -509,7 +512,7 @@ T ZipArray<T>::Clear(ZipArrayIdx_t idx)
 }
 
 template <typename T>
-T ZipArray<T>::Set(ZipArrayIdx_t idx, const T &value)
+T ZipArray<T>::Set(ZipArrayIdx_t idx, const T& value)
 {
     if (_datatype != ZIPARRAY_MAP && _count >= ZIP_ARRAY_SIZE_MAX - 1)
     {
@@ -543,7 +546,7 @@ T ZipArray<T>::Set(ZipArrayIdx_t idx, const T &value)
 
     if (ZIPARRAY_FULLARRAY == _datatype)
     {
-        T &v = ((T *)_data)[idx];
+        T& v = ((T*)_data)[idx];
         T oldv = v;
         v = value;
         ++_count;
@@ -552,7 +555,7 @@ T ZipArray<T>::Set(ZipArrayIdx_t idx, const T &value)
 
     if (ZIPARRAY_MAP == _datatype)
     {
-        T &v = (*((ZipArrayMap_t *)_data))[idx];
+        T& v = (*((ZipArrayMap_t*)_data))[idx];
         T oldv = v;
         v = value;
         ++_count;
@@ -568,19 +571,19 @@ T ZipArray<T>::Set(ZipArrayIdx_t idx, const T &value)
         SetRealIdx(idx, realidx, _value, _idxwidth);
     }
 
-    T &v = ((T *)_data)[realidx - 1];
+    T& v = ((T*)_data)[realidx - 1];
     T oldv = v;
     v = value;
     return oldv;
 }
 
 template <typename T>
-bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, void *map, void *data, unsigned char datatype, unsigned char idxwidth)
+bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T** ppvalue, void* map, void* data, unsigned char datatype, unsigned char idxwidth)
 {
     if (ZIPARRAY_FULLARRAY == datatype)
     {
         if (ppvalue != NULL)
-            *ppvalue = &((T *)data)[idx];
+            *ppvalue = &((T*)data)[idx];
 
         return true;
     }
@@ -588,7 +591,7 @@ bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, void *map, void *data,
     if (ZIPARRAY_MAP == datatype)
     {
         if (ppvalue != NULL)
-            *ppvalue = &(*((ZipArrayMap_t *)data))[idx];
+            *ppvalue = &(*((ZipArrayMap_t*)data))[idx];
 
         return true;
     }
@@ -597,7 +600,7 @@ bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, void *map, void *data,
     if (realidx != 0)
     {
         if (ppvalue != NULL)
-            *ppvalue = &((T *)data)[realidx - 1];
+            *ppvalue = &((T*)data)[realidx - 1];
 
         return true;
     }
@@ -606,12 +609,12 @@ bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, void *map, void *data,
 }
 
 template <typename T>
-bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, ZipArrayIdx_t *ridx) const
+bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T** ppvalue, ZipArrayIdx_t* ridx) const
 {
     if (ZIPARRAY_FULLARRAY == _datatype)
     {
         if (ppvalue != NULL)
-            *ppvalue = &((T *)_data)[idx];
+            *ppvalue = &((T*)_data)[idx];
         if (ridx != NULL)
             *ridx = idx;
 
@@ -621,7 +624,7 @@ bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, ZipArrayIdx_t *ridx) c
     if (ZIPARRAY_MAP == _datatype)
     {
         if (ppvalue != NULL)
-            *ppvalue = &(*((ZipArrayMap_t *)_data))[idx];
+            *ppvalue = &(*((ZipArrayMap_t*)_data))[idx];
         if (ridx != NULL)
             *ridx = idx;
 
@@ -632,7 +635,7 @@ bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, ZipArrayIdx_t *ridx) c
     if (realidx != 0)
     {
         if (ppvalue != NULL)
-            *ppvalue = &((T *)_data)[realidx - 1];
+            *ppvalue = &((T*)_data)[realidx - 1];
 
         if (ridx != NULL)
             *ridx = realidx - 1;
@@ -644,7 +647,7 @@ bool ZipArray<T>::HasData(ZipArrayIdx_t idx, T **ppvalue, ZipArrayIdx_t *ridx) c
 }
 template <typename T>
 template <typename U>
-void ZipArray<T>::CopyFrom(const ZipArray<U> &other)
+void ZipArray<T>::CopyFrom(const ZipArray<U>& other)
 {
     if (other._datatype <= ZIPARRAY_FULLARRAY)
     {
@@ -656,7 +659,7 @@ void ZipArray<T>::CopyFrom(const ZipArray<U> &other)
             int value_size = _size * sizeof(T);
             int total = mapsize + value_size;
             _value = Allocator::malloc(total);
-            _data = (unsigned char *)_value + mapsize;
+            _data = (unsigned char*)_value + mapsize;
             std::memcpy(_value, other._value, total);
         }
         else
@@ -664,7 +667,7 @@ void ZipArray<T>::CopyFrom(const ZipArray<U> &other)
             Init(other._idxmax, other._datatype);
             for (ZipArrayIdx_t i = 0; i < other._idxmax; ++i)
             {
-                U *pv = NULL;
+                U* pv = NULL;
                 if (other.HasData(i, &pv, NULL))
                     Set(i, *pv);
             }
@@ -679,13 +682,13 @@ void ZipArray<T>::CopyFrom(const ZipArray<U> &other)
         _datatype = other._datatype;
         _value = Allocator::Construct<ZipArrayMap_t>();
         _data = _value;
-        *((ZipArrayMap_t *)_value) = *((ZipArrayMap_t *)other._value);
+        *((ZipArrayMap_t*)_value) = *((ZipArrayMap_t*)other._value);
     }
 }
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator=(const ZipArray<U> &other)
+ZipArray<T>& ZipArray<T>::operator=(const ZipArray<U>& other)
 {
     Clear();
 
@@ -701,13 +704,13 @@ ZipArray<T> &ZipArray<T>::operator=(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> ZipArray<T>::operator+(const ZipArray<U> &other)
+ZipArray<T> ZipArray<T>::operator+(const ZipArray<U>& other)
 {
     ZipArray<T> v(*this);
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (v.HasData(i, &pv, NULL))
@@ -722,13 +725,13 @@ ZipArray<T> ZipArray<T>::operator+(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> ZipArray<T>::operator-(const ZipArray<U> &other)
+ZipArray<T> ZipArray<T>::operator-(const ZipArray<U>& other)
 {
     ZipArray<T> v(*this);
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (v.HasData(i, &pv, NULL))
@@ -743,13 +746,13 @@ ZipArray<T> ZipArray<T>::operator-(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> ZipArray<T>::operator*(const ZipArray<U> &other)
+ZipArray<T> ZipArray<T>::operator*(const ZipArray<U>& other)
 {
     ZipArray<T> v(*this);
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (v.HasData(i, &pv, NULL))
@@ -762,13 +765,13 @@ ZipArray<T> ZipArray<T>::operator*(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> ZipArray<T>::operator/(const ZipArray<U> &other)
+ZipArray<T> ZipArray<T>::operator/(const ZipArray<U>& other)
 {
     ZipArray<T> v(*this);
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (v.HasData(i, &pv, NULL) && *opv != 0)
@@ -781,13 +784,13 @@ ZipArray<T> ZipArray<T>::operator/(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> ZipArray<T>::operator%(const ZipArray<U> &other)
+ZipArray<T> ZipArray<T>::operator%(const ZipArray<U>& other)
 {
     ZipArray<T> v(*this);
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (v.HasData(i, &pv, NULL) && *opv != 0)
@@ -800,12 +803,12 @@ ZipArray<T> ZipArray<T>::operator%(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator+=(const ZipArray<U> &other)
+ZipArray<T>& ZipArray<T>::operator+=(const ZipArray<U>& other)
 {
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (HasData(i, &pv, NULL))
@@ -820,12 +823,12 @@ ZipArray<T> &ZipArray<T>::operator+=(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator-=(const ZipArray<U> &other)
+ZipArray<T>& ZipArray<T>::operator-=(const ZipArray<U>& other)
 {
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (HasData(i, &pv, NULL))
@@ -840,12 +843,12 @@ ZipArray<T> &ZipArray<T>::operator-=(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator*=(const ZipArray<U> &other)
+ZipArray<T>& ZipArray<T>::operator*=(const ZipArray<U>& other)
 {
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (HasData(i, &pv, NULL))
@@ -858,12 +861,12 @@ ZipArray<T> &ZipArray<T>::operator*=(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator/=(const ZipArray<U> &other)
+ZipArray<T>& ZipArray<T>::operator/=(const ZipArray<U>& other)
 {
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (HasData(i, &pv, NULL) && *opv != 0)
@@ -876,12 +879,12 @@ ZipArray<T> &ZipArray<T>::operator/=(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator%=(const ZipArray<U> &other)
+ZipArray<T>& ZipArray<T>::operator%=(const ZipArray<U>& other)
 {
     for (int i = 0; i < other._idxmax; ++i)
     {
-        T *pv = NULL;
-        T *opv = NULL;
+        T* pv = NULL;
+        T* opv = NULL;
         if (other.HasData(i, &opv, NULL))
         {
             if (HasData(i, &pv, NULL) && *opv != 0)
@@ -894,11 +897,11 @@ ZipArray<T> &ZipArray<T>::operator%=(const ZipArray<U> &other)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator+=(const U &v)
+ZipArray<T>& ZipArray<T>::operator+=(const U& v)
 {
     for (int i = 0; i < _idxmax; ++i)
     {
-        T *pv = NULL;
+        T* pv = NULL;
         if (HasData(i, &pv, NULL))
             *pv += v;
     }
@@ -908,11 +911,11 @@ ZipArray<T> &ZipArray<T>::operator+=(const U &v)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator-=(const U &v)
+ZipArray<T>& ZipArray<T>::operator-=(const U& v)
 {
     for (int i = 0; i < _idxmax; ++i)
     {
-        T *pv = NULL;
+        T* pv = NULL;
         if (HasData(i, &pv, NULL))
             *pv -= v;
     }
@@ -922,11 +925,11 @@ ZipArray<T> &ZipArray<T>::operator-=(const U &v)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator*=(const U &v)
+ZipArray<T>& ZipArray<T>::operator*=(const U& v)
 {
     for (int i = 0; i < _idxmax; ++i)
     {
-        T *pv = NULL;
+        T* pv = NULL;
         if (HasData(i, &pv, NULL))
             *pv *= v;
     }
@@ -936,11 +939,11 @@ ZipArray<T> &ZipArray<T>::operator*=(const U &v)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator/=(const U &v)
+ZipArray<T>& ZipArray<T>::operator/=(const U& v)
 {
     for (int i = 0; i < _idxmax; ++i)
     {
-        T *pv = NULL;
+        T* pv = NULL;
         if (HasData(i, &pv, NULL) && v != 0)
             *pv /= v;
     }
@@ -950,11 +953,11 @@ ZipArray<T> &ZipArray<T>::operator/=(const U &v)
 
 template <typename T>
 template <typename U>
-ZipArray<T> &ZipArray<T>::operator%=(const U &v)
+ZipArray<T>& ZipArray<T>::operator%=(const U& v)
 {
     for (int i = 0; i < _idxmax; ++i)
     {
-        T *pv = NULL;
+        T* pv = NULL;
         if (HasData(i, &pv, NULL) && v != 0)
             *pv %= v;
     }
@@ -969,7 +972,7 @@ void ZipArray<T>::Print()
     std::cout << "count: " << _count << " size: " << _size << " idxmax: " << _idxmax << " idxwidth: " << (unsigned short)_idxwidth << " type: " << (unsigned short)_datatype << std::endl;
     for (ZipArrayIdx_t i = 0; i < _idxmax; ++i)
     {
-        T *v = NULL;
+        T* v = NULL;
         ZipArrayIdx_t realidx = -1;
         if (HasData(i, &v, &realidx))
         {
@@ -979,7 +982,7 @@ void ZipArray<T>::Print()
 }
 
 template <typename T>
-void ZipArray<T>::Serialize(OStream &stream) const
+void ZipArray<T>::Serialize(OStream& stream) const
 {
     stream << _idxmax << _idxwidth << _datatype;
     size_t currpos = stream.Curr();
@@ -990,7 +993,7 @@ void ZipArray<T>::Serialize(OStream &stream) const
     stream << (ZipArrayIdx_t)(0); // 先占位
     for (ZipArrayIdx_t i = 0; i < _idxmax; ++i)
     {
-        T *v = NULL;
+        T* v = NULL;
         ZipArrayIdx_t realidx = -1;
         if (HasData(i, &v, &realidx))
         {
@@ -1004,7 +1007,7 @@ void ZipArray<T>::Serialize(OStream &stream) const
 }
 
 template <typename T>
-void ZipArray<T>::Unserialize(IStream &stream)
+void ZipArray<T>::Unserialize(IStream& stream)
 {
     ZipArrayIdx_t oldmax = _idxmax;
     ZipArrayIdx_t oldidxwidth = _idxwidth;
@@ -1032,7 +1035,7 @@ const std::string ZipArray<T>::ToString() const
     std::stringstream ss;
     for (ZipArrayIdx_t i = 0; i < _idxmax; ++i)
     {
-        T *v = NULL;
+        T* v = NULL;
         ZipArrayIdx_t realidx = -1;
         if (HasData(i, &v, &realidx))
         {
@@ -1044,31 +1047,57 @@ const std::string ZipArray<T>::ToString() const
 }
 
 template <typename T>
-OStream &operator<<(OStream &stream, ZipArray<T> &ziparr)
+OStream& operator<<(OStream& stream, ZipArray<T>& ziparr)
 {
     ziparr.Serialize(stream);
     return stream;
 }
 
 template <typename T>
-IOStream &operator<<(IOStream &stream, ZipArray<T> &ziparr)
+IOStream& operator<<(IOStream& stream, ZipArray<T>& ziparr)
 {
     ziparr.Serialize((OStream&)stream);
     return stream;
 }
 
 template <typename T>
-IStream &operator>>(IStream &stream, ZipArray<T> &ziparr)
+IStream& operator>>(IStream& stream, ZipArray<T>& ziparr)
 {
     ziparr.Unserialize(stream);
     return stream;
 }
 
 template <typename T>
-IOStream &operator>>(IOStream &stream, ZipArray<T> &ziparr)
+IOStream& operator>>(IOStream& stream, ZipArray<T>& ziparr)
 {
     ziparr.Unserialize((IStream&)stream);
     return stream;
+}
+
+template <typename T>
+template <typename F>
+void ZipArray<T>::ForEach(const F& f) const
+{
+    switch (_datatype)
+    {
+    case ZIPARRAY_ARRAY_1_8:
+    case ZIPARRAY_ARRAY_1_4:
+    case ZIPARRAY_ARRAY_1_2:
+    case ZIPARRAY_FULLARRAY:
+    {
+        for (int i = 0; i < _size; ++i)
+            f(((T*)_data)[i]);
+    }
+    break;
+    case ZIPARRAY_MAP:
+    {
+        ZipArrayMap_t& m = *((ZipArrayMap_t*)_data);
+        for (auto& v : m)
+            f(v.second);
+    }
+    default:
+        break;
+    }
 }
 
 template <typename T>

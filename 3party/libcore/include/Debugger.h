@@ -15,19 +15,6 @@ using XSpace::FormatThreadId;
 
 namespace XSpace
 {
-
-#ifdef _DEBUG
-
-#ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
-//#define DEBUG_LEVEL DEBUG_LEVEL_LOG
-#endif
-
-#define ___FUNCTION___ __PRETTY_FUNCTION__
-//#define ___FUNCTION___ __FUNCTION__
-#define ___TIME___ DateTime().toString().c_str()
-#define ___TID___ FormatThreadId(std::this_thread::get_id())
-
 // 30 white 31 red 32 green 33 yellow 34 blue 35 purple
 #define DEBUG_GREENnBACK "\033[1;32;40m"  // debug
 #define DEBUG_WHITEnBACK ""               // log
@@ -45,6 +32,18 @@ namespace XSpace
 #define DEBUG_LEVEL_INFO 2
 #define DEBUG_LEVEL_WARN 3
 #define DEBUG_LEVEL_ERR 4
+
+#ifdef _DEBUG
+
+#ifndef DEBUG_LEVEL
+#define DEBUG_LEVEL DEBUG_LEVEL_DEBUG
+//#define DEBUG_LEVEL DEBUG_LEVEL_LOG
+#endif
+
+#define ___FUNCTION___ __PRETTY_FUNCTION__
+//#define ___FUNCTION___ __FUNCTION__
+#define ___TIME___ DateTime().toString().c_str()
+#define ___TID___ FormatThreadId(std::this_thread::get_id())
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_DEBUG
 #define DEBUG(...)                                                                                                           \

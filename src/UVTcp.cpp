@@ -125,8 +125,9 @@ bool UVTcp::StartConnect(const std::string& ip, int port, int timeout)
 
     if (_timeout == 0)
         _timeout = timeout;
-    _local.Ip = ip;
-    _local.Port = port;
+
+    _remoteServer.Ip = ip;
+    _remoteServer.Port = port;
 
     if (!req->Start())
         return false;
@@ -141,7 +142,7 @@ void UVTcp::Reconnect()
     if (_timeout > 0)
     {
         Init();
-        StartConnect(_local.Ip, _local.Port);
+        StartConnect(_remoteServer.Ip, _remoteServer.Port);
     }
     else
     {
