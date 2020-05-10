@@ -41,7 +41,7 @@ public:
     void close();
 
     const std::string &path() const;
-    bool exists() const;
+    bool Exists() const;
     bool canRead() const;
     bool canWrite() const;
 
@@ -121,7 +121,7 @@ public:
     /// file is a directory, recursively deletes all
     /// files in the directory.
 
-    bool createFile();
+    bool CreateFile();
     /// Creates a new, empty file in an atomic operation.
     /// Returns true if the file has been created and false
     /// if the file already exists. Throws an exception if
