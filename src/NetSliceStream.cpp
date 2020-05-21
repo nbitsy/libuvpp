@@ -7,7 +7,9 @@ namespace XSpace
 {
 
 NetSliceStream::NetSliceStream(const std::weak_ptr<UVLoop>& loop, int flags)
-    : UVTcp(loop, flags), _readBroken(false), _readBrokenBuffer(0), _writeSlice(0), _writeSliceLength(0)
+    : UVTcp(loop, flags), _readBroken(false),
+      _readBrokenBuffer(0), _readBrokenBufferStream(0),
+      _writeSlice(0), _writeSliceLength(0)
 {
     DEBUG("Object @%p\n", this);
 }

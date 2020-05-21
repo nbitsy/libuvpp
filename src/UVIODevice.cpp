@@ -9,7 +9,7 @@ namespace XSpace
 
 static void __OnRead(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf)
 {
-    INFO("@%p len: %lu buf->len: %lu\n", buf, nread, buf->len);
+    INFO("@%p len: %lu buf->len: %lu %s\n", buf, nread, buf->len, buf->base+4);
     UVData* uvdata = (UVData*)stream->data;
     if (NULL == uvdata || NULL == uvdata->_self)
     {
@@ -101,6 +101,13 @@ bool UVIODevice::Bind(uv_handle_t* handle, const std::string& ip, int port, unsi
 int UVIODevice::GetAf() const
 {
     return _addr.sin_family;
+}
+
+void UVIODevice::SetReuse(bool v)
+{
+    if (v)
+    {
+    }
 }
 
 void UVIODevice::InitAddress()

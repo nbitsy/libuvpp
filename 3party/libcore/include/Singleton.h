@@ -9,6 +9,9 @@
 #include "Mutex.h"
 #endif
 
+// XXX: 对于thread_local的变量读速度比非thread_local的变量的读速度慢1/2
+// XXX: 对于thread_local的变量读写速度比非thread_local的变量的读写速度慢1/3
+
 namespace XSpace
 {
 
@@ -21,16 +24,20 @@ public:
     ~Singleton() {}
 
     template <typename U>
-    inline static T &InstanceWith(U *u)
+    inline static T &InstanceWith(U *u, bool force = false)
     {
         if (NULL == u)
             return *_instance; // XXX: Crash
 
-        if (_instance != NULL)
-            return *_instance;
-
         if (!is_subclass<U, T>::value)
             return *_instance; // XXX: Crash
+
+        if (_instance != NULL && force)
+        {
+            delete _instance;
+            _instance = u;
+            return *_instance;
+        }
 
         _instance = u;
         return *_instance;
@@ -72,38 +79,39 @@ public:
     ~ThreadSingleton() {}
 
     template <typename U>
-    inline static T &InstanceWith(U *u)
+    inline static T &InstanceWith(U *u, bool force = false)
     {
         if (NULL == u)
-            return *_instance; // XXX: Crash
-
-        if (_instance != NULL)
-            return *_instance;
+            return *_tlinstance; // XXX: Crash
 
         if (!is_subclass<U, T>::value)
-            return *_instance; // XXX: Crash
+            return *_tlinstance; // XXX: Crash
 
-        _instance = u;
-        return *_instance;
-    }
-
-    inline static T &Instance()
-    {
-        if (!_instance)
+        if (_tlinstance != NULL && force)
         {
-            if (!_instance)
-                _instance = new T();
+            delete _tlinstance;
+            _tlinstance = u;
+            return *_tlinstance;
         }
 
-        return *_instance;
+        _tlinstance = u;
+        return *_tlinstance;
+    }
+
+    inline static T& Instance()
+    {
+        if (!_tlinstance)
+            _tlinstance = new T();
+
+        return *_tlinstance;
     }
 
 protected:
-    thread_local static T *_instance;
+    thread_local static T *_tlinstance;
 };
 
 template <typename T>
-thread_local T *ThreadSingleton<T>::_instance = 0;
+thread_local T *ThreadSingleton<T>::_tlinstance = 0;
 
 } // namespace XSpace
 
