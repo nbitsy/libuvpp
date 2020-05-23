@@ -1,7 +1,6 @@
 
 #include "NetSliceStream.h"
 #include "Allocator.h"
-#include "Slice.h"
 
 namespace XSpace
 {
@@ -24,9 +23,10 @@ std::shared_ptr<UVHandle> NetSliceStream::OnNewConnection()
     return NetSliceStream::CreateShared(GetLoop());
 }
 
-void NetSliceStream::PushSlice(Slice* slice)
+bool NetSliceStream::RecvedSlice(Slice* slice)
 {
     DEBUG("LEN: %d => %s\n", slice->BodyLength(), (char*)slice->Body());
+    return true;
 }
 
 void NetSliceStream::ClearReadBrokenBuffer()
@@ -163,7 +163,7 @@ void NetSliceStream::OnRead(void* data, int nread)
                     break;
 
                 Slice* realslice = DealFlags(slice);
-                PushSlice(realslice);
+                RecvedSlice(realslice);
                 pms->ReadFlipSilence(slice->Length);
             }
 
@@ -223,7 +223,7 @@ void NetSliceStream::ReleaseSlice(Slice* slice)
 }
 
 bool NetSliceStream::Write(void* data, int nsize,
-                           unsigned int MsgID, unsigned char FwdType,
+                           unsigned int MsgID, unsigned char FwdTargetType,
                            unsigned int FwdTarget, unsigned int Target)
 {
     int total = 0;
@@ -231,12 +231,13 @@ bool NetSliceStream::Write(void* data, int nsize,
     if (NULL == _writeSlice)
         return false;
 
+    // 总包体长，包括包头
     _writeSlice->Length = nsize + sizeof(*_writeSlice);
     memcpy(_writeSlice->Body(), data, nsize);
     // XXX: flags???
 
     _writeSlice->MsgID = MsgID;
-    _writeSlice->FwdType = FwdType;
+    _writeSlice->FwdTargetType = FwdTargetType;
     _writeSlice->FwdTarget = FwdTarget;
     _writeSlice->Target = Target;
 
@@ -244,11 +245,6 @@ bool NetSliceStream::Write(void* data, int nsize,
     ReleaseSlice(_writeSlice);
     _writeSlice = NULL;
     return ret;
-}
-
-bool NetSliceStream::WriteSlice(Slice* slice)
-{
-    return Write((void*)slice, slice->Length);
 }
 
 } // namespace XSpace

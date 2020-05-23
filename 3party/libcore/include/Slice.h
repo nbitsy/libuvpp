@@ -38,9 +38,11 @@ const unsigned char SLICE_RWD_7 = ((unsigned char)0x01 << 7);
             Flags &= ~SLICE_##T; \
     }
 
+#pragma pack(push)
+#pragma pack(4)
 struct Slice
 {
-    Slice() {}
+    Slice() : MsgID(0), FwdType(0), FwdTargetType(0), FwdTarget(0), Target(0) {}
     ~Slice() {}
 
     inline int SliceLength() const { return Length; }
@@ -72,18 +74,38 @@ struct Slice
     };
     // 以下几个描述字段可以在不解包的情况下进行一些操作
 
+    inline bool NeedForward() const { return FwdTargetType > 0; }
+
     // 消息ID，客户有这个才知道怎么解释
+    // 0|-1 无效
     unsigned int MsgID;
-    // 转发去的节点类型，如果当前节点类型为FwdType，则启用FwdTarget条件，如果FwdType为0则为广播
-    unsigned int FwdType;
-    // 如果类型匹配后，当前节点标识与FwdTarget相等时启用Target条件，如果FwdTarget为0则为广播
-    unsigned int FwdTarget;
-    // 如果Target为0则为广播
-    unsigned int Target;
+
+    struct
+    {
+        // 转发类型，经过的路径一般是多条的，如果选择一条路径由FwdType来决定
+        // 0 - first
+        // 1 - hash 根据Target进行hash
+        // 2 - random
+        // other hash
+        unsigned short FwdType;
+        // 转发目标的节点类型，如果当前节点类型为FwdTargetType，则启用FwdTarget条件
+        // -1 广播
+        // 0 不转发
+        // other 转发去的目标服务器类型
+        unsigned short FwdTargetType;
+    };
+
+    // 如果类型匹配后，当前节点标识与FwdTarget相等时启用Target条件
+    // -1 广播
+    unsigned long long FwdTarget;
+    // 目标ID，如玩家ID
+    // -1 广播
+    unsigned long long Target;
 
     // 之后为包体
     char End[0];
 };
+#pragma pack(pop)
 
 } // namespace XSpace
 
