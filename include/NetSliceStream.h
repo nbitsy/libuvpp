@@ -37,7 +37,7 @@ public:
     NetSliceStream(const std::weak_ptr<UVLoop>& loop, int flags = AF_UNSPEC);
     ~NetSliceStream();
 
-    std::shared_ptr<UVHandle> OnNewConnection() OVERRIDE;
+    std::shared_ptr<UVHandle> OnNewSession() OVERRIDE;
     void OnRead(void* data, int nread) OVERRIDE;
 
     // 收到一个完整的Slice

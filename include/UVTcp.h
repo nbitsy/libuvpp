@@ -30,7 +30,7 @@ public:
     // timeout : 断线重连间隔或连接超时
     bool StartConnect(const std::string& ip, int port, int timeout = 0);
 
-    std::shared_ptr<UVHandle> OnNewConnection() OVERRIDE;
+    std::shared_ptr<UVHandle> OnNewSession() OVERRIDE;
     void OnAccepted(std::weak_ptr<UVHandle>& server) OVERRIDE;
     void OnAccept(std::weak_ptr<UVHandle>& client) OVERRIDE;
 

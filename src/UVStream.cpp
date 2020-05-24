@@ -8,7 +8,7 @@
 namespace XSpace
 {
 
-static void __OnNewConnection(uv_stream_t* server, int status)
+static void __OnNewSession(uv_stream_t* server, int status)
 {
     UVData* uvdata = (UVData*)uv_handle_get_data((uv_handle_t*)server);
     if (NULL == uvdata)
@@ -18,7 +18,7 @@ static void __OnNewConnection(uv_stream_t* server, int status)
     if (NULL == uvstream)
         return;
 
-    std::shared_ptr<UVHandle> newuvstream = uvstream->OnNewConnection();
+    std::shared_ptr<UVHandle> newuvstream = uvstream->OnNewSession();
     if (NULL == newuvstream)
     {
         std::cerr << "Create connection error!!!" << std::endl;
@@ -45,7 +45,7 @@ bool UVStream::Listen(int backlog)
     if (NULL == _handle)
         return false;
 
-    int r = uv_listen(GetHandle<uv_stream_t>(), backlog, __OnNewConnection);
+    int r = uv_listen(GetHandle<uv_stream_t>(), backlog, __OnNewSession);
     if (r)
     {
         fprintf(stderr, "Listen error %s\n", uv_strerror(r));

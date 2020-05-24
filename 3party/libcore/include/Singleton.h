@@ -9,13 +9,16 @@
 #include "Mutex.h"
 #endif
 
+// XXX: 这个单例有个问题，就是不同的动态库里会有不同的副本！！！！！！！！！！
+// XXX: 如果需要全局单例请使用 GlobalSingleton ！！！！！！！！！！！！！!
+
 // XXX: 对于thread_local的变量读速度比非thread_local的变量的读速度慢1/2
 // XXX: 对于thread_local的变量读写速度比非thread_local的变量的读写速度慢1/3
 
 namespace XSpace
 {
 
-// 全局单例
+// 单例
 template <typename T>
 class Singleton : public Noncopyable
 {

@@ -18,7 +18,7 @@ NetSliceStream::~NetSliceStream()
     DEBUG("Object @%p\n", this);
 }
 
-std::shared_ptr<UVHandle> NetSliceStream::OnNewConnection()
+std::shared_ptr<UVHandle> NetSliceStream::OnNewSession()
 {
     return NetSliceStream::CreateShared(GetLoop());
 }

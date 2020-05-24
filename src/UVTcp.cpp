@@ -204,7 +204,7 @@ bool UVTcp::OnErrorAction(int status)
     return true;
 }
 
-std::shared_ptr<UVHandle> UVTcp::OnNewConnection()
+std::shared_ptr<UVHandle> UVTcp::OnNewSession()
 {
     DEBUG("\n");
     return UVTcp::CreateShared(GetLoop());

@@ -47,7 +47,7 @@ public:
     /**
      * 作为一个服务器，如果有新的连接进来后，需要创建一个新的UVStream来处理这个连接
     */
-    virtual std::shared_ptr<UVHandle> OnNewConnection() = 0;
+    virtual std::shared_ptr<UVHandle> OnNewSession() = 0;
     /**
      * 这个流如果接收了一个连接后调用OnAccept
     */
