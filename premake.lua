@@ -16,7 +16,7 @@ project "uvpp"
     configuration { "DebugLib" }
         symbols "On"
         defines "_DEBUG"
-        defines { "USE_TC_MALLOC", "MEMPOOL_CHECK_OVERFLOW" }
+        defines { "USE_TC_MALLOC", "MEMPOOL_CHECK_OVERFLOW", "DEBUG_LEVEL=DEBUG_LEVEL_INFO" }
         targetdir "lib"
         -- buildoptions { "-g3", "-gdwarf-2", "-std=c++11" }
         buildoptions { "-g3", "-gdwarf-2" }

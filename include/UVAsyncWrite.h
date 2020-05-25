@@ -14,7 +14,19 @@ class UVIODevice;
 
 struct UVAsyncWriteData
 {
-    UVAsyncWriteData(void* data, int length, bool copy = true) : Data(NULL), Length(length)
+    UVAsyncWriteData(void* data, int length, bool copy = true) : Data(NULL), Length(length), MsgID(0)
+    {
+        DEBUG("Object @%p\n", this);
+        Construct(data, length, copy);
+    }
+
+    UVAsyncWriteData(void* data, int length, unsigned int msgid, bool copy = true) : Data(NULL), Length(length), MsgID(msgid)
+    {
+        DEBUG("Object @%p\n", this);
+        Construct(data, length, copy);
+    }
+
+    void Construct(void* data, int length, bool copy = true)
     {
         DEBUG("Object @%p\n", this);
         if (copy)
@@ -43,6 +55,7 @@ struct UVAsyncWriteData
 
     void* Data;
     int Length;
+    unsigned int MsgID;
     bool Copyed;
 };
 
@@ -59,6 +72,7 @@ public:
     void Append(void* data) OVERRIDE;
 
     void Send(void* data, int nwrite, bool copy = true);
+    void Send(void* data, int nwrite, unsigned int msgid, bool copy = true);
 
 private:
     // 一个异步写对象对应一个Handle

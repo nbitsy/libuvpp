@@ -37,7 +37,7 @@ void UVAsyncWrite::OnAsync()
             auto device = iodevice.lock().get();
             INFO("Writing data @%p length: %d\n", data->Data, data->Length);
             if (sendSlice)
-                ((NetSliceStream*)device)->Write(data->Data, data->Length);
+                ((NetSliceStream*)device)->Write(data->Data, data->Length, data->MsgID);
             else
                 device->Write(data->Data, data->Length);
         }
@@ -56,6 +56,15 @@ void UVAsyncWrite::Append(void* data)
 void UVAsyncWrite::Send(void* data, int nwrite, bool copy)
 {
     UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy);
+    if (NULL == uvasyncwritedata)
+        return;
+
+    UVAsync::Send(uvasyncwritedata);
+}
+
+void UVAsyncWrite::Send(void* data, int nwrite, unsigned int msgid, bool copy)
+{
+    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, msgid, copy);
     if (NULL == uvasyncwritedata)
         return;
 
