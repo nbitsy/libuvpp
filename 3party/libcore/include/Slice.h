@@ -3,6 +3,7 @@
 #define _SLICE_H_
 
 #include "Config.h"
+#include "CoreConfig.h"
 
 namespace XSpace
 {
@@ -78,7 +79,7 @@ struct Slice
 
     // 消息ID，客户有这个才知道怎么解释
     // 0|-1 无效
-    unsigned int MsgID;
+    MsgID_t MsgID;
 
     struct
     {

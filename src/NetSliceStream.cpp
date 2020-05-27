@@ -209,8 +209,12 @@ Slice* NetSliceStream::MakeSlice(int nsize, _OUT int& total)
 
     if (size > WRITE_BUFFER_SIZE_MAX)
         return NULL;
+        
+    void* p = Allocator::malloc(size);
+    if (NULL == p)
+        return NULL;
 
-    writeSlice = (Slice*)Allocator::malloc(size);
+    writeSlice = ::new (p) Slice();
     if (NULL == writeSlice)
         return NULL;
 

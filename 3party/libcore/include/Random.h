@@ -9,6 +9,7 @@ class Random
 {
 public:
     static int Rand();
+    // [0, end]
     static int Rand(long end);
     // [star, end]
     static long Rand(long start, long end);
