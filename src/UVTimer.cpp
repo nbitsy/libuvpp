@@ -23,9 +23,6 @@ UVTimer::UVTimer(const std::weak_ptr<UVLoop> &loop, long long ticks)
 
 UVTimer::~UVTimer()
 {
-    if (_handle != NULL)
-        Stop();
-
     DEBUG("Object @%p\n", this);
 }
 
@@ -41,7 +38,7 @@ void __OnTimer(uv_timer_t *timer)
 
     Timestamp *timestamp = (Timestamp *)uvdata->_data;
     if (timestamp != NULL)
-        timestamp->Update();
+        timestamp->UpdateMicrosecond();
 
     t->Ticking(timestamp);
 

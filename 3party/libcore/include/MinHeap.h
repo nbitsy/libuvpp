@@ -2,8 +2,8 @@
 #ifndef _MINHEAP_H_
 #define _MINHEAP_H_
 
-#include <unordered_map>
 #include "Allocator.h"
+#include <unordered_map>
 
 namespace XSpace
 {
@@ -11,11 +11,11 @@ namespace XSpace
 template <typename T, typename Greater>
 struct MinHeapNode
 {
-    MinHeapNode(const T &value = T())
+    MinHeapNode(const T& value = T())
         : Value(value), Idx(-1), Next(0), Prev(0) {}
     ~MinHeapNode() {}
 
-    inline bool operator>(const MinHeapNode &n) const
+    inline bool operator>(const MinHeapNode& n) const
     {
         Greater gt;
         return gt(Value, n.Value);
@@ -23,8 +23,8 @@ struct MinHeapNode
 
     T Value;
     int Idx;
-    struct MinHeapNode *Next;
-    struct MinHeapNode **Prev;
+    struct MinHeapNode* Next;
+    struct MinHeapNode** Prev;
 };
 
 template <typename T, typename Greater>
@@ -33,7 +33,7 @@ class MinHeap
 public:
     typedef size_t size_type;
     typedef MinHeapNode<T, Greater> value_type;
-    typedef value_type *node_pointer;
+    typedef value_type* node_pointer;
 
 public:
     MinHeap() : _data(0), _size(0), _capacity(0) {}
@@ -45,11 +45,11 @@ public:
     inline node_pointer Top() const { return _size ? *_data : 0; }
     inline int Reserve(size_type n);
 
-    node_pointer Push(const T &v);
+    node_pointer Push(const T& v);
     node_pointer Push(node_pointer v);
     node_pointer Pop();
     int Erase(const node_pointer v);
-    int Erase(const T &v);
+    int Erase(const T& v);
 
 protected:
     void ShiftUp(unsigned hole_index, const node_pointer v);
@@ -57,13 +57,13 @@ protected:
 
 private:
     // TODO: 把节点缓存起来
-    inline void *realloc(void *ptr, size_type size) { return Allocator::realloc(ptr, size); }
-    inline void *malloc(size_type size) { return Allocator::malloc(size); }
-    inline void free(void *ptr) { Allocator::free(ptr); }
+    inline void* realloc(void* ptr, size_type size) { return Allocator::realloc(ptr, size); }
+    inline void* malloc(size_type size) { return Allocator::malloc(size); }
+    inline void free(void* ptr) { Allocator::free(ptr); }
 
 private:
     // 元素存储空间
-    node_pointer *_data;
+    node_pointer* _data;
     // 当前元素个数
     mutable size_type _size;
     // 容量大小
@@ -84,7 +84,7 @@ MinHeap<T, Greater>::~MinHeap()
 }
 
 template <typename T, typename Greater>
-typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Push(const T &val)
+typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Push(const T& val)
 {
     if (Reserve(_size + 16))
         return 0;
@@ -122,13 +122,13 @@ typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Pop()
 }
 
 template <typename T, typename Greater>
-int MinHeap<T, Greater>::Erase(const T &v)
+int MinHeap<T, Greater>::Erase(const T& v)
 {
     auto i = _v2p.find(v);
     if (i == _v2p.end())
         return -1;
 
-    auto &n = i->second;
+    auto& n = i->second;
     if (n)
         return Erase(n);
     return -1;
@@ -139,7 +139,7 @@ int MinHeap<T, Greater>::Erase(const node_pointer v)
 {
     if (!v)
         return -1;
-    
+
     if (v->Idx != -1)
     {
         _v2p.erase(v->Value);
@@ -168,8 +168,8 @@ int MinHeap<T, Greater>::Reserve(size_type n)
         if (capacity < n)
             capacity = n;
 
-        node_pointer *ptr = 0;
-        if (!(ptr = (node_pointer *)realloc(_data, capacity * sizeof(node_pointer))))
+        node_pointer* ptr = 0;
+        if (!(ptr = (node_pointer*)realloc(_data, capacity * sizeof(node_pointer))))
             return -1;
 
         _data = ptr;

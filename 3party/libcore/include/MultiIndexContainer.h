@@ -110,32 +110,32 @@ public:
 };
 
 template <typename V, typename K1, typename K2, typename K3 = NullType1, typename K4 = NullType2>
-class MultiIdxContainer : public EntryContainer<K1, V>, public EntryContainer<K2, V>, public EntryContainer<K3, V>, public EntryContainer<K4, V>
+class MultiIdxContainer
 {
-    typedef EntryContainer<K1, V> Base1;
-    typedef EntryContainer<K2, V> Base2;
-    typedef EntryContainer<K3, V> Base3;
-    typedef EntryContainer<K4, V> Base4;
-    typedef typename Base1::value_reference value_reference;
-    typedef typename Base1::const_value_reference const_value_reference;
+    typedef EntryContainer<K1, V> C1;
+    typedef EntryContainer<K2, V> C2;
+    typedef EntryContainer<K3, V> C3;
+    typedef EntryContainer<K4, V> C4;
+    typedef typename C1::value_reference value_reference;
+    typedef typename C1::const_value_reference const_value_reference;
 
 public:
     MultiIdxContainer() {}
     virtual ~MultiIdxContainer() {}
 
     bool Add(const_value_reference value,
-             typename Base1::const_key_reference key1,
-             typename Base2::const_key_reference key2,
-             typename Base3::const_key_reference key3 = typename Base3::key_type(),
-             typename Base4::const_key_reference key4 = typename Base4::key_type())
+             typename C1::const_key_reference key1,
+             typename C2::const_key_reference key2,
+             typename C3::const_key_reference key3 = typename C3::key_type(),
+             typename C4::const_key_reference key4 = typename C4::key_type())
     {
-        if (Base1::Add(key1, value))
+        if (_c1.Add(key1, value))
         {
-            if (Base2::Add(key2, value))
+            if (_c2.Add(key2, value))
             {
-                if (Base3::Add(key3, value))
+                if (_c3.Add(key3, value))
                 {
-                    if (Base4::Add(key4, value))
+                    if (_c4.Add(key4, value))
                         return true;
                     goto _rm3;
                 }
@@ -150,51 +150,47 @@ public:
         }
 
     _rm3:
-        Base3::Remove(key3);
+        _c3.Remove(key3);
     _rm2:
-        Base2::Remove(key2);
+        _c2.Remove(key2);
     _rm1:
-        Base1::Remove(key1);
+        _c1.Remove(key1);
         return false;
     }
 
+    bool AddByKey1(typename C1::const_key_reference key, value_reference value) { return _c1.Add(key, value); }
+    bool AddByKey2(typename C2::const_key_reference key, value_reference value) { return _c2.Add(key, value); }
+    bool AddByKey3(typename C3::const_key_reference key, value_reference value) { return _c3.Add(key, value); }
+    bool AddByKey4(typename C4::const_key_reference key, value_reference value) { return _c4.Add(key, value); }
+
     // 只能从单个容器中删除，如果需要同步删除则需要提供更多的Key
-    bool RemoveByKey1(typename Base1::const_key_reference key)
-    {
-        return Base1::Remove(key);
-    }
+    bool RemoveByKey1(typename C1::const_key_reference key) { return _c1.Remove(key); }
+    bool RemoveByKey2(typename C2::const_key_reference key) { return _c2.Remove(key); }
+    bool RemoveByKey3(typename C3::const_key_reference key) { return _c3.Remove(key); }
+    bool RemoveByKey4(typename C4::const_key_reference key) { return _c4.Remove(key); }
 
-    bool RemoveByKey2(typename Base2::const_key_reference key)
+    int Remove(typename C1::const_key_reference key1,
+               typename C2::const_key_reference key2 = typename C2::key_type(),
+               typename C3::const_key_reference key3 = typename C3::key_type(),
+               typename C4::const_key_reference key4 = typename C4::key_type())
     {
-        return Base2::Remove(key);
-    }
-
-    bool RemoveByKey3(typename Base3::const_key_reference key)
-    {
-        return Base4::Remove(key);
-    }
-
-    bool RemoveByKey4(typename Base4::const_key_reference key)
-    {
-        return Base4::Remove(key);
-    }
-
-    int Remove(typename Base1::const_key_reference key1,
-               typename Base2::const_key_reference key2 = typename Base2::key_type(),
-               typename Base3::const_key_reference key3 = typename Base3::key_type(),
-               typename Base4::const_key_reference key4 = typename Base4::key_type())
-    {
-        int c = Base1::Remove(key1);
-        c += Base2::Remove(key2);
-        c += Base3::Remove(key3);
-        c += Base4::Remove(key4);
+        int c = _c1.Remove(key1);
+        c += _c2.Remove(key2);
+        c += _c3.Remove(key3);
+        c += _c4.Remove(key4);
         return c;
     }
 
-    inline const_value_reference FindByKey1(typename Base1::const_key_reference key1) const { return Base1::Find(key1); }
-    inline const_value_reference FindByKey2(typename Base2::const_key_reference key2) const { return Base2::Find(key2); }
-    inline const_value_reference FindByKey3(typename Base3::const_key_reference key3) const { return Base3::Find(key3); }
-    inline const_value_reference FindByKey4(typename Base4::const_key_reference key4) const { return Base4::Find(key4); }
+    inline const_value_reference FindByKey1(typename C1::const_key_reference key1) const { return _c1.Find(key1); }
+    inline const_value_reference FindByKey2(typename C2::const_key_reference key2) const { return _c2.Find(key2); }
+    inline const_value_reference FindByKey3(typename C3::const_key_reference key3) const { return _c3.Find(key3); }
+    inline const_value_reference FindByKey4(typename C4::const_key_reference key4) const { return _c3.Find(key4); }
+
+private:
+    EntryContainer<K1, V> _c1;
+    EntryContainer<K2, V> _c2;
+    EntryContainer<K3, V> _c3;
+    EntryContainer<K4, V> _c4;
 };
 
 } // namespace XSpace

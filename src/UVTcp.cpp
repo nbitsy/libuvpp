@@ -69,14 +69,15 @@ bool UVTcp::Init()
     {
         StopRead();
         olddata = uv_handle_get_data(_handle);
-        Allocator::Destroy(_handle);
+        Allocator::free(_handle);
+        _handle = NULL;
     }
 
     auto loop = _loop.lock();
     if (NULL == loop)
         return false;
 
-    _handle = (uv_handle_t*)Allocator::Construct<uv_tcp_t>();
+    _handle = (uv_handle_t*)Allocator::malloc(sizeof(uv_tcp_t));
     if (NULL == _handle)
         return false;
 

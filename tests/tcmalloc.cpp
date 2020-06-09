@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
 {
     void* p = TCAllocator::malloc(100);
     std::cout << "Malloc @" << p << std::endl;
-    TCAllocator::free(p);
-    std::cout << "Free @" << p << std::endl;
+    //TCAllocator::free(p);
+    //std::cout << "Free @" << p << std::endl;
 
 	return 0;
 }

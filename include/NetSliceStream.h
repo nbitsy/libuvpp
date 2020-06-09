@@ -29,6 +29,12 @@ public:
     static const int WIRTE_BUFFER_SIZE = 64 * 1024;
     static const int WRITE_BUFFER_SIZE_MAX = 128 * 1024;
 #endif
+    static Slice* CreateSlice(int nsize, _OUT int& total);
+    // nsize 传入data的长度，成功后返回Slice的长度
+    static Slice* MakeSlice(void* data, _IN _OUT int& nsize,
+                            unsigned int MsgID = 0, unsigned char FwdTargetType = 0,
+                            unsigned int FwdTarget = 0, unsigned int Target = 0);
+    static void ReleaseSlice(Slice* slice);
 
 public:
     UV_CREATE_HANDLE(NetSliceStream)
@@ -49,8 +55,6 @@ public:
                unsigned int MsgID = 0, unsigned char FwdTargetType = 0,
                unsigned int FwdTarget = 0, unsigned int Target = 0) OVERWRITE;
     inline bool WriteSlice(Slice* slice) { return UVTcp::Write(slice, slice->Length); }
-    Slice* MakeSlice(int nsize, _OUT int& total);
-    void ReleaseSlice(Slice* slice);
 
 private:
     MemStream* GetSpliceBuffer(int nread);

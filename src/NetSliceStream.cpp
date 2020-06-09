@@ -1,6 +1,7 @@
 
 #include "NetSliceStream.h"
 #include "Allocator.h"
+#include "Timestamp.h"
 
 namespace XSpace
 {
@@ -198,7 +199,7 @@ void NetSliceStream::OnRead(void* data, int nread)
     }
 }
 
-Slice* NetSliceStream::MakeSlice(int nsize, _OUT int& total)
+Slice* NetSliceStream::CreateSlice(int nsize, _OUT int& total)
 {
     Slice* writeSlice = NULL;
     int size = READ_BUFFER_SIZE;
@@ -218,7 +219,30 @@ Slice* NetSliceStream::MakeSlice(int nsize, _OUT int& total)
     if (NULL == writeSlice)
         return NULL;
 
+    writeSlice->Timestamp = Timestamp().Ticks();
     return writeSlice;
+}
+
+Slice* NetSliceStream::MakeSlice(void* data, int& nsize,
+                                 unsigned int MsgID, unsigned char FwdTargetType,
+                                 unsigned int FwdTarget, unsigned int Target)
+{
+    int total = 0;
+    Slice* slice = CreateSlice(nsize, total);
+    if (NULL == slice)
+        return NULL;
+
+    // 总包体长，包括包头
+    slice->Length = nsize + sizeof(*slice);
+    memcpy(slice->Body(), data, nsize);
+    // XXX: flags???
+
+    slice->MsgID = MsgID;
+    slice->FwdTargetType = FwdTargetType;
+    slice->FwdTarget = FwdTarget;
+    slice->Target = Target;
+    nsize = total;
+    return slice;
 }
 
 void NetSliceStream::ReleaseSlice(Slice* slice)
@@ -230,22 +254,12 @@ bool NetSliceStream::Write(void* data, int nsize,
                            unsigned int MsgID, unsigned char FwdTargetType,
                            unsigned int FwdTarget, unsigned int Target)
 {
-    int total = 0;
-    _writeSlice = MakeSlice(nsize, total);
+    // TODO: 如果现有缓存空间足够可以不用Make
+    _writeSlice = MakeSlice(data, nsize, MsgID, FwdTargetType, FwdTarget, Target);
     if (NULL == _writeSlice)
         return false;
 
-    // 总包体长，包括包头
-    _writeSlice->Length = nsize + sizeof(*_writeSlice);
-    memcpy(_writeSlice->Body(), data, nsize);
-    // XXX: flags???
-
-    _writeSlice->MsgID = MsgID;
-    _writeSlice->FwdTargetType = FwdTargetType;
-    _writeSlice->FwdTarget = FwdTarget;
-    _writeSlice->Target = Target;
-
-    bool ret = UVTcp::Write((void*)_writeSlice, total);
+    bool ret = UVTcp::Write((void*)_writeSlice, nsize);
     ReleaseSlice(_writeSlice);
     _writeSlice = NULL;
     return ret;

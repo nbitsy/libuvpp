@@ -10,12 +10,15 @@ static void __OnClosed(uv_handle_t* handle)
     DEBUG("Free @%p\n", handle);
     UVData* uvdata = (UVData*)handle->data;
     if (NULL == uvdata)
-        std::cout << "@" << handle << " 's owner has released already." << std::endl;
+        WARN(" %p 's owner has released already.", handle);
 
     UVHandle* h = uvdata->GetPtr<UVHandle>();
     if (NULL == h)
         return;
+
     h->OnClosed();
+
+    Allocator::free(handle);
 }
 
 UVHandle::UVHandle(const std::weak_ptr<UVLoop>& loop) : _loop(loop), _handle(NULL)
@@ -26,12 +29,11 @@ UVHandle::UVHandle(const std::weak_ptr<UVLoop>& loop) : _loop(loop), _handle(NUL
 UVHandle::~UVHandle()
 {
     /**
-     * 如果Handle对象已经被释放，但是事件后面才被调起则非去现意外情况
-     * 那么在对像被释放的时候就发起关闭事件，并且清空数据对象，后面事件
-     * 的调起也不会有任何问题
+     * 如果Handle对象已经被释放，但是事件后面才被调起则会出现意外情况
+     * 所以，Handle对象的回收都是通过延迟回收来实现，就是在延迟回收的
+     * 流程里，如果Handle的状态为closed时，则说明可以回收。
     */
-    Close();
-    // XXX: handle本身的回收需要到确定的handle的析构函数里去处理
+    _handle = NULL;
     DEBUG("Object @%p\n", this);
 }
 

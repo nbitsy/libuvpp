@@ -54,6 +54,7 @@ namespace XSpace
 #define DEBUG_PURE(...) fprintf(stderr, ##__VA_ARGS__)
 #else
 #define DEBUG(...)
+#define DEBUG_PURE(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_LOG
@@ -70,6 +71,7 @@ namespace XSpace
     }
 #else
 #define LOG(...)
+#define LOG_PURE(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
@@ -86,6 +88,7 @@ namespace XSpace
     }
 #else
 #define INFO(...)
+#define INFO_PURE(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
@@ -102,6 +105,7 @@ namespace XSpace
     }
 #else
 #define WARN(...)
+#define WARN_PURE(...)
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
@@ -118,6 +122,7 @@ namespace XSpace
     }
 #else
 #define ERROR(...)
+#define ERROR_PURE(...)
 #endif
 
 #else

@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "CoreConfig.h"
+#include "Allocator.h"
 
 namespace XSpace
 {
@@ -28,7 +29,8 @@ const unsigned char SLICE_RC5 = ((unsigned char)0x01 << 3); // RC5密码
 const unsigned char SLICE_RWD_4 = ((unsigned char)0x01 << 4);
 const unsigned char SLICE_RWD_5 = ((unsigned char)0x01 << 5);
 const unsigned char SLICE_RWD_6 = ((unsigned char)0x01 << 6);
-const unsigned char SLICE_RWD_7 = ((unsigned char)0x01 << 7);
+// 是否路由过起始点，路由可以设置起始点，还未到达起始点之前都需要本起处理
+const unsigned char SLICE_ROUTED_START_POINT = ((unsigned char)0x01 << 7);
 
 #define SLICE_FLAG_GET(T) (Flags & SLICE_##T)
 #define SLICE_FLAG_SET(T, v)     \
@@ -40,11 +42,13 @@ const unsigned char SLICE_RWD_7 = ((unsigned char)0x01 << 7);
     }
 
 #pragma pack(push)
-#pragma pack(4)
+#pragma pack(1)
 struct Slice
 {
-    Slice() : MsgID(0), FwdType(0), FwdTargetType(0), FwdTarget(0), Target(0) {}
+    Slice() : LengthAndFLags(0), MsgID(0), Timestamp(0), FwdType(0), FwdTargetType(0), FwdTarget(0), Target(0) {}
     ~Slice() {}
+
+    static Slice* CreateSlice(int nsize, _OUT int& total);
 
     inline int SliceLength() const { return Length; }
     inline int HeadLength() const { return sizeof(Slice); }
@@ -59,6 +63,10 @@ struct Slice
     inline bool IsDES() const { return SLICE_FLAG_GET(DES); }
     inline void SetRC5(bool v) { SLICE_FLAG_SET(RC5, v); }
     inline bool IsRC5() const { return SLICE_FLAG_GET(RC5); }
+    inline void SetRoutedStartPoint(bool v) { SLICE_FLAG_SET(ROUTED_START_POINT, v); }
+    inline bool IsRoutedStartPoint() const { return SLICE_FLAG_GET(ROUTED_START_POINT); }
+
+    inline bool NeedForward() const { return FwdTargetType > 0; }
 
     union {
         struct
@@ -72,37 +80,35 @@ struct Slice
             int Length : 24; // 低
 #endif
         };
+        int LengthAndFLags;
     };
     // 以下几个描述字段可以在不解包的情况下进行一些操作
-
-    inline bool NeedForward() const { return FwdTargetType > 0; }
 
     // 消息ID，客户有这个才知道怎么解释
     // 0|-1 无效
     MsgID_t MsgID;
-
-    struct
-    {
-        // 转发类型，经过的路径一般是多条的，如果选择一条路径由FwdType来决定
-        // 0 - first
-        // 1 - hash 根据Target进行hash
-        // 2 - random
-        // other hash
-        unsigned short FwdType;
-        // 转发目标的节点类型，如果当前节点类型为FwdTargetType，则启用FwdTarget条件
-        // -1 广播
-        // 0 不转发
-        // other 转发去的目标服务器类型
-        unsigned short FwdTargetType;
-    };
-
+    // 消息生成时的时间戳
+    unsigned long long Timestamp;
+    // 转发类型，经过的路径一般是多条的，如果选择一条路径由FwdType来决定
+    // 0 - first
+    // 1 - hash 根据Target进行hash
+    // 2 - random
+    // 3 - target
+    // other hash
+    unsigned char FwdType;
+    // 转发目标的节点类型，如果当前节点类型为FwdTargetType，则启用FwdTarget条件
+    // -1 广播
+    // 0 不转发
+    // other 转发去的目标服务器类型
+    unsigned char FwdTargetType;
     // 如果类型匹配后，当前节点标识与FwdTarget相等时启用Target条件
+    // ull主要是因为服务器的节点ID是ull的
     // -1 广播
     unsigned long long FwdTarget;
     // 目标ID，如玩家ID
+    // ull为目标ID预留空间，一般是unsigned int的
     // -1 广播
     unsigned long long Target;
-
     // 之后为包体
     char End[0];
 };

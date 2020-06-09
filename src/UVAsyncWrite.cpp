@@ -31,11 +31,12 @@ void UVAsyncWrite::OnAsync()
 
     auto& iodevice = _iodevice;
     auto& sendSlice = _sendSlice;
-    tmp.ForEach([&iodevice, &sendSlice](UVAsyncWriteData* data) {
+
+    tmp.ForEach([iodevice, sendSlice](UVAsyncWriteData* data) {
         if (!iodevice.expired())
         {
             auto device = iodevice.lock().get();
-            INFO("Writing data @%p length: %d\n", data->Data, data->Length);
+            DEBUG("Writing data @%p length: %d\n", data->Data, data->Length);
             if (sendSlice)
                 ((NetSliceStream*)device)->Write(data->Data, data->Length, data->MsgID);
             else

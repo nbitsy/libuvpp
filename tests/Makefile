@@ -4,9 +4,10 @@
 LIB=-L../lib -L../../Core/lib -L../../Core/3party/tcmalloc/lib
 INCL=-I../include -I../../Core/include
 
-CPPFLAGS=-g -Wall -std=c++17 $(INCL) -D_DEBUG -DUSE_TC_MALLOC
-CFLAGS=-g -Wall -std=c++17 $(INCL) -D_DEBUG -DUSE_TC_MALLOC
-LDFLAGS=$(LIB) -lcore -ltcmalloc_minimal
+CPPFLAGS=-g -Wall -std=c++17 $(INCL) -D_DEBUG -DUSE_TC_MALLOC -fPIC
+CFLAGS=-g -Wall -std=c++17 $(INCL) -D_DEBUG -DUSE_TC_MALLOC -fPIC
+#LDFLAGS=$(LIB) -lcore -ltcmalloc_minimal
+LDFLAGS=$(LIB) -lcore -ltcmalloc
 
 FF := $(shell find * -name "*.cpp")
 FF += $(shell find * -name "*.c")

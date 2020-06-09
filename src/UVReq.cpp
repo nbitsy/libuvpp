@@ -11,6 +11,12 @@ UVReq::UVReq() : _req(NULL)
 
 UVReq::~UVReq()
 {
+    if (_req)
+    {
+        Allocator::free(_req);
+        _req = NULL;
+    }
+    DEBUG("Object @%p\n", this);
 }
 
 void UVReq::SetData(void* data, bool force, bool strong)

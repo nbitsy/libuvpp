@@ -195,7 +195,7 @@ void UVReqWrite::InitAddress(const struct sockaddr* addr)
 
 UVReqWrite::~UVReqWrite()
 {
-    INFO("Object @%p\n", this);
+    //INFO("Object @%p\n", this);
     if (!_bBuffers)
     {
         if (_bCopye && d._data != NULL)
