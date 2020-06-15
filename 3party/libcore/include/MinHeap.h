@@ -2,13 +2,35 @@
 #ifndef _MINHEAP_H_
 #define _MINHEAP_H_
 
-#include "Allocator.h"
 #include <unordered_map>
+
+#include "Allocator.h"
+#include "TypeTraits.h"
 
 namespace XSpace
 {
 
-template <typename T, typename Greater>
+#ifdef _DEBUG
+#define RESERVED_SIZE 4
+#define RESERVE_THRESHOLD 2
+#define MINHEAP_SIZE_MIN 4
+#else
+#define RESERVED_SIZE 16
+#define RESERVE_THRESHOLD 4
+#define MINHEAP_SIZE_MIN 8
+#endif
+
+template <typename T>
+struct greater
+{
+    typedef typename remove_const<T>::type value_type;
+    inline bool operator()(const value_type& a, const value_type& b) const
+    {
+        return a > b;
+    }
+};
+
+template <typename T, typename Greater = greater<T>>
 struct MinHeapNode
 {
     MinHeapNode(const T& value = T())
@@ -27,7 +49,7 @@ struct MinHeapNode
     struct MinHeapNode** Prev;
 };
 
-template <typename T, typename Greater>
+template <typename T, typename Greater = greater<T>>
 class MinHeap
 {
 public:
@@ -39,11 +61,20 @@ public:
     MinHeap() : _data(0), _size(0), _capacity(0) {}
     ~MinHeap();
 
+    void Clear();
     inline size_type Size() const { return _size; }
     inline bool Empty() const { return 0 == _size; }
     inline bool IsTop(const node_pointer v) const { return v ? v->Idx == 0 : false; }
     inline node_pointer Top() const { return _size ? *_data : 0; }
-    inline int Reserve(size_type n);
+    inline bool Reserve();
+
+    inline size_type AvailableSize() const
+    {
+        if (_capacity <= _size)
+            return 0;
+
+        return _capacity - _size;
+    }
 
     node_pointer Push(const T& v);
     node_pointer Push(node_pointer v);
@@ -51,13 +82,16 @@ public:
     int Erase(const node_pointer v);
     int Erase(const T& v);
 
+    node_pointer Adjust(const node_pointer v);
+    node_pointer Adjust(const T& v);
+
 protected:
     void ShiftUp(unsigned hole_index, const node_pointer v);
+    void ShiftUpunconditional(unsigned hole_index, const node_pointer v);
     void ShiftDown(unsigned hole_index, const node_pointer v);
 
 private:
     // TODO: 把节点缓存起来
-    inline void* realloc(void* ptr, size_type size) { return Allocator::realloc(ptr, size); }
     inline void* malloc(size_type size) { return Allocator::malloc(size); }
     inline void free(void* ptr) { Allocator::free(ptr); }
 
@@ -73,20 +107,40 @@ private:
 };
 
 template <typename T, typename Greater>
-MinHeap<T, Greater>::~MinHeap()
+void MinHeap<T, Greater>::Clear()
 {
+    _v2p.clear();
+
     for (unsigned i = 0; i < _size; ++i)
     {
         if (_data[i])
             free(_data[i]);
     }
     free(_data);
+
+    _data = NULL;
+    _capacity = 0;
+    _size = 0;
+}
+
+template <typename T, typename Greater>
+MinHeap<T, Greater>::~MinHeap()
+{
+    if (_data)
+    {
+        for (unsigned i = 0; i < _size; ++i)
+        {
+            if (_data[i])
+                free(_data[i]);
+        }
+        free(_data);
+    }
 }
 
 template <typename T, typename Greater>
 typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Push(const T& val)
 {
-    if (Reserve(_size + 16))
+    if (!Reserve())
         return 0;
 
     node_pointer v = Allocator::Construct<value_type>(val);
@@ -101,7 +155,7 @@ typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Push(const T& va
 template <typename T, typename Greater>
 typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Push(node_pointer v)
 {
-    if (Reserve(_size + 16))
+    if (!Reserve())
         return 0;
 
     ShiftUp(_size++, v);
@@ -137,7 +191,7 @@ int MinHeap<T, Greater>::Erase(const T& v)
 template <typename T, typename Greater>
 int MinHeap<T, Greater>::Erase(const node_pointer v)
 {
-    if (!v)
+    if (!v || !_size)
         return -1;
 
     if (v->Idx != -1)
@@ -147,12 +201,12 @@ int MinHeap<T, Greater>::Erase(const node_pointer v)
         node_pointer last = _data[--_size];
         unsigned parent = (v->Idx - 1) / 2;
         if (v->Idx > 0 && *_data[parent] > *last)
-            ShiftUp(v->Idx, last);
+            ShiftUpunconditional(v->Idx, last);
         else
             ShiftDown(v->Idx, last);
-        v->Idx = -1;
 
-        free(v);
+        v->Idx = -1;
+        Allocator::Destroy(v);
         return 0;
     }
 
@@ -160,23 +214,65 @@ int MinHeap<T, Greater>::Erase(const node_pointer v)
 }
 
 template <typename T, typename Greater>
-int MinHeap<T, Greater>::Reserve(size_type n)
+typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Adjust(const node_pointer v)
 {
-    if (_capacity < n)
+	if (-1== v->Idx) {
+		return Push(v);
+	} else {
+		size_t parent = (v->Idx- 1) / 2;
+		/* The position of e has changed; we shift it up or down
+		 * as needed.  We can't need to do both. */
+		if (v->Idx > 0 && *_data[parent] > *v)
+			ShiftUpunconditional(v->Idx, v);
+		else
+            ShiftDown(v->Idx, v);
+
+		return v;
+	}
+
+    return NULL;
+}
+
+template <typename T, typename Greater>
+typename MinHeap<T, Greater>::node_pointer MinHeap<T, Greater>::Adjust(const T& v)
+{
+    auto i = _v2p.find(v);
+    if (i == _v2p.end())
+        return NULL;
+
+    auto& n = i->second;
+    if (n)
+        return Adjust(n);
+
+    return NULL;
+}
+
+template <typename T, typename Greater>
+bool MinHeap<T, Greater>::Reserve()
+{
+    if (AvailableSize() > RESERVE_THRESHOLD)
+        return true;
+
+    size_type capacity = _capacity ? _capacity * 2 : MINHEAP_SIZE_MIN;
+    if (capacity < RESERVED_SIZE)
+        capacity = RESERVED_SIZE;
+
+    int size = capacity * sizeof(node_pointer);
+    node_pointer* ptr = (node_pointer*)malloc(size);
+    if (!ptr)
+        return false;
+
+    std::memset(ptr, 0x00, size);
+    if (_data)
     {
-        size_type capacity = _capacity ? _capacity * 2 : 8;
-        if (capacity < n)
-            capacity = n;
-
-        node_pointer* ptr = 0;
-        if (!(ptr = (node_pointer*)realloc(_data, capacity * sizeof(node_pointer))))
-            return -1;
-
-        _data = ptr;
-        _capacity = capacity;
+        std::memcpy(ptr, _data, _capacity * sizeof(node_pointer));
+        free(_data);
     }
 
-    return 0;
+    _data = ptr;
+    _capacity = capacity;
+
+    return true;
 }
 
 template <typename T, typename Greater>
@@ -189,6 +285,19 @@ void MinHeap<T, Greater>::ShiftUp(unsigned hole_index, const node_pointer v)
         hole_index = parent;
         parent = (hole_index - 1) / 2;
     }
+    (_data[hole_index] = v)->Idx = hole_index;
+}
+
+template <typename T, typename Greater>
+void MinHeap<T, Greater>::ShiftUpunconditional(unsigned hole_index, const node_pointer v)
+{
+    size_t parent = (hole_index - 1) / 2;
+    do
+    {
+        (_data[hole_index] = _data[parent])->Idx = hole_index;
+        hole_index = parent;
+        parent = (hole_index - 1) / 2;
+    } while (hole_index && *_data[parent] > *v);
     (_data[hole_index] = v)->Idx = hole_index;
 }
 

@@ -58,6 +58,9 @@ public:
     Timestamp& UpdateMicrosecond(TimeDiff delay = 0);
     // delay*1000 = second, millisecond
     Timestamp& UpdateMillisecond(TimeDiff delay = 0);
+    // delay = second, millisecond
+    Timestamp& UpdateSecond(TimeDiff delay = 0);
+
     //inline Timestamp& Update(TimeDiff delay = 0) { return UpdateMillisecond(delay); }
     UtcTimeVal ToUtcTime() const;
     std::time_t EpochTime() const;

@@ -60,7 +60,7 @@ namespace XSpace
 #if DEBUG_LEVEL <= DEBUG_LEVEL_LOG
 #define LOG(...)                                                                                                             \
     {                                                                                                                        \
-        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_WHITEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, "%s%s %s:%d %s [%p] ", DEBUG_WHITEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                      \
     }
 #define LOG_PURE(...)                            \
@@ -77,7 +77,7 @@ namespace XSpace
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 #define INFO(...)                                                                                                             \
     {                                                                                                                         \
-        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_PURPLEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, "%s%s %s:%d %s [%p] ", DEBUG_PURPLEnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                       \
     }
 #define INFO_PURE(...)                            \
@@ -94,7 +94,7 @@ namespace XSpace
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
 #define WARN(...)                                                                                                             \
     {                                                                                                                         \
-        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_YELLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, "%s%s %s:%d %s [%p] ", DEBUG_YELLOWnBACK, ___TIME___, ___FUNCTION___, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                       \
     }
 #define WARN_PURE(...)                            \
@@ -111,7 +111,7 @@ namespace XSpace
 #if DEBUG_LEVEL <= DEBUG_LEVEL_WARN
 #define ERROR(...)                                                                                                              \
     {                                                                                                                           \
-        fprintf(stderr, "%s%s %s:%d %s [%p]", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, __LINE__, DEBUG_END, ___TID___); \
+        fprintf(stderr, "%s%s %s:%d %s [%p] ", DEBUG_REDnBACK, ___TIME___, __PRETTY_FUNCTION__, __LINE__, DEBUG_END, ___TID___); \
         fprintf(stderr, ##__VA_ARGS__);                                                                                         \
     }
 #define ERROR_PURE(...)                        \

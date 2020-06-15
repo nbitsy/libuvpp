@@ -71,14 +71,14 @@ public:
     void OnAsync() OVERRIDE;
     void Append(void* data) OVERRIDE;
 
-    void Send(void* data, int nwrite, bool copy = true);
-    void Send(void* data, int nwrite, unsigned int msgid, bool copy = true);
+    void Send(void* data, int nwrite, bool copy = true, bool dataisslice = false);
+    void Send(void* data, int nwrite, unsigned int msgid, bool copy = true, bool dataisslice = false);
 
 private:
     // 一个异步写对象对应一个Handle
     std::weak_ptr<UVIODevice> _iodevice; // 对宿主的弱引用，宿主对我是强引用
     SyncDeque<UVAsyncWriteData*> _queue;
-    bool _sendSlice; // 发送的数据包是否加上Slice的包头
+    bool _makeSliceBeforeSend; // 发送的数据包是否加上Slice的包头
 };
 
 } // namespace XSpace
