@@ -14,13 +14,15 @@ class UVIODevice;
 
 struct UVAsyncWriteData
 {
-    UVAsyncWriteData(void* data, int length, bool copy = true) : Data(NULL), Length(length), MsgID(0)
+    UVAsyncWriteData(void* data, int length, bool copy = true, bool dataisslice = false)
+        : Data(NULL), Length(length), MsgID(0), DataIsSlice(dataisslice)
     {
         DEBUG("Object @%p\n", this);
         Construct(data, length, copy);
     }
 
-    UVAsyncWriteData(void* data, int length, unsigned int msgid, bool copy = true) : Data(NULL), Length(length), MsgID(msgid)
+    UVAsyncWriteData(void* data, int length, unsigned int msgid, bool copy = true, bool dataisslice = false)
+        : Data(NULL), Length(length), MsgID(msgid), DataIsSlice(dataisslice)
     {
         DEBUG("Object @%p\n", this);
         Construct(data, length, copy);
@@ -57,6 +59,7 @@ struct UVAsyncWriteData
     int Length;
     unsigned int MsgID;
     bool Copyed;
+    bool DataIsSlice;
 };
 
 class UVAsyncWrite : public UVAsync
@@ -78,7 +81,6 @@ private:
     // 一个异步写对象对应一个Handle
     std::weak_ptr<UVIODevice> _iodevice; // 对宿主的弱引用，宿主对我是强引用
     SyncDeque<UVAsyncWriteData*> _queue;
-    bool _makeSliceBeforeSend; // 发送的数据包是否加上Slice的包头
 };
 
 } // namespace XSpace

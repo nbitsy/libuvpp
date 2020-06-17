@@ -9,7 +9,7 @@ namespace XSpace
 {
 
 UVAsyncWrite::UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice, bool sendSlice)
-    : UVAsync(loop), _iodevice(iodevice), _makeSliceBeforeSend(sendSlice)
+    : UVAsync(loop), _iodevice(iodevice)
 {
     DEBUG("Object @%p\n", this);
     DEBUG("Register to loop: %p\n", _loop.lock()->FormatedThreadId());
@@ -30,17 +30,15 @@ void UVAsyncWrite::OnAsync()
     _queue.Swap(tmp);
 
     auto& iodevice = _iodevice;
-    auto& makeSliceBeforeSend = _makeSliceBeforeSend;
-
-    tmp.ForEach([iodevice, makeSliceBeforeSend](UVAsyncWriteData* data) {
+    tmp.ForEach([iodevice](UVAsyncWriteData* data) {
         if (!iodevice.expired())
         {
             auto device = iodevice.lock().get();
             DEBUG("Writing data @%p length: %d\n", data->Data, data->Length);
-            if (makeSliceBeforeSend)
-                ((NetSliceStream*)device)->Write(data->Data, data->Length, data->MsgID);
-            else
+            if (data->DataIsSlice)
                 device->Write(data->Data, data->Length);
+            else
+                ((NetSliceStream*)device)->Write(data->Data, data->Length, data->MsgID);
         }
         Allocator::Destroy(data);
     });
@@ -56,23 +54,21 @@ void UVAsyncWrite::Append(void* data)
 
 void UVAsyncWrite::Send(void* data, int nwrite, bool copy, bool dataisslice)
 {
-    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy);
+    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy, dataisslice);
     if (NULL == uvasyncwritedata)
         return;
 
     // 如果data里存放的本身就是一个slice，则不需要拼装Slice了
     // XXX: 默认情况是需要拼装的
-    _makeSliceBeforeSend = !dataisslice;
     UVAsync::Send(uvasyncwritedata);
 }
 
 void UVAsyncWrite::Send(void* data, int nwrite, unsigned int msgid, bool copy, bool dataisslice)
 {
-    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, msgid, copy);
+    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, msgid, copy, dataisslice);
     if (NULL == uvasyncwritedata)
         return;
 
-    _makeSliceBeforeSend = !dataisslice;
     UVAsync::Send(uvasyncwritedata);
 }
 
