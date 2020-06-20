@@ -32,9 +32,12 @@ public:
     static Slice* CreateSlice(int nsize, _OUT int& total);
     // nsize 传入data的长度，成功后返回Slice的长度
     static Slice* MakeSlice(void* data, _IN _OUT int& nsize,
-                            unsigned int MsgID = 0, unsigned char FwdTargetType = 0,
+                            MsgID_t MsgID = 0, unsigned char FwdTargetType = 0,
                             unsigned int FwdTarget = 0, unsigned int Target = 0);
     static void ReleaseSlice(Slice* slice);
+    static SimpleSlice* CreateSimpleSlice(int nsize, _OUT int& total);
+    static SimpleSlice* MakeSimpleSlice(void* data, _IN _OUT int& nsize, MsgID_t MsgID = 0);
+    static void ReleaseSlice(SimpleSlice* slice);
 
 public:
     UV_CREATE_HANDLE(NetSliceStream)
@@ -50,11 +53,16 @@ public:
     virtual bool RecvedSlice(Slice* slice);
     // 消息头部的标志位处理
     virtual Slice* DealFlags(_NOMODIFY Slice* slice);
+    virtual SimpleSlice* DealFlags(_NOMODIFY SimpleSlice* slice);
     // 把data组装进一个Slice发送出去
-    bool Write(void* data, int nsize,
-               unsigned int MsgID = 0, unsigned char FwdTargetType = 0,
+    bool WriteBySlice(void* data, int nsize,
+               MsgID_t MsgID = 0, unsigned char FwdTargetType = 0,
                unsigned int FwdTarget = 0, unsigned int Target = 0) OVERWRITE;
-    inline bool WriteSlice(Slice* slice) { return UVTcp::Write(slice, slice->Length); }
+    inline bool WriteSlice(Slice* slice) { return slice ? UVTcp::Write(slice, slice->Length) : false; }
+
+    // 把data组装成一个SimpleSlice发送出去
+    bool WriteBySimpleSlice(void* data, int nsize, MsgID_t MsgID = 0);
+    inline bool WriteSimpleSlice(SimpleSlice* slice) { return slice ? UVTcp::Write(slice, slice->Length) : false; }
 
 private:
     MemStream* GetSpliceBuffer(int nread);
@@ -69,10 +77,6 @@ private:
     void* _readBrokenBuffer;
     // 用于控制拼包缓存
     MemStream* _readBrokenBufferStream;
-    // 用于发送消息的缓存
-    Slice* _writeSlice;
-    // 发送缓存大小
-    int _writeSliceLength;
 };
 
 } // namespace XSpace

@@ -8,7 +8,7 @@
 namespace XSpace
 {
 
-UVAsyncWrite::UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice, bool sendSlice)
+UVAsyncWrite::UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice)
     : UVAsync(loop), _iodevice(iodevice)
 {
     DEBUG("Object @%p\n", this);
@@ -35,10 +35,21 @@ void UVAsyncWrite::OnAsync()
         {
             auto device = iodevice.lock().get();
             DEBUG("Writing data @%p length: %d\n", data->Data, data->Length);
-            if (data->DataIsSlice)
+            switch (data->SliceType)
+            {
+            case EST_NONE:
                 device->Write(data->Data, data->Length);
-            else
-                ((NetSliceStream*)device)->Write(data->Data, data->Length, data->MsgID);
+                break;
+            case EST_SLICE:
+                ((NetSliceStream*)device)->WriteBySlice(data->Data, data->Length, data->MsgID);
+                break;
+            case EST_SIMPLE_SLICE:
+                ((NetSliceStream*)device)->WriteBySimpleSlice(data->Data, data->Length);
+                break;
+            default:
+                device->Write(data->Data, data->Length);
+                break;
+            }
         }
         Allocator::Destroy(data);
     });
@@ -52,9 +63,9 @@ void UVAsyncWrite::Append(void* data)
     _queue.PushBack((UVAsyncWriteData*)data);
 }
 
-void UVAsyncWrite::Send(void* data, int nwrite, bool copy, bool dataisslice)
+void UVAsyncWrite::Send(void* data, int nwrite, bool copy, ESliceType slice)
 {
-    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy, dataisslice);
+    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, copy, slice);
     if (NULL == uvasyncwritedata)
         return;
 
@@ -63,9 +74,9 @@ void UVAsyncWrite::Send(void* data, int nwrite, bool copy, bool dataisslice)
     UVAsync::Send(uvasyncwritedata);
 }
 
-void UVAsyncWrite::Send(void* data, int nwrite, unsigned int msgid, bool copy, bool dataisslice)
+void UVAsyncWrite::Send(void* data, int nwrite, unsigned int msgid, bool copy, ESliceType slice)
 {
-    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, msgid, copy, dataisslice);
+    UVAsyncWriteData* uvasyncwritedata = Allocator::Construct<UVAsyncWriteData>(data, nwrite, msgid, copy, slice);
     if (NULL == uvasyncwritedata)
         return;
 

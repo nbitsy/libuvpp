@@ -6,6 +6,7 @@
 
 #include "SyncDeque.h"
 #include "UVAsync.h"
+#include "Slice.h"
 
 namespace XSpace
 {
@@ -14,15 +15,15 @@ class UVIODevice;
 
 struct UVAsyncWriteData
 {
-    UVAsyncWriteData(void* data, int length, bool copy = true, bool dataisslice = false)
-        : Data(NULL), Length(length), MsgID(0), DataIsSlice(dataisslice)
+    UVAsyncWriteData(void* data, int length, bool copy = true, ESliceType slice = EST_NONE)
+        : Data(NULL), Length(length), MsgID(0), SliceType(slice)
     {
         DEBUG("Object @%p\n", this);
         Construct(data, length, copy);
     }
 
-    UVAsyncWriteData(void* data, int length, unsigned int msgid, bool copy = true, bool dataisslice = false)
-        : Data(NULL), Length(length), MsgID(msgid), DataIsSlice(dataisslice)
+    UVAsyncWriteData(void* data, int length, unsigned int msgid, bool copy = true, ESliceType slice = EST_NONE)
+        : Data(NULL), Length(length), MsgID(msgid), SliceType(slice)
     {
         DEBUG("Object @%p\n", this);
         Construct(data, length, copy);
@@ -59,7 +60,7 @@ struct UVAsyncWriteData
     int Length;
     unsigned int MsgID;
     bool Copyed;
-    bool DataIsSlice;
+    ESliceType SliceType;
 };
 
 class UVAsyncWrite : public UVAsync
@@ -68,14 +69,16 @@ public:
     UV_CREATE_HANDLE(UVAsyncWrite)
 
 public:
-    UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice, bool sendSlice = false);
+    UVAsyncWrite(const std::weak_ptr<UVLoop>& loop, const std::weak_ptr<UVIODevice>& iodevice);
     ~UVAsyncWrite();
 
     void OnAsync() OVERRIDE;
-    void Append(void* data) OVERRIDE;
 
-    void Send(void* data, int nwrite, bool copy = true, bool dataisslice = false);
-    void Send(void* data, int nwrite, unsigned int msgid, bool copy = true, bool dataisslice = false);
+    void Send(void* data, int nwrite, bool copy = true, ESliceType slice = EST_SLICE);
+    void Send(void* data, int nwrite, unsigned int msgid, bool copy = true, ESliceType slice = EST_NONE);
+
+protected:
+    void Append(void* data) OVERRIDE;
 
 private:
     // 一个异步写对象对应一个Handle

@@ -8,8 +8,7 @@ namespace XSpace
 
 NetSliceStream::NetSliceStream(const std::weak_ptr<UVLoop>& loop, int flags)
     : UVTcp(loop, flags), _readBroken(false),
-      _readBrokenBuffer(0), _readBrokenBufferStream(0),
-      _writeSlice(0), _writeSliceLength(0)
+      _readBrokenBuffer(0), _readBrokenBufferStream(0)
 {
     DEBUG("Object @%p\n", this);
 }
@@ -26,6 +25,7 @@ std::shared_ptr<UVHandle> NetSliceStream::OnNewSession()
 
 bool NetSliceStream::RecvedSlice(Slice* slice)
 {
+    // XXX: slice可能是个Slice
     DEBUG("LEN: %d => %s\n", slice->BodyLength(), (char*)slice->Body());
     return true;
 }
@@ -141,6 +141,13 @@ Slice* NetSliceStream::DealFlags(_NOMODIFY Slice* slice)
     return slice;
 }
 
+SimpleSlice* NetSliceStream::DealFlags(_NOMODIFY SimpleSlice* slice)
+{
+    DEBUG("LEN(flags:%x): %d => %s\n", slice->Flags, slice->Length, slice->Body());
+    // TODO: 需要对应解压和加密选项的处理
+    return slice;
+}
+
 void NetSliceStream::OnRead(void* data, int nread)
 {
     DEBUG("RECV: %d\n", nread);
@@ -154,18 +161,39 @@ void NetSliceStream::OnRead(void* data, int nread)
             // 解出收到的数据包里所有的完整包
             while (pms->ReadSize())
             {
-                Slice* slice = (Slice*)pms->C_ReadPos();
-                // 有包头不完整的包
-                if (pms->ReadSize() < slice->HeadLength())
-                    break;
+                SimpleSlice* s = (SimpleSlice*)pms->C_ReadPos();
+                bool simple = s->IsSimpleSlice();
+                if (simple)
+                {
+                    // 有包头不完整的包
+                    if (pms->ReadSize() < s->HeadLength())
+                        break;
+                }
+                else
+                {
+                    Slice* slice = (Slice*)s;
+                    // 有包头不完整的包
+                    if (pms->ReadSize() < slice->HeadLength())
+                        break;
+                }
 
                 // 有不完整包休的包
-                if (slice->Length > pms->ReadSize())
+                if (s->Length > pms->ReadSize())
                     break;
 
-                Slice* realslice = DealFlags(slice);
-                RecvedSlice(realslice);
-                pms->ReadFlipSilence(slice->Length);
+                if (simple)
+                {
+                    SimpleSlice* realslice = DealFlags(s);
+                    // XXX: SimpleSlice也把它转成Slice去处理，这里不做任何实质上的处理，需要在RecvedSlice进行再次识别
+                    RecvedSlice((Slice*)realslice);
+                }
+                else
+                {
+                    Slice* realslice = DealFlags((Slice*)s);
+                    RecvedSlice(realslice);
+                }
+
+                pms->ReadFlipSilence(s->Length);
             }
 
             // 有不完整包
@@ -201,9 +229,9 @@ void NetSliceStream::OnRead(void* data, int nread)
 
 Slice* NetSliceStream::CreateSlice(int nsize, _OUT int& total)
 {
-    Slice* writeSlice = NULL;
+    Slice* slice = NULL;
     int size = READ_BUFFER_SIZE;
-    total = nsize + sizeof(*writeSlice);
+    total = nsize + sizeof(*slice);
 
     while (size < total)
         size <<= 1;
@@ -215,16 +243,15 @@ Slice* NetSliceStream::CreateSlice(int nsize, _OUT int& total)
     if (NULL == p)
         return NULL;
 
-    writeSlice = ::new (p) Slice();
-    if (NULL == writeSlice)
+    slice = ::new (p) Slice();
+    if (NULL == slice)
         return NULL;
 
-    writeSlice->Timestamp = Timestamp().Ticks();
-    return writeSlice;
+    return slice;
 }
 
 Slice* NetSliceStream::MakeSlice(void* data, int& nsize,
-                                 unsigned int MsgID, unsigned char FwdTargetType,
+                                 MsgID_t MsgID, unsigned char FwdTargetType,
                                  unsigned int FwdTarget, unsigned int Target)
 {
     int total = 0;
@@ -250,18 +277,74 @@ void NetSliceStream::ReleaseSlice(Slice* slice)
     Allocator::free(slice);
 }
 
-bool NetSliceStream::Write(void* data, int nsize,
-                           unsigned int MsgID, unsigned char FwdTargetType,
+SimpleSlice* NetSliceStream::CreateSimpleSlice(int nsize, _OUT int& total)
+{
+    SimpleSlice* slice = NULL;
+    int size = READ_BUFFER_SIZE;
+    total = nsize + sizeof(*slice);
+
+    while (size < total)
+        size <<= 1;
+
+    if (size > WRITE_BUFFER_SIZE_MAX)
+        return NULL;
+        
+    void* p = Allocator::malloc(size);
+    if (NULL == p)
+        return NULL;
+
+    slice = ::new (p) SimpleSlice();
+    if (NULL == slice)
+        return NULL;
+
+    return slice;
+}
+
+SimpleSlice* NetSliceStream::MakeSimpleSlice(void* data, _IN _OUT int& nsize, MsgID_t MsgID)
+{
+    int total = 0;
+    SimpleSlice* slice = CreateSimpleSlice(nsize, total);
+    if (NULL == slice)
+        return NULL;
+
+    // 总包体长，包括包头
+    slice->Length = nsize + sizeof(*slice);
+    memcpy(slice->Body(), data, nsize);
+    slice->MsgID = MsgID;
+
+    // XXX: flags???
+    nsize = total;
+    return slice;
+}
+
+void NetSliceStream::ReleaseSlice(SimpleSlice* slice)
+{
+    Allocator::free(slice);
+}
+
+bool NetSliceStream::WriteBySlice(void* data, int nsize,
+                           MsgID_t MsgID, unsigned char FwdTargetType,
                            unsigned int FwdTarget, unsigned int Target)
 {
     // TODO: 如果现有缓存空间足够可以不用Make
-    _writeSlice = MakeSlice(data, nsize, MsgID, FwdTargetType, FwdTarget, Target);
-    if (NULL == _writeSlice)
+    Slice* slice = MakeSlice(data, nsize, MsgID, FwdTargetType, FwdTarget, Target);
+    if (NULL == slice)
         return false;
 
-    bool ret = UVTcp::Write((void*)_writeSlice, nsize);
-    ReleaseSlice(_writeSlice);
-    _writeSlice = NULL;
+    bool ret = UVTcp::Write((void*)slice, nsize);
+    ReleaseSlice(slice);
+    return ret;
+}
+
+bool NetSliceStream::WriteBySimpleSlice(void* data, int nsize, MsgID_t msgid)
+{
+    // TODO: 如果现有缓存空间足够可以不用Make
+    SimpleSlice* slice = MakeSimpleSlice(data, nsize, msgid);
+    if (NULL == slice)
+        return false;
+
+    bool ret = UVTcp::Write((void*)slice, nsize);
+    ReleaseSlice(slice);
     return ret;
 }
 
