@@ -38,10 +38,10 @@ struct Slice : public SimpleSlice
     static Slice* CreateSlice(int nsize, _OUT int& total);
     inline int HeadLength() const { return sizeof(Slice); }
     inline void* Body() { return &End[0]; }
-    inline int BodyLength() const { return Length >= sizeof(Slice) ? Length - sizeof(Slice) : 0; }
+    inline unsigned int BodyLength() const { return Length >= sizeof(Slice) ? Length - sizeof(Slice) : 0; }
     inline bool NeedForward() const { return FwdTargetType > 0; }
 
-    // 转发类型，经过的路径一般是多条的，如果选择一条路径由FwdType来决定
+    // 转发类型，经过的路径一般是多条的，如何选择一条路径由FwdType来决定
     // 0 - first
     // 1 - hash 根据Target进行hash
     // 2 - random
@@ -49,17 +49,17 @@ struct Slice : public SimpleSlice
     // other hash
     unsigned char FwdType;
     // 转发目标的节点类型，如果当前节点类型为FwdTargetType，则启用FwdTarget条件
-    // -1 广播
+    // -1 广播(0xff)
     // 0 不转发
     // other 转发去的目标服务器类型
     unsigned char FwdTargetType;
     // 如果类型匹配后，当前节点标识与FwdTarget相等时启用Target条件
     // ull主要是因为服务器的节点ID是ull的
-    // -1 广播
+    // -1 广播(0xffffffffffffffff)
     unsigned long long FwdTarget;
     // 目标ID，如玩家ID
     // ull为目标ID预留空间，一般是unsigned int的
-    // -1 广播
+    // -1 广播(0xffffffffffffffff)
     unsigned long long Target;
     // 之后为包体
     char End[0];

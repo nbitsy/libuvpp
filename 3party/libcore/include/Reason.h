@@ -24,7 +24,7 @@ public:
 };
 
 inline std::string ToString(const Reason& result) { return result.ToString(); }
-inline const char* ToStringSafe(const Reason& result) { return result.ToStringUnsafe(); }
+inline const char* ToStringUnsafe(const Reason& result) { return result.ToStringUnsafe(); }
 
 } // namespace XSpace
 

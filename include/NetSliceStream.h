@@ -29,6 +29,7 @@ public:
     static const int WIRTE_BUFFER_SIZE = 64 * 1024;
     static const int WRITE_BUFFER_SIZE_MAX = 128 * 1024;
 #endif
+
     static Slice* CreateSlice(int nsize, _OUT int& total);
     // nsize 传入data的长度，成功后返回Slice的长度
     static Slice* MakeSlice(void* data, _IN _OUT int& nsize,
@@ -49,19 +50,21 @@ public:
     std::shared_ptr<UVHandle> OnNewSession() OVERRIDE;
     void OnRead(void* data, int nread) OVERRIDE;
 
-    // 收到一个完整的Slice
+    // 收到一个完整的Slice，SimpleSlice也由这个来处理，函数内部需要识别
     virtual bool RecvedSlice(Slice* slice);
     // 消息头部的标志位处理
     virtual Slice* DealFlags(_NOMODIFY Slice* slice);
+    // 消息头部的标志位处理
     virtual SimpleSlice* DealFlags(_NOMODIFY SimpleSlice* slice);
     // 把data组装进一个Slice发送出去
     bool WriteBySlice(void* data, int nsize,
                MsgID_t MsgID = 0, unsigned char FwdTargetType = 0,
                unsigned int FwdTarget = 0, unsigned int Target = 0) OVERWRITE;
+    // 发送一个Slice
     inline bool WriteSlice(Slice* slice) { return slice ? UVTcp::Write(slice, slice->Length) : false; }
-
     // 把data组装成一个SimpleSlice发送出去
     bool WriteBySimpleSlice(void* data, int nsize, MsgID_t MsgID = 0);
+    // 发送一个SimpleSlice
     inline bool WriteSimpleSlice(SimpleSlice* slice) { return slice ? UVTcp::Write(slice, slice->Length) : false; }
 
 private:
@@ -76,7 +79,7 @@ private:
     // 拼包时缓存，完整后释放，因为拼包的机会不多，不要占着资源
     void* _readBrokenBuffer;
     // 用于控制拼包缓存
-    MemStream* _readBrokenBufferStream;
+    MemStream* _brokenBufferReader;
 };
 
 } // namespace XSpace

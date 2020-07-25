@@ -30,44 +30,48 @@ public:
     inline static T &InstanceWith(U *u, bool force = false)
     {
         if (NULL == u)
-            return *_instance; // XXX: Crash
+            return *_inst; // XXX: Crash
 
         if (!is_subclass<U, T>::value)
-            return *_instance; // XXX: Crash
+            return *_inst; // XXX: Crash
 
-        if (_instance != NULL && force)
-        {
-            delete _instance;
-            _instance = u;
-            return *_instance;
-        }
-
-        _instance = u;
-        return *_instance;
-    }
-
-    inline static T &Instance()
-    {
-        if (!_instance)
         {
 #ifdef SINGLETON_SAFE
             ScopeLock lk(_lck);
-            if (!_instance)
 #endif
-                _instance = new T();
+            if (_inst != NULL && force)
+            {
+                delete _inst;
+                _inst = u;
+                return *_inst;
+            }
+
+            _inst = u;
         }
-        return *_instance;
+        return *_inst;
+    }
+
+    inline static T& Instance()
+    {
+        {
+#ifdef SINGLETON_SAFE
+            ScopeLock lk(_lck);
+#endif
+            if (!_inst)
+                _inst = new T();
+        }
+        return *_inst;
     }
 
 protected:
-    static T *_instance;
+    static T* _inst;
 #ifdef SINGLETON_SAFE
     static Mutex _lck;
 #endif
 };
 
 template <typename T>
-T *Singleton<T>::_instance = 0;
+T *Singleton<T>::_inst = 0;
 #ifdef SINGLETON_SAFE
 template <typename T>
 Mutex Singleton<T>::_lck;

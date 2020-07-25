@@ -29,6 +29,7 @@ public:
     Timestamp &operator=(const Timestamp &other);
 
     TimeDiff Elapsed() const;
+    TimeDiff Elapsed(const Timestamp* other) const;
     bool IsElapsed(TimeDiff interval) const;
 
     bool operator<(const Timestamp &other) const;
@@ -93,7 +94,15 @@ inline Timestamp::TimeDiff Timestamp::Resolution()
 inline Timestamp::TimeDiff Timestamp::Elapsed() const
 {
     Timestamp now;
-    return now - *this;
+    return now._tv - this->_tv;
+}
+
+inline Timestamp::TimeDiff Timestamp::Elapsed(const Timestamp* other) const
+{
+    if (other)
+        return other->_tv - this->_tv;
+
+    return Elapsed();
 }
 
 inline bool Timestamp::IsElapsed(TimeDiff interval) const

@@ -8,7 +8,7 @@ namespace XSpace
 
 NetSliceStream::NetSliceStream(const std::weak_ptr<UVLoop>& loop, int flags)
     : UVTcp(loop, flags), _readBroken(false),
-      _readBrokenBuffer(0), _readBrokenBufferStream(0)
+      _readBrokenBuffer(0), _brokenBufferReader(0)
 {
     DEBUG("Object @%p\n", this);
 }
@@ -38,10 +38,10 @@ void NetSliceStream::ClearReadBrokenBuffer()
         _readBrokenBuffer = NULL;
     }
 
-    if (_readBrokenBufferStream != NULL)
+    if (_brokenBufferReader != NULL)
     {
-        Allocator::Destroy(_readBrokenBufferStream);
-        _readBrokenBufferStream = NULL;
+        Allocator::Destroy(_brokenBufferReader);
+        _brokenBufferReader = NULL;
     }
 }
 
@@ -54,12 +54,12 @@ void NetSliceStream::ClearReadBroken()
 MemStream* NetSliceStream::GetSpliceBuffer(int nread)
 {
     // 之前有不完整的包，空间够用
-    if (_readBrokenBufferStream != NULL && _readBrokenBufferStream->WriteSize() >= nread)
-        return _readBrokenBufferStream;
+    if (_brokenBufferReader != NULL && _brokenBufferReader->WriteSize() >= nread)
+        return _brokenBufferReader;
 
     int alreadyRead = 0;
     if (_readBrokenBuffer != NULL)
-        alreadyRead = _readBrokenBufferStream->ReadSize();
+        alreadyRead = _brokenBufferReader->ReadSize();
 
     int needspace = nread + alreadyRead;
     int size = READ_BUFFER_SIZE;
@@ -83,7 +83,7 @@ MemStream* NetSliceStream::GetSpliceBuffer(int nread)
             return NULL;
         }
 
-        memcpy(readBrokenBuf, _readBrokenBufferStream->C_ReadPos(), alreadyRead);
+        memcpy(readBrokenBuf, _brokenBufferReader->C_ReadPos(), alreadyRead);
         MemStream* readBufStream = Allocator::Construct<MemStream>((unsigned char*)readBrokenBuf, size, alreadyRead);
         if (NULL == readBufStream)
         {
@@ -95,8 +95,8 @@ MemStream* NetSliceStream::GetSpliceBuffer(int nread)
         ClearReadBrokenBuffer();
 
         _readBrokenBuffer = readBrokenBuf;
-        _readBrokenBufferStream = readBufStream;
-        return _readBrokenBufferStream;
+        _brokenBufferReader = readBufStream;
+        return _brokenBufferReader;
     }
     else
     {
@@ -108,14 +108,14 @@ MemStream* NetSliceStream::GetSpliceBuffer(int nread)
             return NULL;
         }
 
-        _readBrokenBufferStream = Allocator::Construct<MemStream>((unsigned char*)_readBrokenBuffer, size);
-        if (NULL == _readBrokenBufferStream)
+        _brokenBufferReader = Allocator::Construct<MemStream>((unsigned char*)_readBrokenBuffer, size);
+        if (NULL == _brokenBufferReader)
         {
             ClearReadBroken();
             return NULL;
         }
 
-        return _readBrokenBufferStream;
+        return _brokenBufferReader;
     }
 
     return NULL;
@@ -125,8 +125,8 @@ bool NetSliceStream::HasSpliceSlice() const
 {
     if (_readBrokenBuffer != NULL)
     {
-        Slice* slice = (Slice*)_readBrokenBufferStream->C_ReadPos();
-        if (slice->Length > 0 && slice->Length <= _readBrokenBufferStream->ReadSize())
+        Slice* slice = (Slice*)_brokenBufferReader->C_ReadPos();
+        if (slice->Length > 0 && slice->Length <= _brokenBufferReader->ReadSize())
             return true;
     }
 

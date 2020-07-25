@@ -9,7 +9,7 @@
 namespace XSpace
 {
 
-class Slice;
+struct Slice;
 
 /**
  * SimpleSlice是最低层的通信包结构，很简单，只有一个长度，所有数据跟在长度后面，而Msg是基于
@@ -77,21 +77,21 @@ struct SimpleSlice
         {
 #ifdef LITTLE_ENDIAN
             // 这个长度包括SimpleSlice的大小，也就是说真实数据的大小为包体长-sizeof(SimpleSlice)
-            int Length : 24; // 低
-            int Flags : 8;   // 高
+            unsigned int Length : 24; // 低
+            unsigned int Flags : 8;   // 高
 #else
-            int Flags : 8;   // 高
-            int Length : 24; // 低
+            unsigned int Flags : 8;   // 高
+            unsigned int Length : 24; // 低
 #endif
         };
-        int LengthAndFLags;
+        unsigned int LengthAndFLags;
     };
     // 以下几个描述字段可以在不解包的情况下进行一些操作
 
     // 消息ID，不解包情况下转发需要
     // 0|-1 无效
     MsgID_t MsgID;
-
+    // 之后为包体
     char End[0];
 };
 #pragma pack(pop)
